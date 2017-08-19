@@ -49,7 +49,7 @@ def create_tables():
         # read the connection parameters
         params = config()
         # connect to the PostgreSQL server
-        conn = psycopg2.connect(**params)
+        conn = psycopg2.connect(user = postgres, password = postgres)
         cur = conn.cursor()
         # create table one by one
         for command in commands:
