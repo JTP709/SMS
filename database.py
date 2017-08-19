@@ -12,17 +12,23 @@ def create_tables():
         	'PIT Incident',
         	'Near Miss',
         	'HAZMAT'
-        ),
+        )
+        """,
+        """
         CREATE TYPE category AS ENUM(
         	'Unsafe Act',
         	'Unsafe Behavior',
         	'Unsafe Condition'
-        ),
+        )
+        """,
+        """
         CREATE TYPE audit_type AS ENUM(
         	'Behavior',
         	'Area Organization',
         	'Regulatory Compliance'
-        ),
+        )
+        """,
+        """
         CREATE TABLE incident (
 	        case_num SERIAL PRIMARY KEY,
 	        incident_type type NOT NULL,
@@ -31,11 +37,15 @@ def create_tables():
 	        property_damage BOOLEAN NOT NULL,
 	        description TEXT(1000) NOT NULL,
 	        root cause TEXT (1000) NOT NULL,
-        ),
+        )
+        """,
+        """
         CREATE TABLE audit (
 	        id SERIAL PRIMARY KEY,
 	        audit_type VARCHAR(255) NOT NULL
-        ),
+        )
+        """,
+        """
         CREATE TABLE action_items (
             id SERIAL PRIMARY KEY,
             case_id INTEGER REFERENCES incident(case_num),
