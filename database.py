@@ -16,7 +16,7 @@ def create_tables():
         """,
         """
         CREATE TYPE category AS ENUM(
-        	'Unsafe Act',
+        	'Unsafe Act
         	'Unsafe Behavior',
         	'Unsafe Condition'
         )
@@ -35,14 +35,20 @@ def create_tables():
 	        incident_cat category NOT NULL,
 	        injury BOOLEAN NOT NULL,
 	        property_damage BOOLEAN NOT NULL,
-	        description TEXT(1000) NOT NULL,
-	        root cause TEXT (1000) NOT NULL,
+	        description TEXT,
+	        root_cause TEXT
         )
         """,
         """
         CREATE TABLE audit (
 	        id SERIAL PRIMARY KEY,
-	        audit_type VARCHAR(255) NOT NULL
+	        type audit_type NOT NULL,
+            que_1 TEXT(500) NOT NULL,
+            que_2 TEXT(500),
+            que_3 TEXT(500),
+            ans_1 TEXT(1000),
+            ans_2 TEXT(1000),
+            ans_3 TEXT(1000)
         )
         """,
         """
@@ -50,8 +56,8 @@ def create_tables():
             id SERIAL PRIMARY KEY,
             case_id INTEGER REFERENCES incident(case_num),
             audit_id INTEGER REFERENCES audit(id),
-            finding TEXT(1000) NOT NULL,
-            corrective_action TEXT(1000) NOT NULL
+            finding TEXT,
+            corrective_action TEXT
         )
         """)
     conn = None
