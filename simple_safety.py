@@ -101,6 +101,18 @@ def editAudit(id):
 def editActionItem(id):
 	return "Edit action item %s" % id
 
+@app.route('/incident/delete/<int:id>')
+def editIncident(id):
+	return "Delete incident report %s" % id
+
+@app.route('/aduit/delete/<int:id>')
+def editAudit(id):
+	return "Delete audit page %s" % id
+
+@app.route('/actionitem/delete/<int:id>')
+def editActionItem(id):
+	return "Delete action item %s" % id
+
 if __name__ == '__main__':
     app.debug = True
     app.run(host='0.0.0.0', port=5000)
