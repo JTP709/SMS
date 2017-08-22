@@ -22,20 +22,55 @@ def connect(database_name="safety"):
     except:
         print ("<error message>")
 
+def audit_health():
+	db, cursor = connect()
+	query = """
+    		SELECT count(*) as num
+    			FROM audit
+    			WHERE ans_1 = FALSE OR
+    				ans_2 = FALSE OR
+    				ans_3 = FALSE
+            """
+	cursor.execute(query)
+	results = cursor.fetchone()
+	return results
+	db.close()
+
+def audit_totals():
+	db, cursor = connect()
+	query = """
+			SELECT count(*) as num
+				FROM audit
+			"""
+
+	cursor.execute(query)
+	results = cursor.fetchone()
+
+	return results
+	db.close()
+
 @app.route('/')
 @app.route('/dashboard/')
 def dashboard():
 	"""Loads the dashboard page"""
 	db, cursor = connect()
 	# need to add date
-	query = """
-    		SELECT case_num, incident_cat, description
+	incident_query = """
+    		SELECT to_char(date_time, 'FMMonth FMDD, YYYY'),
+    			to_char(date_time, 'HH12:MI'),
+    			case_num, incident_cat, description
     			FROM incident
-    			WHERE incident.injury = TRUE;
+    			WHERE incident.injury = TRUE
+    			ORDER BY date_time desc;
             """
-	cursor.execute(query)
+	cursor.execute(incident_query)
 	results = cursor.fetchall()
-	return render_template('dashboard.html',incidents = results)
+
+	audit_query = audit_health()
+	audit_query_t = audit_totals()
+	health = round(float(float(audit_query[0])/float(audit_query_t[0]))*100,2)
+
+	return render_template('dashboard.html',incidents = results, health = health)
 	db.close()
 
 @app.route('/reports/')
