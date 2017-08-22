@@ -9,6 +9,7 @@ TODO: main page
 #TODO: create report
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify
+import psycopg2
 
 app = Flask(__name__)
 
@@ -26,45 +27,43 @@ def connect(database_name="safety"):
 def dashboard():
 	"""Loads the dashboard page"""
 	db, cursor = connect()
-    query = """
-            SELECT articles.title, count(*) as num
-                FROM log JOIN articles
-                ON log.path = concat('/article/', articles.slug)
-                GROUP BY articles.title
-                ORDER BY num desc
-                LIMIT 3;
+	# need to add date
+	query = """
+    		SELECT case_num, incident_cat, description
+    			FROM incident
+    			WHERE incident.injury = TRUE;
             """
-    cursor.execute(query)
-    results = cursor.fetchall()
-    return render_template('dasbhoard.html'query = query)
-    db.close()
+	cursor.execute(query)
+	results = cursor.fetchall()
+	return render_template('dashboard.html',incidents = results)
+	db.close()
 
 @app.route('/reports/')
-def dashboard():
+def reports():
 	return "Reports Page for incidents and audits"
 
 @app.route('/newactionitem/')
-def dashboard():
+def newActionItem():
 	return "New Action Item Page"
 
 @app.route('/newincident/')
-def dashboard():
+def newIncident():
 	return "New Report Page"
 
 @app.route('/newaudit/')
-def dashboard():
+def newAudit():
 	return "New Audit Page"
 
 @app.route('/incident/edit/<int:id>')
-def dashboard():
+def editIncident(id):
 	return "Edit incident report %s" % id
 
 @app.route('/aduit/edit/<int:id>')
-def dashboard():
+def editAudit(id):
 	return "Edit audit page %s" % id
 
 @app.route('/actionitem/edit/<int:id>')
-def dashboard():
+def editActionItem(id):
 	return "Edit action item %s" % id
 
 if __name__ == '__main__':
