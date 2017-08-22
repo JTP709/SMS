@@ -7,7 +7,7 @@ def create_tables():
     """ create tables in the PostgreSQL database"""
     commands = (
         """
-        CREATE TYPE type AS ENUM(
+        CREATE TYPE type AS ENUM (
         	'Injury',
         	'PIT Incident',
         	'Near Miss',
@@ -15,22 +15,23 @@ def create_tables():
         )
         """,
         """
-        CREATE TYPE category AS ENUM(
-        	'Unsafe Act
+        CREATE TYPE category AS ENUM (
+        	'Unsafe Act',
         	'Unsafe Behavior',
         	'Unsafe Condition'
         )
         """,
         """
-        CREATE TYPE audit_type AS ENUM(
+        CREATE TYPE audit_type AS ENUM (
         	'Behavior',
         	'Area Organization',
-        	'Regulatory Compliance'
+        	'HAZWASTE'
         )
         """,
         """
         CREATE TABLE incident (
 	        case_num SERIAL PRIMARY KEY,
+            date_time TIMESTAMP default NULL,
 	        incident_type type NOT NULL,
 	        incident_cat category NOT NULL,
 	        injury BOOLEAN NOT NULL,
@@ -42,13 +43,14 @@ def create_tables():
         """
         CREATE TABLE audit (
 	        id SERIAL PRIMARY KEY,
+            date_time TIMESTAMP default NULL,
 	        type audit_type NOT NULL,
-            que_1 TEXT(500) NOT NULL,
-            que_2 TEXT(500),
-            que_3 TEXT(500),
-            ans_1 TEXT(1000),
-            ans_2 TEXT(1000),
-            ans_3 TEXT(1000)
+            que_1 TEXT NOT NULL,
+            que_2 TEXT,
+            que_3 TEXT,
+            ans_1 BOOLEAN,
+            ans_2 BOOLEAN,
+            ans_3 BOOLEAN
         )
         """,
         """
