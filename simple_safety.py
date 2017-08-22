@@ -49,6 +49,35 @@ def audit_totals():
 	return results
 	db.close()
 
+def getCaseID
+	db, cursor = connect()
+	query = ("""
+				SELECT case_num
+					FROM incident
+					ORDER BY case_num desc
+					LIMIT 1;
+			""")
+
+		cursor.execute(query)
+		results = int(cursor.fetchall())
+
+
+		return str(results)
+		db.close()
+
+def incidentActions(case,finding,action)
+	db, cursor = connect()
+	action_items = ("""
+					INSERT INTO action_items (
+									case_id,
+									finding,
+									corrective_action
+									)
+						VALUES (%s,%s,%s)
+					""")
+	cursor.execute(action_items, case, finding, action)
+	dbclose()
+
 @app.route('/')
 @app.route('/dashboard/')
 def dashboard():
@@ -73,43 +102,90 @@ def dashboard():
 	return render_template('dashboard.html',incidents = results, health = health)
 	db.close()
 
-@app.route('/reports/')
+@app.route('/incidents/')
 def reports():
 	return "Reports Page for incidents and audits"
 
-@app.route('/newactionitem/')
-def newActionItem():
-	return "New Action Item Page"
+@app.route('/audits/')
+def reports():
+	return "Reports Page for incidents and audits"
 
-@app.route('/newincident/')
+@app.route('/actions/')
+def reports():
+	return "Reports Page for incidents and audits"
+
+@app.route('/incidents/new/', methods = ['GET','POST'])
 def newIncident():
-	return "New Report Page"
+	if request.method == 'POST':
+		db, cursor = connect()
+		insert = ("""
+				INSERT INTO incident (
+								date_time,
+								incident_type,
+								incident_cat,
+								injury,
+								property_damage,
+								description,
+								root_cause
+								)
+					VALUES (%s,%s,%s,%s,%s,%s,%s)
+				""")
 
-@app.route('/newaudit/')
+		date_time = request.form['date_time']
+		incident_type = request.form['incident_type']
+		incident_cat = request.form['incident_cat']
+		injury = request.form['injury']
+		property_damage = ['property_damage']
+		description = ['description']
+		root_cause = ['root_cause']
+
+		cursor.execute(insert, date_time, incident_type, incident_cat, injury, property_damage, description, root_cause)
+
+		#dont forget to make case_id an int
+		case_id = getCaseID()
+		finding = request.form['finding']
+		corrective_action = request.form['corrective_action']
+
+		incidentActions(case_id,finding,corrective_action)
+
+		return redirect(url_for('/incidents/'))
+	else:
+		return render_template('newincidents.html')
+	db.close()
+
+@app.route('/audits/new/', methods = ['GET','POST'])
 def newAudit():
+	if request.method == 'POST':
+		return redirect(url_for(''))
 	return "New Audit Page"
 
-@app.route('/incident/edit/<int:id>')
+@app.route('/actions/new/', methods = ['GET','POST'])
+def newActionItem():
+	if request.method == 'POST':
+		return redirect(url_for(''))
+	return "New Action Item Page"
+
+@app.route('/incidents/edit/<int:id>')
 def editIncident(id):
 	return "Edit incident report %s" % id
 
-@app.route('/aduit/edit/<int:id>')
+@app.route('/aduits/edit/<int:id>')
 def editAudit(id):
 	return "Edit audit page %s" % id
 
-@app.route('/actionitem/edit/<int:id>')
+@app.route('/actions/edit/<int:id>')
 def editActionItem(id):
 	return "Edit action item %s" % id
 
-@app.route('/incident/delete/<int:id>')
+@app.route('/incidents/delete/<int:id>')
 def editIncident(id):
 	return "Delete incident report %s" % id
 
-@app.route('/aduit/delete/<int:id>')
+@app.route('/aduits/delete/<int:id>')
 def editAudit(id):
 	return "Delete audit page %s" % id
 
-@app.route('/actionitem/delete/<int:id>')
+@app.route('/actions/delete/<int:id>')
 def editActionItem(id):
 	return "Delete action item %s" % id
 
