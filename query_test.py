@@ -9,23 +9,39 @@ def connect(database_name="safety"):
     except:
         print ("<error message>")
 
-def dashboard():
-	"""Loads the dashboard page"""
+def query_1():
 	db, cursor = connect()
-	# need to add date
-	query = """
-    		SELECT case_num, incident_cat, description
-    			FROM incident
-    			WHERE incident.injury = TRUE;
+	audit_query = """
+    		SELECT count(*) as num
+    			FROM audit
+    			WHERE ans_1 = FALSE OR
+    				ans_2 = FALSE OR
+    				ans_3 = FALSE
             """
-	cursor.execute(query)
-	results = cursor.fetchall()
-	return results
+	cursor.execute(audit_query)
+	audit_results = cursor.fetchone()
+	return audit_results
+	db.close()
+
+def query_2():
+	db, cursor = connect()
+	audit_query_t = """
+			SELECT count(*) as num
+				FROM audit
+			"""
+
+	cursor.execute(audit_query_t)
+	audit_totals = cursor.fetchone()
+
+	return audit_totals
 	db.close()
 
 if __name__=="__main__":
-	dashboard = dashboard()
-	#print(dashboard)
-	for i in range(len(dashboard)):
-		print(dashboard[i][1])
-		
+	query_1 = query_1()
+	query_2 = query_2()
+	print(int(query_1[0]))
+	print(int(query_2[0]))
+	health = round(float(float(query_1[0])/float(query_2[0]))*100,2)
+	print(health)
+	#for i in range(len(dashboard)):
+	#	print(dashboard[i])		
