@@ -1,0 +1,46 @@
+<html>
+<head>
+</head>
+
+<body>
+	<!-- Left Menu Column -->
+	<div>
+		<a href="#">Submit a Report</a>
+		</br>
+		<a href="#">Report Manager</a>
+	</div>
+	<!-- Main Content -->
+	<!-- 
+	Sorty by Date
+	Return top 5
+	List details in column
+	-->
+	<div>
+		<h1>Safety Dashboard</h1>
+		<div>
+			<h3>Five Recent Injuries:</h3>
+			<table style="width:100%">
+				<tr>
+					<th><b>Case ID</b></th>
+					<th><b>Category</b></th>
+					<th><b>Description</b></th>
+				</tr>
+				{% for i in range(1) %}
+					<tr> 
+						<th>{{incidents[i][0]}}</th>
+						<th>{{incidents[i][1]}}</th>
+						<th>{{incidents[i][2]}}</th>
+					</tr>
+				{% endfor %}
+			 </table>
+		</div>
+		<div>
+			<h3>Audit Health:</h3>
+
+			<!--<p>{{health}}%</p>-->
+
+		</div>
+	</div>
+</body>
+
+</html>
