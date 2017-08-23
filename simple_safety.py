@@ -1,9 +1,13 @@
 """
 TODO: main page
 - Dashboard
+	- 
 - Generate Report Button
 	- Filter reports
 	- Select reports
+- Add OAuth with users that can generate seperate information for their specific site.
+	- Local Weather API
+		- Severe Weather Notifications sent to e-mail
 """
 
 #TODO: create report
@@ -19,7 +23,7 @@ def connect(database_name="safety"):
         cursor = db.cursor()
         return db, cursor
     except:
-        print ("<error message>")
+        print ("Could not connect to the database.")
 
 def audit_health():
 	db, cursor = connect()
@@ -64,21 +68,6 @@ def getCaseID():
 	return str(results_i)
 	db.close()
 
-def incidentActions(case,finding,action):
-	db, cursor = connect()
-	action_items = ("""
-					INSERT INTO action_items (
-									case_id,
-									finding,
-									corrective_action
-									)
-						VALUES (%s,%s,%s)
-					""")
-	data = (case, finding, action)
-	cursor.execute(action_items, data)
-	db.close()
-
-
 app = Flask(__name__)
 
 @app.route('/')
@@ -107,7 +96,27 @@ def dashboard():
 
 @app.route('/incidents/')
 def incidents():
-	return "Reports Page for incidents and audits"
+	db, cursor = connect()
+	# need to add date
+	incident_query = """
+    		SELECT to_char(date_time, 'FMMonth FMDD, YYYY'),
+	    			to_char(date_time, 'HH12:MI'),
+	    			case_num, 
+	    			incident_type, 
+	    			incident_cat, 
+	    			injury, 
+	    			property_damage,
+	    			description,
+	    			root_cause
+    			FROM incident
+    			ORDER BY case_num desc;
+            """
+	cursor.execute(incident_query)
+	results = cursor.fetchall()
+	length = len(results)
+
+	return render_template('incidents.html',incidents = results, length = length)
+	db.close()
 
 @app.route('/audits/')
 def audits():
@@ -149,16 +158,29 @@ def newIncident():
 		#print(date_time, incident_type, incident_cat, injury, property_damage, description, root_cause)
 
 		cursor.execute(insert, data)
+		print(data)
+
+		action_items = ("""
+					INSERT INTO action_items (
+									case_id,
+									finding,
+									corrective_action
+									)
+						VALUES (%s,%s,%s)
+					""")
 
 		finding = request.form['description']
 		corrective_action = request.form['corrective_action']
 
-		incidentActions(case_id,finding,corrective_action)
+		data_a = (new_id, finding, corrective_action)
 
-		return redirect(url_for('dashboard'))
+		cursor.execute(action_items, data_a)
+		db.commit()
+		db.close()
+
+		return redirect(url_for('incidents'))
 	else:
 		return render_template('newincidents.html')
-	db.close()
 
 @app.route('/audits/new/', methods = ['GET','POST'])
 def newAudit():

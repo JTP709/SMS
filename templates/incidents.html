@@ -7,7 +7,7 @@
 	<div>
 		<a href="#">Custom Report</a>
 		<br>
-		<a href="/incidents/new/">Submit a Report</a>
+		<a href="/incidents/new">Submit a Report</a>
 		<br>
 		<a href="#">Edit a Report</a>
 		<br>
@@ -21,37 +21,34 @@
 	</div>
 	<!-- Main Content -->
 	<div>
-		<h1>Safety Dashboard</h1>
+		<h1>Incident Reports</h1>
 		<div>
-			<h3>Three Most Recent Injuries:</h3>
 			<table style="width:100%">
 				<tr>
 					<th><b>Date</b></th>
 					<th><b>Time</b></th>
 					<th><b>Case ID</b></th>
+					<th><b>Type</b></th>
 					<th><b>Category</b></th>
+					<th><b>Injury Case</b></th>
+					<th><b>Property Damage</b></th>
 					<th><b>Description</b></th>
+					<th><b>Root Cause</b></th>
 				</tr>
-				{% for i in range(3) %}
+				{% for i in range(length) %}
 					<tr> 
 						<th>{{incidents[i][0]}}</th>
 						<th>{{incidents[i][1]}}</th>
 						<th>{{incidents[i][2]}}</th>
 						<th>{{incidents[i][3]}}</th>
 						<th>{{incidents[i][4]}}</th>
+						<th>{{incidents[i][5]}}</th>
+						<th>{{incidents[i][6]}}</th>
+						<th>{{incidents[i][7]}}</th>
+						<th>{{incidents[i][8]}}</th>
 					</tr>
 				{% endfor %}
 			 </table>
-		</div>
-		<div>
-			<h3>Audit Health:</h3>
-
-			<p>{{health}}%</p>
-
-		</div>
-		<div>
-			<h3>Upcoming Action Items:</h3>
-			<p>TODO: Add Action Item Section</p>
 		</div>
 	</div>
 </body>
