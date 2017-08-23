@@ -34,7 +34,7 @@ def audit_totals():
 	return results
 	db.close()
 
-def getCaseID
+def getCaseID():
 	db, cursor = connect()
 	query = ("""
 				SELECT case_num
@@ -43,14 +43,14 @@ def getCaseID
 					LIMIT 1;
 			""")
 
-		cursor.execute(query)
-		results = int(cursor.fetchall())
+	cursor.execute(query)
+	results = int(cursor.fetchone())
 
 
-		return str(results)
-		db.close()
+	return str(results)
+	db.close()
 
-def incidentActions(case,finding,action)
+def incidentActions(case,finding,action):
 	db, cursor = connect()
 	action_items = ("""
 					INSERT INTO action_items (

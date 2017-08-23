@@ -1,0 +1,64 @@
+<html>
+
+<head>
+<!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">-->
+	</head>
+<body>
+
+<h1>New Incident Report</h1>
+
+<form action="#" method = 'post'>
+
+	<p>Date/Time:</p>
+		<input type ='datetime-local' name='date_time'>
+		<br>
+	<p>Incident Type</p>
+		<br>
+		<input type ='radio'  name='incident_type' value ='Injury'>Injury
+		<br>
+		<input type ='radio'  name='incident_type' value ='PIT Incident'>PIT Incident
+		<br>
+		<input type ='radio'  name='incident_type' value ='Near Miss'>Near Miss
+		<br>
+		<input type ='radio'  name='incident_type' value ='HAZMAT'>HAZMAT
+		<br>
+	<p>Incident Category</p>
+		<br>
+		<input type ='radio'  name='incident_cat' value ='Unsafe Act'>Unsafe Act
+		<br>
+		<input type ='radio'  name='incident_cat' value ='Unsafe Behavior'>Unsafe Behavior
+		<br>
+		<input type ='radio'  name='incident_cat' value ='Unsafe Condition'>Unsafe Condition
+		<br>
+	<p>Injury</p>
+		<br>
+		<input type ='radio'  name='injury' value ='t'>True
+		<br>
+		<input type ='radio'  name='injury' value ='f'>False
+		<br>
+	<p>Property Damage</p>
+		<br>
+		<input type ='radio'  name='property_damage' value ='t'>True
+		<br>
+		<input type ='radio'  name='property_damage' value ='f'>False
+		<br>
+	<p>Description</p>
+		<br>
+		<input type ='text' size='2000' name='description'>
+		<br>
+	<p>Root Cause:</p>
+		<br>
+		<input type ='text' size='2000' name='root_cause'>
+		<br>
+	<p>Corrective Actions:</p>
+		<br>
+		<input type ='text' size='2000' name='corrective_action'>
+		<br>
+
+
+<input type='submit' value='Create'>
+
+</form>
+
+</body>
+</html>
