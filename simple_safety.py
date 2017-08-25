@@ -232,7 +232,7 @@ def editIncident(id):
 		data = (str(id),)
 		cursor.execute(query, data)
 		results = cursor.fetchall()
-		return render_template('incident_id.html',incidents = results)
+		return render_template('incident_edit.html',incidents = results)
 		db.close()
 
 @app.route('/incidents/delete/<int:id>/', methods = ['GET','POST'])
@@ -259,9 +259,15 @@ def audits():
 
 @app.route('/audits/new/', methods = ['GET','POST'])
 def newAudit():
-	if request.method == 'POST':
-		return redirect(url_for(''))
 	return "New Audit Page"
+
+@app.route('/aduits/edit/<int:id>', methods = ['GET','POST'])
+def editAudit(id):
+	return "Edit audit page %s" % id
+
+@app.route('/aduits/delete/<int:id>', methods = ['GET','POST'])
+def deleteAudit(id):
+	return "Delete audit page %s" % id
 
 @app.route('/actions/')
 def actions():
@@ -269,23 +275,13 @@ def actions():
 
 @app.route('/actions/new/', methods = ['GET','POST'])
 def newActionItem():
-	if request.method == 'POST':
-		return redirect(url_for(''))
 	return "New Action Item Page"
 
-@app.route('/aduits/edit/<int:id>')
-def editAudit(id):
-	return "Edit audit page %s" % id
-
-@app.route('/actions/edit/<int:id>')
+@app.route('/actions/edit/<int:id>', methods = ['GET','POST'])
 def editActionItem(id):
 	return "Edit action item %s" % id
 
-@app.route('/aduits/delete/<int:id>')
-def deleteAudit(id):
-	return "Delete audit page %s" % id
-
-@app.route('/actions/delete/<int:id>')
+@app.route('/actions/delete/<int:id>', methods = ['GET','POST'])
 def deleteActionItem(id):
 	return "Delete action item %s" % id
 
