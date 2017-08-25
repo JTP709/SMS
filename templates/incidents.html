@@ -5,13 +5,19 @@
 <body>
 	<!-- Left Menu Column -->
 	<div>
+		<a href="/dashboard/">Dashboard</a>
+		<br>
 		<a href="#">Custom Report</a>
 		<br>
-		<a href="/incidents/new">Submit a Report</a>
+		<a href="/incidents/">Incidents</a>
+		<br>
+		<a href="/incidents/new/">Submit a Report</a>
 		<br>
 		<a href="#">Edit a Report</a>
 		<br>
 		<a href="#">Delete a Report</a>
+		<br>
+		<a href="#">Audits</a>
 		<br>
 		<a href="#">Submit an Audit</a>
 		<br>
@@ -25,9 +31,9 @@
 		<div>
 			<table style="width:100%">
 				<tr>
+					<th><b>Case ID</b></th>
 					<th><b>Date</b></th>
 					<th><b>Time</b></th>
-					<th><b>Case ID</b></th>
 					<th><b>Type</b></th>
 					<th><b>Category</b></th>
 					<th><b>Injury Case</b></th>
@@ -37,7 +43,7 @@
 				</tr>
 				{% for i in range(length) %}
 					<tr> 
-						<th>{{incidents[i][0]}}</th>
+						<th><a href="/incidents/edit/{{incidents[i][0]}}">{{incidents[i][0]}}</a></th>
 						<th>{{incidents[i][1]}}</th>
 						<th>{{incidents[i][2]}}</th>
 						<th>{{incidents[i][3]}}</th>

@@ -99,9 +99,9 @@ def incidents():
 	db, cursor = connect()
 	# need to add date
 	incident_query = """
-    		SELECT to_char(date_time, 'FMMonth FMDD, YYYY'),
-	    			to_char(date_time, 'HH12:MI'),
-	    			case_num, 
+    		SELECT case_num,
+    				to_char(date_time, 'FMMonth FMDD, YYYY'),
+	    			to_char(date_time, 'HH12:MI'), 
 	    			incident_type, 
 	    			incident_cat, 
 	    			injury, 
@@ -117,14 +117,6 @@ def incidents():
 
 	return render_template('incidents.html',incidents = results, length = length)
 	db.close()
-
-@app.route('/audits/')
-def audits():
-	return "Reports Page for incidents and audits"
-
-@app.route('/actions/')
-def actions():
-	return "Reports Page for incidents and audits"
 
 @app.route('/incidents/new/', methods = ['GET','POST'])
 def newIncident():
@@ -182,21 +174,104 @@ def newIncident():
 	else:
 		return render_template('newincidents.html')
 
+@app.route('/incidents/edit/<int:id>/', methods = ['GET','POST'])
+def editIncident(id):
+	if request.method == 'POST':
+		db, cursor = connect()
+		
+		case_id = (int(id),)
+		date_time = request.form.get('date_time')
+		incident_type = request.form.get('incident_type')
+		incident_cat = request.form.get('incident_cat')
+		injury = request.form.get('injury')
+		property_damage = request.form.get('property_damage')
+		description = request.form.get('description')
+		root_cause = request.form.get('root_cause')
+
+		query = [[date_time,'date_time'],[incident_type,'incident_type'],[incident_cat,'incident_cat'],[injury,'injury'],[property_damage,'property_damage'],[description, 'description'], [root_cause,'root_cause']]
+
+		for i in range(len(query)):
+			if query[i][0] != '' and query[i][0] != None:
+				newdata = (query[i][0],case_id[0])
+				insert = ("UPDATE incident SET "+query[i][1]+" = %s WHERE case_num = %s")
+				cursor.execute(insert,newdata)
+		
+		finding = request.form.get('description')
+		corrective_action = request.form.get('corrective_action')
+
+		action_query = [[finding,'finding'],[corrective_action,'corrective_action']]
+
+		for j in range(len(action_query)):
+			if action_query[j][0] != '' and action_query[j][0] != None:
+				newActionData = (action_query[j][0],case_id[0])
+				insertAction = ("UPDATE action_items SET "+action_query[j][1]+" = %s WHERE case_num = %s")
+				cursor.execute(insertAction,newActionData)
+
+		db.commit()
+		db.close()
+
+		return redirect(url_for('incidents'))
+
+	else:
+		db, cursor = connect()
+		
+		query = """
+	    		SELECT i.case_num,
+	    				to_char(i.date_time, 'FMMonth FMDD, YYYY'),
+		    			to_char(i.date_time, 'HH12:MI'),
+		    			i.incident_type, 
+		    			i.incident_cat, 
+		    			i.injury, 
+		    			i.property_damage,
+		    			i.description,
+		    			i.root_cause,
+		    			a.corrective_action
+	    			FROM incident as i, action_items as a
+	    			WHERE i.case_num = a.case_id AND i.case_num = %s;
+	            """
+		data = (str(id),)
+		cursor.execute(query, data)
+		results = cursor.fetchall()
+		return render_template('incident_id.html',incidents = results)
+		db.close()
+
+@app.route('/incidents/delete/<int:id>/', methods = ['GET','POST'])
+def deleteIncident(id):
+	if request.method == 'POST':
+		db, cursor = connect()
+		delete = """
+				DELETE FROM action_items
+				WHERE case_id = %s;
+				DELETE FROM incident
+				WHERE case_num = %s;
+				"""
+		case = (str(id),str(id))
+		cursor.execute(delete,case)
+		db.commit()
+		db.close()
+		return redirect(url_for('incidents'))
+	else:
+		return render_template('incident_delete.html', id = id)
+
+@app.route('/audits/')
+def audits():
+	return "Reports Page for incidents and audits"
+
 @app.route('/audits/new/', methods = ['GET','POST'])
 def newAudit():
 	if request.method == 'POST':
 		return redirect(url_for(''))
 	return "New Audit Page"
 
+@app.route('/actions/')
+def actions():
+	return "Reports Page for incidents and audits"
+
 @app.route('/actions/new/', methods = ['GET','POST'])
 def newActionItem():
 	if request.method == 'POST':
 		return redirect(url_for(''))
 	return "New Action Item Page"
-
-@app.route('/incidents/edit/<int:id>')
-def editIncident(id):
-	return "Edit incident report %s" % id
 
 @app.route('/aduits/edit/<int:id>')
 def editAudit(id):
@@ -205,10 +280,6 @@ def editAudit(id):
 @app.route('/actions/edit/<int:id>')
 def editActionItem(id):
 	return "Edit action item %s" % id
-
-@app.route('/incidents/delete/<int:id>')
-def deleteIncident(id):
-	return "Delete incident report %s" % id
 
 @app.route('/aduits/delete/<int:id>')
 def deleteAudit(id):
