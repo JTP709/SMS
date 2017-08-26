@@ -1,4 +1,6 @@
 import psycopg2
+import datetime
+import re
 from config import config
 
 # Add dates to incidents, audits. Rebuild Audit Tables.
@@ -106,6 +108,16 @@ audits = (audit_1, audit_2, audit_3, audit_4, audit_5, audit_6, audit_7, audit_8
 
 actions_a = (actions_audits_1, actions_audits_2, actions_audits_3, actions_audits_4, actions_audits_5, actions_audits_6, actions_audits_7, actions_audits_8, actions_audits_9)
 
+def dueDate(time_stamp):
+	date = time_stamp[1]
+	dateRegex = re.compile(r'\d\d\d\d-\d\d-\d\d')
+	mo = dateRegex.search(date)
+	num = mo.group()
+	finding_date = datetime.datetime.strptime(num, "%Y-%m-%d")
+	week = datetime.timedelta(days = 7)
+	due_date = finding_date + week
+	return due_date
+
 def populate():
 	params = config()
 	# connect to the PostgreSQL server
@@ -130,16 +142,20 @@ def populate():
 		cur.execute(incident, injuries[i])
 		print("Injury case added!")
 
-		audit_data = (str(i+1), injuries[i][5], actions_i[i])
+		incident_due_date = dueDate(injuries[i])
+		audit_data = (str(i+1), injuries[i][1], injuries[i][6], actions_i[i], incident_due_date, 't')
 
 		action_items = (
 			"""
 			INSERT INTO action_items (
 							case_id,
+							date_time,
 							finding,
-							corrective_action
+							corrective_action,
+							due_date,
+							open_close
 							)
-				VALUES (%s,%s,%s)""")
+				VALUES (%s,%s,%s,%s,%s,%s)""")
 		
 		cur.execute(action_items, audit_data)
 		print("Action item added!")
@@ -163,16 +179,20 @@ def populate():
 		cur.execute(audit, audits[j])
 		print("Audit added!")
 
-		action_data = (str(j+1), 'Audit deficiency', actions_a[j],)
+		action_due_date = dueDate(audits[j])
+		action_data = (str(j+1), audits[j][1], 'Audit deficiency', actions_a[j], action_due_date, 't')
 
 		action_items_a = (
 			"""
 			INSERT INTO action_items (
 							audit_id,
+							date_time,
 							finding,
-							corrective_action
+							corrective_action,
+							due_date,
+							open_close
 							)
-				VALUES (%s,%s,%s)""")
+				VALUES (%s,%s,%s,%s,%s,%s)""")
 		
 		cur.execute(action_items_a, action_data)
 		print("Action item added!")

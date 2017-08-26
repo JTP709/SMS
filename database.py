@@ -56,10 +56,13 @@ def create_tables():
         """
         CREATE TABLE action_items (
             id SERIAL PRIMARY KEY,
+            date_time TIMESTAMP default NULL,
             case_id INTEGER REFERENCES incident(case_num),
             audit_id INTEGER REFERENCES audit(id),
             finding TEXT,
-            corrective_action TEXT
+            corrective_action TEXT,
+            due_date TIMESTAMP default NULL,
+            open_close BOOLEAN
         )
         """)
     conn = None
