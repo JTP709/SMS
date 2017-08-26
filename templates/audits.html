@@ -1,0 +1,52 @@
+<html>
+<head>
+</head>
+
+<body>
+	<!-- Left Menu Column -->
+	<div>
+		<a href="/dashboard/">Dashboard</a>
+		<br>
+		<a href="/reports/">Custom Report</a>
+		<br>
+		<a href="/incidents/">Incidents</a>
+		<br>
+		<a href="/incidents/new/">Submit an Incident Report</a>
+		<br>
+		<a href="/audits/">Audits</a>
+		<br>
+		<a href="/audits/new">Submit an Audit</a>
+		<br>
+		<a href="/actions/">Action Items</a>
+		<br>
+		<a href="/actions/new">Submit an Action Item</a>
+	</div>
+	<!-- Main Content -->
+	<div>
+		<h1>Incident Reports</h1>
+		<div>
+			<table style="width:100%">
+				<tr>
+					<th><b>Audit ID</b></th>
+					<th><b>Date</b></th>
+					<th><b>Time</b></th>
+					<th><b>Type</b></th>
+					<th><b>Health</b></th>
+					<th><b>Corrective Action</b></th>
+				</tr>
+				{% for i in range(length) %}
+					<tr> 
+						<th><a href="/audits/edit/{{audits[i][0]}}">{{audits[i][0]}}</a></th>
+						<th>{{audits[i][1]}}</th>
+						<th>{{audits[i][2]}}</th>
+						<th>{{audits[i][3]}}</th>
+						<th>{{health[i]}}%</th>
+						<th>{{audits[i][9]}}</th>
+					</tr>
+				{% endfor %}
+			 </table>
+		</div>
+	</div>
+</body>
+
+</html>

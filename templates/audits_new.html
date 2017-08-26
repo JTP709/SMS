@@ -1,0 +1,87 @@
+<html>
+
+<head>
+<!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">-->
+	</head>
+<body>
+<!-- Left Menu Column -->
+	<div>
+		<a href="/dashboard/">Dashboard</a>
+		<br>
+		<a href="/reports/">Custom Report</a>
+		<br>
+		<a href="/incidents/">Incidents</a>
+		<br>
+		<a href="/incidents/new/">Submit an Incident Report</a>
+		<br>
+		<a href="/audits/">Audits</a>
+		<br>
+		<a href="/audits/new">Submit an Audit</a>
+		<br>
+		<a href="/actions/">Action Items</a>
+		<br>
+		<a href="/actions/new">Submit an Action Item</a>
+	</div>
+	<div>
+		<h1>New Incident Report</h1>
+
+		<form action="#" method = 'post'>
+
+			<p>Date/Time:</p>
+				<input type ='datetime-local' name='date_time'>
+				<br>
+			<p>Audit Type</p>
+				<br>
+				<input type ='radio'  name='audit_type' value ='Behavior'>Behavior
+				<br>
+				<input type ='radio'  name='audit_type' value ='Area Organization'>Area Organization
+				<br>
+				<input type ='radio'  name='audit_type' value ='HAZWASTE'>HAZWASTE
+				<br>
+			<p><b>Question 1:</b></p>
+			<p><b>Behavior: </b>Was the employee wearing their PPE?</p>
+			<p><b>Area Organization: </b>Does the area have designated locations for all carts, tools, pallets, inventory, and non-inventory items?</p>
+			<p><b>HAZWASTE: </b>Are all barrels in good condition?</p>
+			<br>
+			<p>Answer:</p>
+				<br>
+				<input type ='radio'  name='answer_1' value ='t'>Yes
+				<br>
+				<input type ='radio'  name='answer_1' value ='f'>No
+				<br>
+			<p><b>Question 2:</b></p>
+			<p><b>Behavior: </b>Was the employee using proper lifting techniques?</p>
+			<p><b>Area Organization: </b>Are all carts, pallets, tools, and items in a designated location?</p>
+			<p><b>HAZWASTE: </b>Are all barrels properly labelled?</p>
+			<br>
+			<p>Answer:</p>
+				<br>
+				<input type ='radio'  name='answer_2' value ='t'>Yes
+				<br>
+				<input type ='radio'  name='answer_2' value ='f'>No
+				<br>	
+			<p><b>Question 3:</b></p>
+			<p><b>Behavior: </b>Was the employee's work area clean?</p>
+			<p><b>Area Organization: </b>Is the area clean and free from trip hazards?</p>
+			<p><b>HAZWASTE: </b>Are the appropriate HAZWASTE items stored in the proper container?</p>
+			<br>
+			<p>Answer:</p>
+				<br>
+				<input type ='radio'  name='answer_3' value ='t'>Yes
+				<br>
+				<input type ='radio'  name='answer_3' value ='f'>No
+				<br>				
+			<p>Corrective Action Finding</p>
+				<br>
+				<input type ='text' size='2000' name='description'>
+				<br>
+			<p>Corrective Actions:</p>
+				<br>
+				<input type ='text' size='2000' name='corrective_action'>
+				<br>
+
+			<input type='submit' value='Create'>
+		</form>
+	</div>
+</body>
+</html>
