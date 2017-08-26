@@ -1,17 +1,14 @@
 """
-TODO: main page
-- Action Item Update
- - Incident Report "finding" auto populate bug
- - Add date to action items
-- Generate Report Button
+TODO:
+Generate Report Button
 	- Filter reports
 	- Select reports
-- Add OAuth with users that can generate seperate information for their specific site.
-	- Local Weather API
-		- Severe Weather Notifications sent to e-mail
+User Profile Page
+- Specific Site Locations
+- User's job title/position
+- Local Weather API
+	- Severe Weather Notifications sent to e-mail
 """
-
-#TODO: create report
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, make_response, flash
 import psycopg2
@@ -21,6 +18,7 @@ from oauth2client.client import FlowExchangeError
 import httplib2
 import json
 import requests
+import datetime
 #from functions import connect, audit_health, audit_totals, getCaseID, incidentActions
 
 CLIENT_ID = json.loads(open('client_secrets.json','r').read())['web']['client_id']
@@ -179,6 +177,11 @@ def getUserID(email):
 	results = cursor.fetchone()
 	return results
 	db.close()
+
+def datetime_handler(x):
+    if isinstance(x, datetime.datetime):
+        return x.isoformat()
+    raise TypeError("Unknown type")
 
 app = Flask(__name__)
 
@@ -890,6 +893,83 @@ def closeActionItem(id):
 @app.route('/reports/')
 def reports():
 	return "This page will be used to generate custom reports and injury/incident trends."
+
+# JSON API EndPoints
+
+class incidents(object):
+	@property
+	def serialize(self):
+		return {
+			'case number' : self.case_num,
+			'date/time' : self.date_time,
+			'incident type' : self.incident_type,
+			'incident category' : self.incident_cat,
+			'injury case' : self.injury,
+			'property damage case' : self.property_damage,
+			'description' : self.description,
+			'root cause analysis' : self.root_cause,
+			'user id' : self.user_id
+		}
+
+@app.route('/incidents/json/')
+def incidentsJSON():
+	if request.method == 'GET':
+		# Returns all incidents in the Database
+		db, cursor = connect()
+		query = """
+				SELECT *
+					FROM incident
+				"""
+		cursor.execute(query)
+		results = cursor.fetchall()
+		db.commit()
+		db.close()
+		return json.dumps(results, default=datetime_handler)
+
+@app.route('/audits/json')
+def auditsJSON():
+	if request.method == 'GET':
+		# Returns all incidents in the Database
+		db, cursor = connect()
+		query = """
+				SELECT *
+					FROM audit
+				"""
+		cursor.execute(query)
+		results = cursor.fetchall()
+		db.commit()
+		db.close()
+		return json.dumps(results, default=datetime_handler)
+
+@app.route('/actions/json')
+def actionsJSON():
+	if request.method == 'GET':
+		# Returns all incidents in the Database
+		db, cursor = connect()
+		query = """
+				SELECT *
+					FROM action_items
+				"""
+		cursor.execute(query)
+		results = cursor.fetchall()
+		db.commit()
+		db.close()
+		return json.dumps(results, default=datetime_handler)
+
+@app.route('/users/json')
+def usersJSON():
+	if request.method == 'GET':
+		# Returns all incidents in the Database
+		db, cursor = connect()
+		query = """
+				SELECT *
+					FROM users
+				"""
+		cursor.execute(query)
+		results = cursor.fetchall()
+		db.commit()
+		db.close()
+		return json.dumps(results)
 
 if __name__ == '__main__':
 	app.secret_key = 'super secret key'
