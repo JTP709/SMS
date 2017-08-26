@@ -110,6 +110,76 @@ def getActionsID():
 	return str(results_a)
 	db.close()
 
+def getUserIDNum():
+	db, cursor = connect()
+	query = ("""
+				SELECT id
+					FROM users
+					ORDER BY id desc
+					LIMIT 1;
+			""")
+
+	cursor.execute(query)
+	results = cursor.fetchone()
+	results_a = int(results[0])
+
+	return str(results_a)
+	db.close()
+
+def createUser(session):
+	db, cursor = connect()
+	insert = ("""
+			INSERT INTO users (
+							id,
+							name,
+							email,
+							picture
+							)
+				VALUES (%s,%s,%s,%s)
+			""")
+	case_id = getUserIDNum()
+	new_id = str(int(case_id)+1)
+	name = session['username']
+	email = session['email']
+	picture = session['picture']
+		
+	data = (new_id, name, email, picture)
+
+	cursor.execute(insert, data)
+	db.commit()
+	db.close()
+	return new_id
+
+def getUserInfo(id):
+	db, cursor = connect()
+	query = """
+			SELECT id,
+					name,
+					email,
+					picture,
+					position
+				FROM users
+				WHERE id = %s;
+			"""
+	data = (str(id),)
+	cursor.execute(query, data)
+	results = cursor.fetchone()
+	return results
+	db.close()
+
+def getUserID(email):
+	db, cursor = connect()
+	query = """
+			SELECT id
+				FROM users
+				WHERE email = %s;
+			"""
+	data = (email,)
+	cursor.execute(query, data)
+	results = cursor.fetchone()
+	return results
+	db.close()
+
 app = Flask(__name__)
 
 @app.route('/login/')
@@ -152,7 +222,7 @@ def gconnect():
 	# Verify that the access token is valid for this app.
 	if result['issued_to'] != CLIENT_ID:
 		response = make_response(json.dumps("Token's client ID does not match app's."), 401)
-		print "Token's client ID does not match app's."
+		print("Token's client ID does not match app's.")
 		response.headers['Content-Type'] = 'application/json'
 		return response
 	# Check to see if user is already logged in.
@@ -175,6 +245,13 @@ def gconnect():
 	session['picture'] = data['picture']
 	session['email'] = data['email']
 
+	# See if user exists; if not, make a new one
+	
+	user_id = getUserID(session['email'])
+	if not user_id:
+		user_id = createUser(session)
+	session['user_id'] = user_id
+
 	output = ''
 	output += '<h1>Welcome, '
 	output += session['username']
@@ -190,20 +267,20 @@ def gconnect():
 
 @app.route('/gdisconnect/')
 def gdisconnect():
-    access_token = session['credentials']
+    access_token = session.get('credentials')
     if access_token is None:
-        print 'Access Token is None'
+        print('Access Token is None')
         response = make_response(json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    print 'In gdisconnect access token is %s', access_token
-    print 'User name is: '
-    print session['username']
+    print ('In gdisconnect access token is %s', access_token)
+    print ('User name is: ')
+    print (session['username'])
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % session['credentials']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
-    print 'result is '
-    print result
+    print ('result is ')
+    print (result)
     if result['status'] == '200':
         del session['credentials']
         del session['gplus_id']
@@ -255,11 +332,9 @@ def dashboard():
             """
 	cursor.execute(query)
 	actions = cursor.fetchall()
-			
 	length = len(results)
-
-	return render_template('dashboard.html',incidents = results, health = health, actions = actions)
 	db.close()
+	return render_template('dashboard.html',incidents = results, health = health, actions = actions)
 
 @app.route('/incidents/')
 def incidents():
@@ -300,9 +375,10 @@ def newIncident():
 								injury,
 								property_damage,
 								description,
-								root_cause
+								root_cause,
+								user_id
 								)
-					VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+					VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
 				""")
 		case_id = getCaseID()
 		new_id = str(int(case_id)+1)
@@ -313,13 +389,13 @@ def newIncident():
 		property_damage = request.form['property_damage']
 		description = request.form['description']
 		root_cause = request.form['root_cause']
+		user_id	 = getUserID(session['email'])
 
-		data = (new_id, date_time, incident_type, incident_cat, injury, property_damage, description, root_cause)
+		data = (new_id, date_time, incident_type, incident_cat, injury, property_damage, description, root_cause, user_id)
 
 		#print(date_time, incident_type, incident_cat, injury, property_damage, description, root_cause)
 
 		cursor.execute(insert, data)
-		print(data)
 
 		action_items = ("""
 					INSERT INTO action_items (
@@ -327,17 +403,19 @@ def newIncident():
 									finding,
 									corrective_action,
 									due_date,
-									open_close
+									open_close,
+									user_id
 									)
-						VALUES (%s,%s,%s,%s,%s)
+						VALUES (%s,%s,%s,%s,%s,%s)
 					""")
 
 		finding = request.form['description']
 		corrective_action = request.form['corrective_action']
 		due_date = request.form['due_date']
 		open_close = 't'
+		user_id	 = session['user_id']
 
-		data_a = (new_id, finding, corrective_action, due_date, open_close)
+		data_a = (new_id, finding, corrective_action, due_date, open_close, user_id)
 
 		cursor.execute(action_items, data_a)
 		db.commit()
@@ -402,18 +480,28 @@ def editIncident(id):
 		    			i.description,
 		    			i.root_cause,
 		    			a.corrective_action,
-		    			a.due_date
+		    			a.due_date,
+		    			i.user_id
 	    			FROM incident as i, action_items as a
 	    			WHERE i.case_num = a.case_id AND i.case_num = %s;
 	            """
 		data = (str(id),)
 		cursor.execute(query, data)
 		results = cursor.fetchall()
-		return render_template('incidents_edit.html',incidents = results)
+		creator = getUserInfo(str(results[0][11]))
+		if 'username' not in session or int(creator[0]) != int(session['user_id']):
+			output = ''
+			output += "<h1>I'm sorry, "
+			output += session['username']
+			output += '! You are not authorized to edit this incident.</h1>'
+			output += "Please return to the <a href ='/incidients/'>Incidents Page.</a>"
+			return output 
+		else:
+			return render_template('incidents_edit.html',incidents = results)
 		db.close()
 
 @app.route('/incidents/delete/<int:id>/', methods = ['GET','POST'])
-def deleteIncident(id):	
+def deleteIncident(id):
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
@@ -483,9 +571,10 @@ def newAudit():
 								que_3,
 								ans_1,
 								ans_2,
-								ans_3
+								ans_3,
+								user_id
 								)
-					VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+					VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
 				""")
 		audit_id = getAuditID()
 		new_id = str(int(audit_id)+1)
@@ -494,6 +583,7 @@ def newAudit():
 		answer_1 = request.form['answer_1']
 		answer_2 = request.form['answer_2']
 		answer_3 = request.form['answer_3']
+		user_id	 = getUserID(session['email'])
 
 		if audit_type == 'Behavior':
 			question_1 = 'Was the employee wearing their PPE?'
@@ -508,7 +598,7 @@ def newAudit():
 			question_2 = 'Is the area clean and free from trip hazards?'
 			question_3 = 'Are the appropriate HAZWASTE items stored in the proper container?'
 
-		data = (new_id, date_time, audit_type, question_1, question_2, question_3, answer_1, answer_2, answer_3)
+		data = (new_id, date_time, audit_type, question_1, question_2, question_3, answer_1, answer_2, answer_3, user_id)
 
 		cursor.execute(insert, data)
 
@@ -518,15 +608,17 @@ def newAudit():
 									finding,
 									corrective_action
 									due_date,
-									open_close
+									open_close,
+									user_id
 									)
-						VALUES (%s,%s,%s,%s,%s)
+						VALUES (%s,%s,%s,%s,%s,%s)
 					""")
 
 		finding = request.form['description']
 		corrective_action = request.form['corrective_action']
 		due_date = request.form['due_date']
 		open_close = 't'
+		user_id	 = session['user_id']
 
 		data_a = (new_id, finding, corrective_action, due_date, open_close)
 
@@ -597,7 +689,8 @@ def editAudit(id):
 	    			i.id,
 	    			i.finding,
 	    			i.corrective_action,
-	    			i.due_date
+	    			i.due_date,
+	    			i.user_id
     			FROM audit as a, action_items as i
     			WHERE a.id = i.audit_id
     			ORDER BY a.id desc;
@@ -605,7 +698,16 @@ def editAudit(id):
 		data = (str(id),)
 		cursor.execute(query, data)
 		results = cursor.fetchall()
-		return render_template('audits_edit.html',audits = results)
+		creator = getUserInfo(str(results[0][14]))
+		if 'username' not in session or int(creator[0]) != int(session['user_id']):
+			output = ''
+			output += "<h1>I'm sorry, "
+			output += session['username']
+			output += '! You are not authorized to edit this audit.</h1>'
+			output += "Please return to the <a href ='/audits/'>Incidents Page.</a>"
+			return output 
+		else:
+			return render_template('audits_edit.html',audits = results)
 		db.close()
 
 @app.route('/audits/delete/<int:id>/', methods = ['GET','POST'])
@@ -666,9 +768,10 @@ def newActionItem():
 								finding,
 								corrective_action,
 								due_date,
-								open_close
+								open_close,
+								user_id
 								)
-					VALUES (%s,%s,%s,%s,%s,%s)
+					VALUES (%s,%s,%s,%s,%s,%s,%s)
 				""")
 		case_id = getActionsID()
 		new_id = str(int(case_id)+1)
@@ -677,6 +780,7 @@ def newActionItem():
 		corrective_action = request.form['corrective_action']
 		due_date = request.form['due_date']
 		open_close = 't'
+		user_id	 = getUserID(session['email'])
 
 		data = (new_id, date_time, finding, corrective_action, due_date, open_close)
 
@@ -726,14 +830,24 @@ def editActionItem(id):
     				audit_id,
     				finding,
     				corrective_action,
-    				due_date
+    				due_date,
+    				user_id
     			FROM action_items
     			WHERE id = %s;
 	            """
 		data = (str(id),)
 		cursor.execute(query, data)
 		results = cursor.fetchall()
-		return render_template('actions_edit.html',actions = results)
+		creator = getUserInfo(str(results[0][8]))
+		if 'username' not in session or int(creator[0]) != int(session['user_id']):
+			output = ''
+			output += "<h1>I'm sorry, "
+			output += session['username']
+			output += '! You are not authorized to edit this action item.</h1>'
+			output += "Please return to the <a href ='/actions/'>Incidents Page.</a>"
+			return output 
+		else:
+			return render_template('actions_edit.html',actions = results)
 		db.close()
 
 @app.route('/actions/delete/<int:id>/', methods = ['GET','POST'])

@@ -29,6 +29,15 @@ def create_tables():
         )
         """,
         """
+        CREATE TABLE users (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL,
+            email TEXT,
+            picture TEXT,
+            position TEXT
+        )
+        """,
+        """
         CREATE TABLE incident (
 	        case_num SERIAL PRIMARY KEY,
             date_time TIMESTAMP default NULL,
@@ -37,7 +46,8 @@ def create_tables():
 	        injury BOOLEAN NOT NULL,
 	        property_damage BOOLEAN NOT NULL,
 	        description TEXT,
-	        root_cause TEXT
+	        root_cause TEXT,
+            user_id INTEGER REFERENCES users(id)
         )
         """,
         """
@@ -50,7 +60,8 @@ def create_tables():
             que_3 TEXT,
             ans_1 BOOLEAN,
             ans_2 BOOLEAN,
-            ans_3 BOOLEAN
+            ans_3 BOOLEAN,
+            user_id INTEGER REFERENCES users(id)
         )
         """,
         """
@@ -62,7 +73,8 @@ def create_tables():
             finding TEXT,
             corrective_action TEXT,
             due_date TIMESTAMP default NULL,
-            open_close BOOLEAN
+            open_close BOOLEAN,
+            user_id INTEGER REFERENCES users(id)
         )
         """)
     conn = None
@@ -84,7 +96,7 @@ def create_tables():
     finally:
         if conn is not None:
             conn.close()
- 
- 
+    print("Tables have been created!")
+
 if __name__ == '__main__':
     create_tables()
