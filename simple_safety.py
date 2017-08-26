@@ -638,6 +638,10 @@ def closeActionItem(id):
 	else:
 		return render_template('actions_close.html', id = id)
 
+@app.route('/reports/')
+def reports():
+	return "This page will be used to generate custom reports and injury/incident trends."
+
 if __name__ == '__main__':
     app.debug = True
     app.run(host='0.0.0.0', port=5000)
