@@ -13,9 +13,18 @@ TODO: main page
 
 #TODO: create report
 
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, make_response, flash
 import psycopg2
+import random, string
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.client import FlowExchangeError
+import httplib2
+import json
+import requests
 #from functions import connect, audit_health, audit_totals, getCaseID, incidentActions
+
+CLIENT_ID = json.loads(open('client_secrets.json','r').read())['web']['client_id']
+APPLICATION_NAME = "Safety Management System"
 
 def connect(database_name="safety"):
     """Connects to database"""
@@ -103,6 +112,112 @@ def getActionsID():
 
 app = Flask(__name__)
 
+@app.route('/login/')
+def showLogin():
+	state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
+	session['state'] = state
+	return render_template('login.html', STATE=state)
+
+@app.route('/gconnect', methods=['POST'])
+def gconnect():
+	if request.args.get('state') != session['state']:
+		response = make_response(json.dumps('Invalid state'), 401)
+		response.headers['Content-Type'] = 'application/json'
+		return response
+	code = request.data.decode('utf-8')
+	try:
+		# Upgrade the authorization code into a credentials object
+		oauth_flow = flow_from_clientsecrets('client_secrets.json', scope = '')
+		oauth_flow.redirect_uri = 'postmessage'
+		credentials = oauth_flow.step2_exchange(code)
+	except FlowExchangeError:
+		response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
+		response.headers['Content-Type'] = 'application/json'
+		return response
+	# Check that the access token is valid.
+	access_token = credentials.access_token
+	url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
+	h = httplib2.Http()
+	result = json.loads(h.request(url, 'GET')[1])
+	# If there was an error in the access token info, abort.
+	if result.get('error') is not None:
+		response = make_response(json.dumps(results.get('error')), 500)
+		response.headers['Content-Type'] = 'application/json'
+	# Verify that the access token is used for the intended user.
+	gplus_id = credentials.id_token['sub']
+	if result['user_id'] != gplus_id:
+		respones = make_response(json.dumps("Token's user ID doesn't match the given user ID"), 401)
+		response.headers['Content-Type'] = 'application/json'
+		return response
+	# Verify that the access token is valid for this app.
+	if result['issued_to'] != CLIENT_ID:
+		response = make_response(json.dumps("Token's client ID does not match app's."), 401)
+		print "Token's client ID does not match app's."
+		response.headers['Content-Type'] = 'application/json'
+		return response
+	# Check to see if user is already logged in.
+	stored_credentials = session.get('credentials')
+	stored_gplus_id = session.get('gplus_id')
+	if stored_credentials is not None and gplus_id == stored_gplus_id:
+		response = make_response(json.dumps('Current user is already connected.'), 200)
+		response.headers['Content-Type'] = 'application/json'
+	# Store the access token in the session for later use.
+	session['credentials'] = credentials.access_token
+	session['gplus_id'] = gplus_id
+	# Get user info
+	userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+	params = {'access_token': credentials.access_token, 'alt': 'json'}
+	answer = requests.get(userinfo_url, params=params)
+
+	data = answer.json()
+
+	session['username'] = data['name']
+	session['picture'] = data['picture']
+	session['email'] = data['email']
+
+	output = ''
+	output += '<h1>Welcome, '
+	output += session['username']
+	output += '!</h1>'
+	output += '<img src="'
+	output += session['picture']
+	output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+	print(credentials)
+	print(credentials.access_token)
+	flash("you are now logged in as %s" % session['username'])
+	print("done!")
+	return output
+
+@app.route('/gdisconnect/')
+def gdisconnect():
+    access_token = session['credentials']
+    if access_token is None:
+        print 'Access Token is None'
+        response = make_response(json.dumps('Current user not connected.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    print 'In gdisconnect access token is %s', access_token
+    print 'User name is: '
+    print session['username']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % session['credentials']
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[0]
+    print 'result is '
+    print result
+    if result['status'] == '200':
+        del session['credentials']
+        del session['gplus_id']
+        del session['username']
+        del session['email']
+        del session['picture']
+        response = make_response(json.dumps('Successfully disconnected.'), 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    else:
+        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
 @app.route('/')
 @app.route('/dashboard/')
 def dashboard():
@@ -172,6 +287,8 @@ def incidents():
 
 @app.route('/incidents/new/', methods = ['GET','POST'])
 def newIncident():
+	if 'username' not in session:
+		return redirect('/login')
 	if request.method == 'POST':
 		db, cursor = connect()
 		insert = ("""
@@ -232,6 +349,8 @@ def newIncident():
 
 @app.route('/incidents/edit/<int:id>/', methods = ['GET','POST'])
 def editIncident(id):
+	if 'username' not in session:
+		return redirect('/login')
 	if request.method == 'POST':
 		db, cursor = connect()
 		
@@ -294,7 +413,9 @@ def editIncident(id):
 		db.close()
 
 @app.route('/incidents/delete/<int:id>/', methods = ['GET','POST'])
-def deleteIncident(id):
+def deleteIncident(id):	
+	if 'username' not in session:
+		return redirect('/login')
 	if request.method == 'POST':
 		db, cursor = connect()
 		delete = """
@@ -348,6 +469,8 @@ def audits():
 
 @app.route('/audits/new/', methods = ['GET','POST'])
 def newAudit():
+	if 'username' not in session:
+		return redirect('/login')
 	if request.method == 'POST':
 		db, cursor = connect()
 		insert = ("""
@@ -417,6 +540,8 @@ def newAudit():
 
 @app.route('/audits/edit/<int:id>/', methods = ['GET','POST'])
 def editAudit(id):
+	if 'username' not in session:
+		return redirect('/login')
 	if request.method == 'POST':
 		db, cursor = connect()
 		
@@ -485,6 +610,8 @@ def editAudit(id):
 
 @app.route('/audits/delete/<int:id>/', methods = ['GET','POST'])
 def deleteAudit(id):
+	if 'username' not in session:
+		return redirect('/login')
 	if request.method == 'POST':
 		db, cursor = connect()
 		delete = """
@@ -528,6 +655,8 @@ def actions():
 
 @app.route('/actions/new/', methods = ['GET','POST'])
 def newActionItem():
+	if 'username' not in session:
+		return redirect('/login')
 	if request.method == 'POST':
 		db, cursor = connect()
 		insert = ("""
@@ -562,6 +691,8 @@ def newActionItem():
 
 @app.route('/actions/edit/<int:id>/', methods = ['GET','POST'])
 def editActionItem(id):
+	if 'username' not in session:
+		return redirect('/login')
 	if request.method == 'POST':
 		db, cursor = connect()
 		
@@ -607,6 +738,8 @@ def editActionItem(id):
 
 @app.route('/actions/delete/<int:id>/', methods = ['GET','POST'])
 def deleteActionItem(id):
+	if 'username' not in session:
+		return redirect('/login')
 	if request.method == 'POST':
 		db, cursor = connect()
 		delete = """
@@ -623,6 +756,8 @@ def deleteActionItem(id):
 
 @app.route('/actions/close/<int:id>/', methods = ['GET','POST'])
 def closeActionItem(id):
+	if 'username' not in session:
+		return redirect('/login')
 	if request.method == 'POST':
 		db, cursor = connect()
 		close = """
@@ -643,5 +778,7 @@ def reports():
 	return "This page will be used to generate custom reports and injury/incident trends."
 
 if __name__ == '__main__':
-    app.debug = True
-    app.run(host='0.0.0.0', port=5000)
+	app.secret_key = 'super secret key'
+	app.config['SESSION_TYPE'] = 'filesystem'
+	app.debug = True
+	app.run(host='0.0.0.0', port=5000)
