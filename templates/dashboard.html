@@ -1,5 +1,6 @@
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 
 <body>
@@ -26,6 +27,15 @@
 		<a href="/actions/new">Submit an Action Item</a>
 	</div>
 	<!-- Main Content -->
+	{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			<ul class=flashes>
+			{% for message in messages %}
+	  			<li>{{ message }}</li>
+			{% endfor %}
+			</ul>
+		{% endif %}
+	{% endwith %}
 	<div>
 		<h1>Safety Dashboard</h1>
 		<div>
@@ -101,17 +111,15 @@
 			<table>
 				<tr>
 					<th><b>Current Weather</b></th>
-					<th><b>Description:</b></th>
 					<th><b>Current Temperature:</b></th>
 					<th><b>High Temperature:</b></th>
 					<th><b>Low Temperature:</b></th>
 				</tr>
 				<tr>
 					<th>{{weather[0]}}</th>
-					<th>{{weather[1]}}</th>
-					<th>{{weather[2]}}</th>
-					<th>{{weather[3]}}</th>
-					<th>{{weather[4]}}</th>
+					<th>{{weather[2]}}&#176;</th>
+					<th>{{weather[3]}}&#176;</th>
+					<th>{{weather[4]}}&#176;</th>
 				</tr>
 			</table>
 		</div>

@@ -32,7 +32,7 @@ app = Flask(__name__)
 
 @app.route('/login/')
 def showLogin():
-	state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
+	state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
 	session['state'] = state
 	return render_template('login.html', STATE=state)
 
@@ -56,7 +56,8 @@ def gconnect():
 	access_token = credentials.access_token
 	url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
 	h = httplib2.Http()
-	result = json.loads(h.request(url, 'GET')[1])
+	raw = h.request(url, 'GET')[1]
+	result = json.loads(raw.decode())
 	# If there was an error in the access token info, abort.
 	if result.get('error') is not None:
 		response = make_response(json.dumps(results.get('error')), 500)
@@ -758,7 +759,28 @@ def closeActionItem(id):
 
 @app.route('/incidents/reports/')
 def incidentsReports():
-	return "This page will be used to generate custom reports and injury/incident trends."
+	db, cursor = connect()
+	# need to add date
+	incident_query = """
+    		SELECT case_num,
+    				to_char(date_time, 'FMMonth FMDD, YYYY'),
+	    			to_char(date_time, 'HH12:MI'), 
+	    			incident_type, 
+	    			incident_cat, 
+	    			injury, 
+	    			property_damage,
+	    			description,
+	    			root_cause
+    			FROM incident
+    			ORDER BY case_num desc;
+            """
+	cursor.execute(incident_query)
+	results = cursor.fetchall()
+	length = len(results)
+
+	return render_template('incidents.html',incidents = results, length = length)
+	db.close()
+
 
 @app.route('/audits/reports/')
 def auditsReports():
