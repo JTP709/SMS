@@ -2,14 +2,18 @@
 
 """
 TODO:
-Generate Report Button
-	- Filter reports
-	- Select reports
-User Profile Page
-- Specific Site Locations
-- User's job title/position
-- Local Weather API
-	- Severe Weather Notifications sent to e-mail
+- Add recordable vs first aid to injuries
+	- Show DART, RIR, FAIR, LTIR on dashboard
+- Generate Custom Reports
+	- Filter options for custom report
+- JSON
+	- Allow CRUD operations through RESTful API endpoints
+	- Implement OAuth for API endpoints
+- User Profile Page
+    - Specific Site Locations
+    - User's job title/position
+    - Local Weather API
+	    - Severe Weather Notifications sent to e-mail
 """
 import sys
 print(sys.version)
@@ -32,12 +36,14 @@ app = Flask(__name__)
 
 @app.route('/login/')
 def showLogin():
+	"""Routes to Login Page"""
 	state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
 	session['state'] = state
 	return render_template('login.html', STATE=state)
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+	"""Connects to Google Plus OAuth API"""
 	if request.args.get('state') != session['state']:
 		response = make_response(json.dumps('Invalid state'), 401)
 		response.headers['Content-Type'] = 'application/json'
@@ -796,9 +802,9 @@ def incidentsReports():
 	    			root_cause
     			FROM incident
     			WHERE incident_type = %s AND
-    					incident_cat = %s AND
-    					injury = %s AND
-    					property_damage = %s
+						incident_cat = %s AND
+						injury = %s AND
+						property_damage = %s
     			ORDER BY case_num desc;
             """
 		
@@ -807,9 +813,14 @@ def incidentsReports():
 		injury = request.form.get('injury')
 		property_damage = request.form.get('property_damage')
 		
+		search = (incident_type, incident_cat, injury, property_damage)
 
-		data = (incident_type, incident_cat, injury, property_damage)
+		data = list()
+		if i in search != None:
+			data.append(i)
 
+		print (data)
+		
 		cursor.execute(query, data)
 		results = cursor.fetchall()
 		length = len(results)
@@ -990,4 +1001,4 @@ if __name__ == '__main__':
 	app.secret_key = 'super secret key'
 	app.config['SESSION_TYPE'] = 'filesystem'
 	app.debug = True
-	app.run(host='0.0.0.0', port=5000)	
+	app.run(host='0.0.0.0', port=5000)
