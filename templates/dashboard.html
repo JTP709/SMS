@@ -52,7 +52,7 @@
 					<tr> 
 						<th>{{incidents[i][0]}}</th>
 						<th>{{incidents[i][1]}}</th>
-						<th>{{incidents[i][2]}}</th>
+						<th><a href="/incidents/edit/{{incidents[i][2]}}/">{{incidents[i][2]}}</a></th>
 						<th>{{incidents[i][3]}}</th>
 						<th>{{incidents[i][4]}}</th>
 					</tr>
@@ -61,13 +61,24 @@
 		</div>
 		<div>
 			<h3>Audit Health:</h3>
-
-			<p>{{health}}%</p>
-
+			<table style="width:100%">
+				<tr>
+					<th><b>Overall Audit Health</b></th>
+					<th><b>Behavior Audit Health</b></th>
+					<th><b>Area Organization Audit Health</b></th>
+					<th><b>HAZWASTE Audit Health</b></th>
+				</tr>
+				<tr>
+					<th>{{health[0]}}%</th>
+					<th>{{health[1]}}%</th>
+					<th>{{health[2]}}%</th>
+					<th>{{health[3]}}%</th>
+				</tr>
+			</table>
 		</div>
 		<div>
 			<h3>Upcoming Action Items:</h3>
-			<table>
+			<table style="width:100%">
 				<tr>
 					<th><b>Action Item ID</b></th>
 					<th><b>Incident Report</b></th>
@@ -108,7 +119,7 @@
 		</div>
 		<div>
 			<h3>Current Weather:</h3>
-			<table>
+			<table style="width:100%">
 				<tr>
 					<th><b>Current Weather</b></th>
 					<th><b>Current Temperature:</b></th>

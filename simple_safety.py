@@ -1,4 +1,4 @@
-#!/usr/bin/python3.5
+#!/usr/bin/python3
 
 """
 TODO:
@@ -149,7 +149,7 @@ def gdisconnect():
 def dashboard():
 	"""Loads the dashboard page"""
 	db, cursor = connect()
-	# need to add date
+	# Fetches most recent incidents
 	incident_query = """
     		SELECT to_char(date_time, 'FMMonth FMDD, YYYY'),
     			to_char(date_time, 'HH12:MI'),
@@ -160,43 +160,81 @@ def dashboard():
             """
 	cursor.execute(incident_query)
 	results = cursor.fetchall()
-
-	db, cursor = connect()
+	# Fetches Audit Health
+	health = []
 	query = """
-    		SELECT count(*) as num
-    			FROM audit
-    			WHERE ans_1 = FALSE OR
-    				ans_2 = FALSE OR
-    				ans_3 = FALSE
+    		SELECT type,
+	    			ans_1,
+	    			ans_2,
+	    			ans_3
+	    		FROM audit;
             """
 	cursor.execute(query)
-	audit_query = cursor.fetchone()
+	audit_results = cursor.fetchall()
+	print(audit_results)
+	length = len(audit_results)
 
-	db, cursor = connect()
+	audit_def = 0.0
+	b_total = 0.0
+	audit_b_def = 0.0
+	a_total = 0.0
+	audit_a_def = 0.0
+	h_total = 0.0
+	audit_h_def = 0.0
+
+	for i in audit_results:
+		for j in range(len(i)):
+			if i[j] == True:
+				audit_def = audit_def + 1.0
+		if i[0] == 'Behavior':
+			b_total = b_total + 3 # adding 3 because there are 3 answers total per audit.
+			for k in range(len(i)):
+				if i[k] == True:
+					audit_b_def = audit_b_def + 1.0
+		if i[0] == 'Area Organization':
+			a_total = a_total + 3
+			for k in range(len(i)):
+				if i[k] == True:
+					audit_a_def = audit_a_def + 1.0
+		if i[0] == 'HAZWASTE':
+			h_total = h_total + 3
+			for k in range(len(i)):
+				if i[k] == True:
+					audit_h_def = audit_h_def + 1.0
+	print(audit_b_def)
+	print(b_total)
+	print(audit_a_def)
+	print(a_total)
+	print(audit_h_def)
+	print(h_total)
+
+	audit_perc = int(float(audit_def/(length*3)*100))
+	health.append(audit_perc)
+	
+	audit_a_perc = int(float(audit_a_def/a_total*100))
+	health.append(audit_a_perc)
+	audit_b_perc = int(float(audit_b_def/b_total*100))
+	health.append(audit_b_perc)
+	audit_h_perc = int(float(audit_h_def/h_total*100))
+	health.append(audit_h_perc)
+	
+	print(health)
+
+	# Fetches Upcoming Action Items
 	query = """
-			SELECT count(*) as num
-				FROM audit
+			SELECT id,
+					to_char(date_time, 'FMMonth FMDD, YYYY'),
+					to_char(date_time, 'HH12:MI'), 
+					case_id,
+					audit_id,
+					finding,
+					corrective_action,
+					to_char(due_date, 'FMMonth FMDD, YYYY'),
+					open_close
+				FROM action_items
+				ORDER BY date_time
+				LIMIT 5;
 			"""
-
-	cursor.execute(query)
-	audit_query_t = cursor.fetchone()
-
-	health = round(float(float(audit_query[0])/float(audit_query_t[0]))*100,2)
-
-	query = """
-    		SELECT id,
-    				to_char(date_time, 'FMMonth FMDD, YYYY'),
-	    			to_char(date_time, 'HH12:MI'), 
-    				case_id,
-    				audit_id,
-    				finding,
-    				corrective_action,
-    				to_char(due_date, 'FMMonth FMDD, YYYY'),
-    				open_close
-    			FROM action_items
-    			ORDER BY date_time
-    			LIMIT 5;
-            """
 	cursor.execute(query)
 	actions = cursor.fetchall()
 	length = len(results)
@@ -413,7 +451,7 @@ def audits():
 	for i in results:
 		audit_def = 0.0
 		for j in range(len(i)):
-			if i[j] == False:
+			if i[j] == True:
 				audit_def = audit_def + 1.0
 		audit_perc = int(float(audit_def/3)*100)
 		health.append(audit_perc)
