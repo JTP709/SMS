@@ -1,3 +1,5 @@
+#!/usr/bin/python3.5
+
 """
 TODO:
 Generate Report Button
@@ -9,17 +11,19 @@ User Profile Page
 - Local Weather API
 	- Severe Weather Notifications sent to e-mail
 """
-
+import sys
+print(sys.version)
+# Import custom functions
+from functions import connect, getCaseID, getAuditID, getActionsID, getUserIDNum, createUser, getUserInfo, getUserID, datetime_handler, getWeather
+# Import Flask operations
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, make_response, flash
-import psycopg2
-import random, string
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.client import FlowExchangeError
-import httplib2
-import json
-import requests
-import datetime
-from functions import connect, getCaseID, getAuditID, getActionsID, getUserIDNum, createUser, getUserInfo, getUserID, datetime_handler
+# Import oauth
+from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
+# Import advanced python scheduler for scheduled weather api calls
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+
+import psycopg2, random, string, httplib2, json, requests, datetime
 
 CLIENT_ID = json.loads(open('client_secrets.json','r').read())['web']['client_id']
 APPLICATION_NAME = "Safety Management System"
@@ -196,7 +200,8 @@ def dashboard():
 	actions = cursor.fetchall()
 	length = len(results)
 	db.close()
-	return render_template('dashboard.html',incidents = results, health = health, actions = actions)
+	print(weather)
+	return render_template('dashboard.html',incidents = results, health = health, actions = actions, weather = weather)
 
 @app.route('/incidents/')
 def incidents():
@@ -765,21 +770,6 @@ def actionsReports():
 
 # JSON API EndPoints
 
-class incidents(object):
-	@property
-	def serialize(self):
-		return {
-			'case number' : self.case_num,
-			'date/time' : self.date_time,
-			'incident type' : self.incident_type,
-			'incident category' : self.incident_cat,
-			'injury case' : self.injury,
-			'property damage case' : self.property_damage,
-			'description' : self.description,
-			'root cause analysis' : self.root_cause,
-			'user id' : self.user_id
-		}
-
 @app.route('/incidents/json/')
 def incidentsJSON():
 	if request.method == 'GET':
@@ -840,8 +830,85 @@ def usersJSON():
 		db.close()
 		return json.dumps(results)
 
+@app.route('/incidents/json/<int:id>/')
+def incidentsJSONID(id):
+	if request.method == 'GET':
+		# Returns all incidents in the Database
+		db, cursor = connect()
+		query = """
+				SELECT *
+					FROM incident
+					WHERE id = %s;
+				"""
+		data = (str(id),)
+		cursor.execute(query, data)
+		results = cursor.fetchall()
+		db.commit()
+		db.close()
+		return json.dumps(results, default=datetime_handler)
+
+@app.route('/audits/json/<int:id>/')
+def auditsJSONID(id):
+	if request.method == 'GET':
+		# Returns all incidents in the Database
+		db, cursor = connect()
+		query = """
+				SELECT *
+					FROM audit
+					WHERE id = %s;
+				"""
+		data = (str(id),)
+		cursor.execute(query, data)
+		results = cursor.fetchall()
+		db.commit()
+		db.close()
+		return json.dumps(results, default=datetime_handler)
+
+@app.route('/actions/json/<int:id>/')
+def actionsJSONID(id):
+	if request.method == 'GET':
+		# Returns all incidents in the Database
+		db, cursor = connect()
+		query = """
+				SELECT *
+					FROM action_items
+					WHERE id = %s;
+				"""
+		data = (str(id),)
+		cursor.execute(query, data)
+		results = cursor.fetchall()
+		db.commit()
+		db.close()
+		return json.dumps(results, default=datetime_handler)
+
+@app.route('/users/json/<int:id>/')
+def usersJSONID(id):
+	if request.method == 'GET':
+		# Returns all incidents in the Database
+		db, cursor = connect()
+		query = """
+				SELECT *
+					FROM users
+					WHERE id = %s;
+				"""
+		data = (str(id),)
+		cursor.execute(query, data)
+		results = cursor.fetchall()
+		db.commit()
+		db.close()
+		return json.dumps(results)
+
 if __name__ == '__main__':
+	weather = getWeather()
+	print(weather)
+	scheduler = BackgroundScheduler()
+	scheduler.start()
+	scheduler.add_job(
+		func = getWeather, 
+		trigger = (IntervalTrigger(hours = 1)),
+		id = 'weather')
+
 	app.secret_key = 'super secret key'
 	app.config['SESSION_TYPE'] = 'filesystem'
 	app.debug = True
-	app.run(host='0.0.0.0', port=5000)
+	app.run(host='0.0.0.0', port=5000)	

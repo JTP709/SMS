@@ -1,4 +1,4 @@
-import psycopg2
+import psycopg2, datetime, json, httplib2
 
 def connect(database_name="safety"):
     """Connects to database"""
@@ -131,3 +131,26 @@ def datetime_handler(x):
     if isinstance(x, datetime.datetime):
         return x.isoformat()
     raise TypeError("Unknown type")
+
+def getWeather():
+	# http://api.openweathermap.org/data/2.5/forecast?id=4508722&APPID=00b1eab8137a0b1d81025d667dbb2f17
+	# app_id = 00b1eab8137a0b1d81025d667dbb2f17
+	# City ID for Cincinnati, OH
+	# city_id = 4508722
+	url = 'http://api.openweathermap.org/data/2.5/forecast?id=4508722&APPID=00b1eab8137a0b1d81025d667dbb2f17&units=imperial'
+	h = httplib2.Http()
+
+	raw = h.request(url,'GET')[1]
+
+	results = json.loads(raw.decode())
+
+	weather_main = results['list'][0]['weather'][0]['main']
+	weather_desc = results['list'][0]['weather'][0]['description']
+	weather_temp = results['list'][0]['main']['temp']
+	weather_temp_max = results['list'][0]['main']['temp_max']
+	weather_temp_min = results['list'][0]['main']['temp_min']
+
+	weather_data = (weather_main, weather_desc, weather_temp, weather_temp_max, weather_temp_min)
+	print("Weather API Updated")
+	return weather_data
+
