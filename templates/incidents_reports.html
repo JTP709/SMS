@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<form action="#" method = 'post'>
+		<p>Incident Type</p>
+			<br>
+			<input type ='radio'  name='incident_type' value ='Injury'>Injury
+			<br>
+			<input type ='radio'  name='incident_type' value ='PIT Incident'>PIT Incident
+			<br>
+			<input type ='radio'  name='incident_type' value ='Near Miss'>Near Miss
+			<br>
+			<input type ='radio'  name='incident_type' value ='HAZMAT'>HAZMAT
+			<br>
+		<p>Incident Category</p>
+			<br>
+			<input type ='radio'  name='incident_cat' value ='Unsafe Act'>Unsafe Act
+			<br>
+			<input type ='radio'  name='incident_cat' value ='Unsafe Behavior'>Unsafe Behavior
+			<br>
+			<input type ='radio'  name='incident_cat' value ='Unsafe Condition'>Unsafe Condition
+			<br>
+		<p>Injury</p>
+			<br>
+			<input type ='radio'  name='injury' value ='t'>True
+			<br>
+			<input type ='radio'  name='injury' value ='f'>False
+			<br>
+		<p>Property Damage</p>
+			<br>
+			<input type ='radio'  name='property_damage' value ='t'>True
+			<br>
+			<input type ='radio'  name='property_damage' value ='f'>False
+			<br>
+		<input type='submit' value='Update'>
+	</form>
+	<div>
+		<h1>Incident Reports</h1>
+		<div>
+			<table style="width:100%">
+				<tr>
+					<th><b>Case ID</b></th>
+					<th><b>Date</b></th>
+					<th><b>Time</b></th>
+					<th><b>Type</b></th>
+					<th><b>Category</b></th>
+					<th><b>Injury Case</b></th>
+					<th><b>Property Damage</b></th>
+					<th><b>Description</b></th>
+					<th><b>Root Cause</b></th>
+				</tr>
+				{% for i in range(length) %}
+					<tr> 
+						<th><a href="/incidents/edit/{{incidents[i][0]}}">{{incidents[i][0]}}</a></th>
+						<th>{{incidents[i][1]}}</th>
+						<th>{{incidents[i][2]}}</th>
+						<th>{{incidents[i][3]}}</th>
+						<th>{{incidents[i][4]}}</th>
+						<th>{{incidents[i][5]}}</th>
+						<th>{{incidents[i][6]}}</th>
+						<th>{{incidents[i][7]}}</th>
+						<th>{{incidents[i][8]}}</th>
+					</tr>
+				{% endfor %}
+			 </table>
+		</div>
+	</div>
+</body>
+</html>

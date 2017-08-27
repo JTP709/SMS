@@ -108,8 +108,6 @@ def gconnect():
 	output += '<img src="'
 	output += session['picture']
 	output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-	print(credentials)
-	print(credentials.access_token)
 	flash("you are now logged in as %s" % session['username'])
 	print("done!")
 	return output
@@ -152,7 +150,7 @@ def dashboard():
 	# Fetches most recent incidents
 	incident_query = """
     		SELECT to_char(date_time, 'FMMonth FMDD, YYYY'),
-    			to_char(date_time, 'HH12:MI'),
+    			to_char(date_time, 'HH24:MI'),
     			case_num, incident_cat, description
     			FROM incident
     			WHERE incident.injury = TRUE
@@ -160,7 +158,9 @@ def dashboard():
             """
 	cursor.execute(incident_query)
 	results = cursor.fetchall()
+	
 	# Fetches Audit Health
+
 	health = []
 	query = """
     		SELECT type,
@@ -171,9 +171,7 @@ def dashboard():
             """
 	cursor.execute(query)
 	audit_results = cursor.fetchall()
-	print(audit_results)
 	length = len(audit_results)
-
 	audit_def = 0.0
 	b_total = 0.0
 	audit_b_def = 0.0
@@ -181,7 +179,6 @@ def dashboard():
 	audit_a_def = 0.0
 	h_total = 0.0
 	audit_h_def = 0.0
-
 	for i in audit_results:
 		for j in range(len(i)):
 			if i[j] == True:
@@ -201,16 +198,8 @@ def dashboard():
 			for k in range(len(i)):
 				if i[k] == True:
 					audit_h_def = audit_h_def + 1.0
-	print(audit_b_def)
-	print(b_total)
-	print(audit_a_def)
-	print(a_total)
-	print(audit_h_def)
-	print(h_total)
-
 	audit_perc = int(float(audit_def/(length*3)*100))
 	health.append(audit_perc)
-	
 	audit_a_perc = int(float(audit_a_def/a_total*100))
 	health.append(audit_a_perc)
 	audit_b_perc = int(float(audit_b_def/b_total*100))
@@ -218,13 +207,12 @@ def dashboard():
 	audit_h_perc = int(float(audit_h_def/h_total*100))
 	health.append(audit_h_perc)
 	
-	print(health)
-
 	# Fetches Upcoming Action Items
+
 	query = """
 			SELECT id,
 					to_char(date_time, 'FMMonth FMDD, YYYY'),
-					to_char(date_time, 'HH12:MI'), 
+					to_char(date_time, 'HH24:MI'), 
 					case_id,
 					audit_id,
 					finding,
@@ -239,7 +227,6 @@ def dashboard():
 	actions = cursor.fetchall()
 	length = len(results)
 	db.close()
-	print(weather)
 	return render_template('dashboard.html',incidents = results, health = health, actions = actions, weather = weather)
 
 @app.route('/incidents/')
@@ -249,7 +236,7 @@ def incidents():
 	incident_query = """
     		SELECT case_num,
     				to_char(date_time, 'FMMonth FMDD, YYYY'),
-	    			to_char(date_time, 'HH12:MI'), 
+	    			to_char(date_time, 'HH24:MI'), 
 	    			incident_type, 
 	    			incident_cat, 
 	    			injury, 
@@ -298,8 +285,6 @@ def newIncident():
 		user_id	 = getUserID(session['email'])
 
 		data = (new_id, date_time, incident_type, incident_cat, injury, property_damage, description, root_cause, user_id)
-
-		#print(date_time, incident_type, incident_cat, injury, property_damage, description, root_cause)
 
 		cursor.execute(insert, data)
 
@@ -378,7 +363,7 @@ def editIncident(id):
 		query = """
 	    		SELECT i.case_num,
 	    				to_char(i.date_time, 'FMMonth FMDD, YYYY'),
-		    			to_char(i.date_time, 'HH12:MI'),
+		    			to_char(i.date_time, 'HH24:MI'),
 		    			i.incident_type, 
 		    			i.incident_cat, 
 		    			i.injury, 
@@ -395,7 +380,7 @@ def editIncident(id):
 		cursor.execute(query, data)
 		results = cursor.fetchall()
 		creator = getUserInfo(str(results[0][11]))
-		if 'username' not in session or int(creator[0]) != int(session['user_id']):
+		if 'username' not in session or int(creator[0]) != int(session['user_id'][0]):
 			output = ''
 			output += "<h1>I'm sorry, "
 			output += session['username']
@@ -433,7 +418,7 @@ def audits():
 	query = """
     		SELECT a.id,
     				to_char(a.date_time, 'FMMonth FMDD, YYYY'),
-	    			to_char(a.date_time, 'HH12:MI'), 
+	    			to_char(a.date_time, 'HH24:MI'), 
 	    			a.type,
 	    			a.ans_1,
 	    			a.ans_2,
@@ -584,7 +569,7 @@ def editAudit(id):
 		query = """
 	    		SELECT a.id,
     				to_char(a.date_time, 'FMMonth FMDD, YYYY'),
-	    			to_char(a.date_time, 'HH12:MI'), 
+	    			to_char(a.date_time, 'HH24:MI'), 
 	    			a.type,
 	    			a.que_1,
 	    			a.que_2,
@@ -605,7 +590,7 @@ def editAudit(id):
 		cursor.execute(query, data)
 		results = cursor.fetchall()
 		creator = getUserInfo(str(results[0][14]))
-		if 'username' not in session or int(creator[0]) != int(session['user_id']):
+		if 'username' not in session or int(creator[0]) != int(session['user_id'][0]):
 			output = ''
 			output += "<h1>I'm sorry, "
 			output += session['username']
@@ -643,7 +628,7 @@ def actions():
 	query = """
     		SELECT id,
     				to_char(date_time, 'FMMonth FMDD, YYYY'),
-	    			to_char(date_time, 'HH12:MI'), 
+	    			to_char(date_time, 'HH24:MI'), 
     				case_id,
     				audit_id,
     				finding,
@@ -731,7 +716,7 @@ def editActionItem(id):
 		query = """
 	    		SELECT id,
     				to_char(date_time, 'FMMonth FMDD, YYYY'),
-	    			to_char(date_time, 'HH12:MI'), 
+	    			to_char(date_time, 'HH24:MI'), 
     				case_id,
     				audit_id,
     				finding,
@@ -745,7 +730,7 @@ def editActionItem(id):
 		cursor.execute(query, data)
 		results = cursor.fetchall()
 		creator = getUserInfo(str(results[0][8]))
-		if 'username' not in session or int(creator[0]) != int(session['user_id']):
+		if 'username' not in session or int(creator[0]) != int(session['user_id'][0]):
 			output = ''
 			output += "<h1>I'm sorry, "
 			output += session['username']
@@ -795,14 +780,14 @@ def closeActionItem(id):
 
 # Custom Report Generator
 
-@app.route('/incidents/reports/')
+@app.route('/incidents/reports/', methods = ['GET','POST'])
 def incidentsReports():
-	db, cursor = connect()
-	# need to add date
-	incident_query = """
+	if request.method == 'POST':
+		db, cursor = connect()
+		query = """
     		SELECT case_num,
     				to_char(date_time, 'FMMonth FMDD, YYYY'),
-	    			to_char(date_time, 'HH12:MI'), 
+	    			to_char(date_time, 'HH24:MI'), 
 	    			incident_type, 
 	    			incident_cat, 
 	    			injury, 
@@ -810,15 +795,50 @@ def incidentsReports():
 	    			description,
 	    			root_cause
     			FROM incident
+    			WHERE incident_type = %s AND
+    					incident_cat = %s AND
+    					injury = %s AND
+    					property_damage = %s
     			ORDER BY case_num desc;
             """
-	cursor.execute(incident_query)
-	results = cursor.fetchall()
-	length = len(results)
+		
+		incident_type = request.form.get('incident_type')
+		incident_cat = request.form.get('incident_cat')
+		injury = request.form.get('injury')
+		property_damage = request.form.get('property_damage')
+		
 
-	return render_template('incidents.html',incidents = results, length = length)
-	db.close()
+		data = (incident_type, incident_cat, injury, property_damage)
 
+		cursor.execute(query, data)
+		results = cursor.fetchall()
+		length = len(results)
+		db.commit()
+		db.close()
+
+		return render_template('incidents_reports.html',incidents = results, length = length)
+
+	else:
+		db, cursor = connect()
+		
+		query = """
+	    		SELECT case_num,
+	    				to_char(date_time, 'FMMonth FMDD, YYYY'),
+		    			to_char(date_time, 'HH24:MI'), 
+		    			incident_type, 
+		    			incident_cat, 
+		    			injury, 
+		    			property_damage,
+		    			description,
+		    			root_cause
+	    			FROM incident
+	    			ORDER BY case_num desc;
+	            """
+		cursor.execute(query)
+		results = cursor.fetchall()
+		length = len(results)
+		return render_template('incidents_reports.html',incidents = results, length = length)
+		db.close()
 
 @app.route('/audits/reports/')
 def auditsReports():
@@ -960,7 +980,6 @@ def usersJSONID(id):
 
 if __name__ == '__main__':
 	weather = getWeather()
-	print(weather)
 	scheduler = BackgroundScheduler()
 	scheduler.start()
 	scheduler.add_job(
