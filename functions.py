@@ -1,3 +1,5 @@
+import psycopg2
+
 def connect(database_name="safety"):
     """Connects to database"""
     try:
@@ -5,34 +7,7 @@ def connect(database_name="safety"):
         cursor = db.cursor()
         return db, cursor
     except:
-        print ("<error message>")
-
-def audit_health():
-	db, cursor = connect()
-	query = """
-    		SELECT count(*) as num
-    			FROM audit
-    			WHERE ans_1 = FALSE OR
-    				ans_2 = FALSE OR
-    				ans_3 = FALSE
-            """
-	cursor.execute(query)
-	results = cursor.fetchone()
-	return results
-	db.close()
-
-def audit_totals():
-	db, cursor = connect()
-	query = """
-			SELECT count(*) as num
-				FROM audit
-			"""
-
-	cursor.execute(query)
-	results = cursor.fetchone()
-
-	return results
-	db.close()
+        print ("Could not connect to the database.")
 
 def getCaseID():
 	db, cursor = connect()
@@ -44,21 +19,115 @@ def getCaseID():
 			""")
 
 	cursor.execute(query)
-	results = int(cursor.fetchone())
+	results = cursor.fetchone()
+	results_i = int(results[0])
 
-
-	return str(results)
+	return str(results_i)
 	db.close()
 
-def incidentActions(case,finding,action):
+def getAuditID():
 	db, cursor = connect()
-	action_items = ("""
-					INSERT INTO action_items (
-									case_id,
-									finding,
-									corrective_action
-									)
-						VALUES (%s,%s,%s)
-					""")
-	cursor.execute(action_items, case, finding, action)
-	dbclose()
+	query = ("""
+				SELECT id
+					FROM audit
+					ORDER BY id desc
+					LIMIT 1;
+			""")
+
+	cursor.execute(query)
+	results = cursor.fetchone()
+	results_a = int(results[0])
+
+	return str(results_a)
+	db.close()
+
+def getActionsID():
+	db, cursor = connect()
+	query = ("""
+				SELECT id
+					FROM action_items
+					ORDER BY id desc
+					LIMIT 1;
+			""")
+
+	cursor.execute(query)
+	results = cursor.fetchone()
+	results_a = int(results[0])
+
+	return str(results_a)
+	db.close()
+
+def getUserIDNum():
+	db, cursor = connect()
+	query = ("""
+				SELECT id
+					FROM users
+					ORDER BY id desc
+					LIMIT 1;
+			""")
+
+	cursor.execute(query)
+	results = cursor.fetchone()
+	results_a = int(results[0])
+
+	return str(results_a)
+	db.close()
+
+def createUser(session):
+	db, cursor = connect()
+	insert = ("""
+			INSERT INTO users (
+							id,
+							name,
+							email,
+							picture
+							)
+				VALUES (%s,%s,%s,%s)
+			""")
+	case_id = getUserIDNum()
+	new_id = str(int(case_id)+1)
+	name = session['username']
+	email = session['email']
+	picture = session['picture']
+		
+	data = (new_id, name, email, picture)
+
+	cursor.execute(insert, data)
+	db.commit()
+	db.close()
+	return new_id
+
+def getUserInfo(id):
+	db, cursor = connect()
+	query = """
+			SELECT id,
+					name,
+					email,
+					picture,
+					position
+				FROM users
+				WHERE id = %s;
+			"""
+	data = (str(id),)
+	cursor.execute(query, data)
+	results = cursor.fetchone()
+	return results
+	db.close()
+
+def getUserID(email):
+	db, cursor = connect()
+	query = """
+			SELECT id
+				FROM users
+				WHERE email = %s;
+			"""
+	data = (email,)
+	cursor.execute(query, data)
+	results = cursor.fetchone()
+	return results
+	db.close()
+
+def datetime_handler(x):
+    if isinstance(x, datetime.datetime):
+        return x.isoformat()
+    raise TypeError("Unknown type")

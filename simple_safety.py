@@ -19,169 +19,10 @@ import httplib2
 import json
 import requests
 import datetime
-#from functions import connect, audit_health, audit_totals, getCaseID, incidentActions
+from functions import connect, getCaseID, getAuditID, getActionsID, getUserIDNum, createUser, getUserInfo, getUserID, datetime_handler
 
 CLIENT_ID = json.loads(open('client_secrets.json','r').read())['web']['client_id']
 APPLICATION_NAME = "Safety Management System"
-
-def connect(database_name="safety"):
-    """Connects to database"""
-    try:
-        db = psycopg2.connect("dbname={}".format(database_name))
-        cursor = db.cursor()
-        return db, cursor
-    except:
-        print ("Could not connect to the database.")
-
-def audit_health():
-	db, cursor = connect()
-	query = """
-    		SELECT count(*) as num
-    			FROM audit
-    			WHERE ans_1 = FALSE OR
-    				ans_2 = FALSE OR
-    				ans_3 = FALSE
-            """
-	cursor.execute(query)
-	results = cursor.fetchone()
-	return results
-	db.close()
-
-def audit_totals():
-	db, cursor = connect()
-	query = """
-			SELECT count(*) as num
-				FROM audit
-			"""
-
-	cursor.execute(query)
-	results = cursor.fetchone()
-
-	return results
-	db.close()
-
-def getCaseID():
-	db, cursor = connect()
-	query = ("""
-				SELECT case_num
-					FROM incident
-					ORDER BY case_num desc
-					LIMIT 1;
-			""")
-
-	cursor.execute(query)
-	results = cursor.fetchone()
-	results_i = int(results[0])
-
-	return str(results_i)
-	db.close()
-
-def getAuditID():
-	db, cursor = connect()
-	query = ("""
-				SELECT id
-					FROM audit
-					ORDER BY id desc
-					LIMIT 1;
-			""")
-
-	cursor.execute(query)
-	results = cursor.fetchone()
-	results_a = int(results[0])
-
-	return str(results_a)
-	db.close()
-
-def getActionsID():
-	db, cursor = connect()
-	query = ("""
-				SELECT id
-					FROM action_items
-					ORDER BY id desc
-					LIMIT 1;
-			""")
-
-	cursor.execute(query)
-	results = cursor.fetchone()
-	results_a = int(results[0])
-
-	return str(results_a)
-	db.close()
-
-def getUserIDNum():
-	db, cursor = connect()
-	query = ("""
-				SELECT id
-					FROM users
-					ORDER BY id desc
-					LIMIT 1;
-			""")
-
-	cursor.execute(query)
-	results = cursor.fetchone()
-	results_a = int(results[0])
-
-	return str(results_a)
-	db.close()
-
-def createUser(session):
-	db, cursor = connect()
-	insert = ("""
-			INSERT INTO users (
-							id,
-							name,
-							email,
-							picture
-							)
-				VALUES (%s,%s,%s,%s)
-			""")
-	case_id = getUserIDNum()
-	new_id = str(int(case_id)+1)
-	name = session['username']
-	email = session['email']
-	picture = session['picture']
-		
-	data = (new_id, name, email, picture)
-
-	cursor.execute(insert, data)
-	db.commit()
-	db.close()
-	return new_id
-
-def getUserInfo(id):
-	db, cursor = connect()
-	query = """
-			SELECT id,
-					name,
-					email,
-					picture,
-					position
-				FROM users
-				WHERE id = %s;
-			"""
-	data = (str(id),)
-	cursor.execute(query, data)
-	results = cursor.fetchone()
-	return results
-	db.close()
-
-def getUserID(email):
-	db, cursor = connect()
-	query = """
-			SELECT id
-				FROM users
-				WHERE email = %s;
-			"""
-	data = (email,)
-	cursor.execute(query, data)
-	results = cursor.fetchone()
-	return results
-	db.close()
-
-def datetime_handler(x):
-    if isinstance(x, datetime.datetime):
-        return x.isoformat()
-    raise TypeError("Unknown type")
 
 app = Flask(__name__)
 
@@ -315,8 +156,26 @@ def dashboard():
 	cursor.execute(incident_query)
 	results = cursor.fetchall()
 
-	audit_query = audit_health()
-	audit_query_t = audit_totals()
+	db, cursor = connect()
+	query = """
+    		SELECT count(*) as num
+    			FROM audit
+    			WHERE ans_1 = FALSE OR
+    				ans_2 = FALSE OR
+    				ans_3 = FALSE
+            """
+	cursor.execute(query)
+	audit_query = cursor.fetchone()
+
+	db, cursor = connect()
+	query = """
+			SELECT count(*) as num
+				FROM audit
+			"""
+
+	cursor.execute(query)
+	audit_query_t = cursor.fetchone()
+
 	health = round(float(float(audit_query[0])/float(audit_query_t[0]))*100,2)
 
 	query = """
@@ -890,8 +749,18 @@ def closeActionItem(id):
 	else:
 		return render_template('actions_close.html', id = id)
 
-@app.route('/reports/')
-def reports():
+# Custom Report Generator
+
+@app.route('/incidents/reports/')
+def incidentsReports():
+	return "This page will be used to generate custom reports and injury/incident trends."
+
+@app.route('/audits/reports/')
+def auditsReports():
+	return "This page will be used to generate custom reports and injury/incident trends."
+
+@app.route('/actions/reports/')
+def actionsReports():
 	return "This page will be used to generate custom reports and injury/incident trends."
 
 # JSON API EndPoints
