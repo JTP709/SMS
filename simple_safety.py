@@ -830,41 +830,45 @@ def closeActionItem(id):
 def incidentsReports():
 	if request.method == 'POST':
 		db, cursor = connect()
-		query = """
-    		SELECT case_num,
-    				to_char(date_time, 'FMMonth FMDD, YYYY'),
-	    			to_char(date_time, 'HH24:MI'), 
-	    			incident_type, 
-	    			incident_cat, 
-	    			injury, 
-	    			property_damage,
-	    			description,
-	    			root_cause
-    			FROM incident
-    			WHERE incident_type = %s AND
-						incident_cat = %s AND
-						injury = %s AND
-						property_damage = %s
-    			ORDER BY case_num desc;
-            """
 		
+		search = []
+
 		incident_type = request.form.get('incident_type')
 		incident_cat = request.form.get('incident_cat')
 		injury = request.form.get('injury')
 		property_damage = request.form.get('property_damage')
-		
-		search = (incident_type, incident_cat, injury, property_damage)
-		print(search)
-		#data = list()
-		#for i in search != None:
-		#	data.append(i)
 
-		#print (data)
-		
-		cursor.execute(query, search)
-		results = cursor.fetchall()
+		if incident_type != None:
+			search.append(('incident_type = ', incident_type))
+		if incident_cat != None:
+			search.append('incident_cat = ', incident_cat)
+		if injury != None:
+			search.append('injury = ', incident_type)
+		if property_damage != None:
+			search.append('property_damage = ', property_damage)
+		print(search)
+
+		for i in range(len(search)):
+			query = """
+	    		SELECT case_num,
+	    				to_char(date_time, 'FMMonth FMDD, YYYY'),
+		    			to_char(date_time, 'HH24:MI'), 
+		    			incident_type, 
+		    			incident_cat, 
+		    			injury, 
+		    			property_damage,
+		    			description,
+		    			root_cause
+	    			FROM incident
+	    			WHERE %s
+	    			ORDER BY case_num desc;
+	            """
+			search_loop = (search[i])
+			print(search_loop[i])
+			cursor.execute(query, search_loop)
+			results = cursor.fetchall()
+
 		length = len(results)
-		db.commit()
 		db.close()
 
 		return render_template('incidents_reports.html',incidents = results, length = length)
