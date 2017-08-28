@@ -8,7 +8,10 @@ def create_tables():
     commands = (
         """
         CREATE TYPE type AS ENUM (
-        	'Injury',
+        	'FA',
+            'RI',
+            'RD',
+            'LTI',
         	'PIT Incident',
         	'Near Miss',
         	'HAZMAT'
@@ -75,6 +78,14 @@ def create_tables():
             due_date TIMESTAMP default NULL,
             open_close BOOLEAN,
             user_id INTEGER REFERENCES users(id)
+        )
+        """,
+        """
+        CREATE TABLE manhours (
+            id SERIAL PRIMARY KEY,
+            year INTEGER NOT NULL,
+            week INTEGER NOT NULL,
+            hours DECIMAL NOT NULL
         )
         """)
     conn = None

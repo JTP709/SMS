@@ -2,8 +2,6 @@
 
 """
 TODO:
-- Add recordable vs first aid to injuries
-	- Show DART, RIR, FAIR, LTIR on dashboard
 - Generate Custom Reports
 	- Filter options for custom report
 - JSON
@@ -256,7 +254,49 @@ def incidents():
 	results = cursor.fetchall()
 	length = len(results)
 
-	return render_template('incidents.html',incidents = results, length = length)
+	total_i = 0
+	total_fa = 0
+	total_ri = 0
+	total_rd = 0
+	total_lti = 0
+	for r in results:
+		if r[3] == 'FA':
+			total_fa = total_fa + 1
+			total_i = total_i + 1
+		if r[3] == 'RI':
+			total_ri = total_ri + 1
+			total_i = total_i + 1
+		if r[3] == 'RD':
+			total_rd = total_rd + 1
+			total_i = total_i + 1
+		if r[3] == 'LTI':
+			total_lti = total_lti + 1
+			total_i = total_i + 1
+	total_rir = total_ri+total_rd+total_lti
+
+	hours_query = """
+			SELECT sum(hours) as num
+				FROM manhours
+				WHERE year = 2017
+				"""
+	cursor.execute(hours_query)
+	hour_results = cursor.fetchone()
+	manhours = hour_results[0]
+	print("HOURS: "+str(manhours))
+	print("TIR: "+str(total_i))
+	print("FAIR: "+str(total_fa))
+	print("RIR: "+str(total_ri))
+	print("LTIR: "+str(total_lti))
+	print("RDR: "+str(total_rd))
+	fair = float(total_fa*200000)/float(manhours)
+	rir = float(total_rir*200000)/float(manhours)
+	lti = float(total_lti*200000)/float(manhours)
+	ori = float(total_ri*200000)/float(manhours)
+	tir = float(total_i*200000)/float(manhours)
+
+	injury_rate = (fair, rir, lti, ori, tir)
+
+	return render_template('incidents.html',incidents = results, length = length, injury_rate = injury_rate)
 	db.close()
 
 @app.route('/incidents/new/', methods = ['GET','POST'])

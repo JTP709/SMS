@@ -1,42 +1,43 @@
 import psycopg2
 import datetime
 import re
+from random import randint
 from config import config
 
 # Add dates to incidents, audits. Rebuild Audit Tables.
 
 # Injury Case 1
-injury_act_1 = ('1','2017-01-16 15:36:38','Injury','Unsafe Act', 'TRUE', 'FALSE', 'While lifting a 50 lb item from the floor onto their wokrstation, the employee felt a sharp pain in their lower back.','The employee ran out of room on their workstation because the takeaway conveyor was inoperable','1')
+injury_act_1 = ('1','2017-01-16 15:36:38','FA','Unsafe Act', 'TRUE', 'FALSE', 'While lifting a 50 lb item from the floor onto their wokrstation, the employee felt a sharp pain in their lower back.','The employee ran out of room on their workstation because the takeaway conveyor was inoperable','1')
 
 actions_injury_1 = ('Provide mobile carts employees can use to stage product if/when the conveyor is inoperable.')
 
 # Injury Case 2
-injury_act_2 = ('2',"2017-03-28 5:01:2",'Injury','Unsafe Behavior', 'TRUE', 'FALSE', 'Employee was cutting open a box and cut their forearm.','The employee was cutting towards themself and not wearing cut resistant sleeves.','1')
+injury_act_2 = ('2',"2017-03-28 5:01:2",'RD','Unsafe Behavior', 'TRUE', 'FALSE', 'Employee was cutting open a box and cut their forearm.','The employee was cutting towards themself and not wearing cut resistant sleeves.','1')
 
 actions_injury_2 = ('Coach employees at morning stand-up meeting on proper box opening techniques. Perform additional behavior audits on decant stations.')
 
 # Injury Case 3
-injury_act_3 = ('3',"2017-03-30 12:00:5",'Injury','Unsafe Condition', 'TRUE', 'FALSE', 'Employee tripped over product protruding into the walkway from a stow location.',"The item was improperly stowed in a bin location too small to accomodate it's length.",'1')
+injury_act_3 = ('3',"2017-03-30 12:00:5",'LTI','Unsafe Condition', 'TRUE', 'FALSE', 'Employee tripped over product protruding into the walkway from a stow location.',"The item was improperly stowed in a bin location too small to accomodate it's length.",'1',)
 
 actions_injury_3 = ('Supervisors will walk bin locations and perform bin audits when a discrepency is found. QA will perform additional bin audits per shift.')
 
 # Injury Case 4
-injury_act_4 = ('4',"2017-04-01 01:41:29",'PIT Incident','Unsafe Act', 'FALSE', 'TRUE', "PIT Operator struck pallet racking while turning into an aisle.","The PIT Operator was looking over their shoulder and talking to another employee while moving in the opposite direction and not paying attention to where they were moving.",'1')
+injury_act_4 = ('4',"2017-04-01 01:41:29",'PIT Incident','Unsafe Act', 'FALSE', 'TRUE', "PIT Operator struck pallet racking while turning into an aisle.","The PIT Operator was looking over their shoulder and talking to another employee while moving in the opposite direction and not paying attention to where they were moving.",'1',)
 
 actions_injury_4 = ("Hold a safety stand-down with all PIT Operators. Perform additonal behavior audits on PIT Operators for one week. Operator at fault will be held accountable in accordance with disciplinary policy.")
 
 # Injury Case 5
-injury_act_5 = ('5',"2017-05-12 19:39:18",'Injury','Unsafe Act', 'TRUE', 'TRUE', "Employee was pulling a pallet with a pallet jack under through the entryway when the top item hit the door frame and fell off, landing on another employee. The item was damaged beyond repair.","The employee pulling the pallet jack stacked the pallet to 7 feet tall, higher than the 5 foot stacking limit.",'1')
+injury_act_5 = ('5',"2017-05-12 19:39:18",'RI','Unsafe Act', 'TRUE', 'TRUE', "Employee was pulling a pallet with a pallet jack under through the entryway when the top item hit the door frame and fell off, landing on another employee. The item was damaged beyond repair.","The employee pulling the pallet jack stacked the pallet to 7 feet tall, higher than the 5 foot stacking limit.",'1')
 
 actions_injury_5 = ("Coach all employees at start of shift stand-up meeting on the pallet heigh limits. Perform additional area organization audits with a focus on pallet stacking height.")
 
 # Injury Case 6
-injury_act_6 = ('6',"2017-05-29 21:30:08",'Injury','Unsafe Act', 'TRUE', 'FALSE', "Employee was loading a truck with outbound product when they felt a sharp pain in their shoulder.","Employee was lifitng a heavy item (estimated 40 to 50 lbs) above their head to stack on the top of the stack of items, approximately 7 foot high. The employee was not using a stool to ensure they don't have to lift outside of their 'power zone.'",'1')
+injury_act_6 = ('6',"2017-05-29 21:30:08",'FA','Unsafe Act', 'TRUE', 'FALSE', "Employee was loading a truck with outbound product when they felt a sharp pain in their shoulder.","Employee was lifitng a heavy item (estimated 40 to 50 lbs) above their head to stack on the top of the stack of items, approximately 7 foot high. The employee was not using a stool to ensure they don't have to lift outside of their 'power zone.'",'1')
 
 actions_injury_6 = ("Supervisor will perform an area organization audit on the dock to ensure the step stools are available. If not, supervisor will place an order for more stalls with procurement.")
 
 # Injury Case 7
-injury_act_7 = ('7',"2017-06-01 16:30:41",'Injury','Unsafe Behavior', 'TRUE', 'FALSE', "Employee was placing an item on their workstation when they dropped the item and it struck their left foot.","Employee was rushing to process the items quickly because they were worried about making rate.",'1')
+injury_act_7 = ('7',"2017-06-01 16:30:41",'FA','Unsafe Behavior', 'TRUE', 'FALSE', "Employee was placing an item on their workstation when they dropped the item and it struck their left foot.","Employee was rushing to process the items quickly because they were worried about making rate.",'1')
 
 actions_injury_7 = ("Supervisor will spend an hour working one on one with the employee to help them develop skills to work efficiently without sacrificing safety or quality. Department Manager will audit supervisor engagements to ensure they are not placing undue pressure on employees.")
 
@@ -197,8 +198,8 @@ def populate():
 
 		action_due_date = dueDate(audits[j])
 		action_data = (str(j+1), audits[j][1], 'Audit deficiency', actions_a[j], action_due_date, 't','1')
-
-		action_items_a = (
+ 
+ 		action_items_a = (
 			"""
 			INSERT INTO action_items (
 							audit_id,
@@ -213,6 +214,26 @@ def populate():
 		
 		cur.execute(action_items_a, action_data)
 		print("Action item added!")
+
+	week = 1
+	for mh in range(34):
+		hours = randint(3000,5000)
+		year = 2017
+		hours_data = (year,week,hours)
+		week += 1
+
+		hours = (
+			"""
+			INSERT INTO manhours (
+							year,
+							week,
+							hours
+							)
+				VALUES (%s,%s,%s)
+			"""
+			)
+		cur.execute(hours, hours_data)
+		print("Hours added!")
 
 	cur.close()
 	conn.commit()
