@@ -154,3 +154,61 @@ def getWeather():
 	print("Weather API Updated")
 	return weather_data
 
+def getInjuryRates():
+	db, cursor = connect()
+
+	incident_query = """
+    		SELECT case_num,
+    				to_char(date_time, 'FMMonth FMDD, YYYY'),
+	    			to_char(date_time, 'HH24:MI'), 
+	    			incident_type, 
+	    			incident_cat, 
+	    			injury, 
+	    			property_damage,
+	    			description,
+	    			root_cause
+    			FROM incident
+    			ORDER BY case_num desc;
+            """
+	cursor.execute(incident_query)
+	results = cursor.fetchall()
+	length = len(results)
+
+	total_i = 0
+	total_fa = 0
+	total_ri = 0
+	total_rd = 0
+	total_lti = 0
+	for r in results:
+		if r[3] == 'FA':
+			total_fa = total_fa + 1
+			total_i = total_i + 1
+		if r[3] == 'RI':
+			total_ri = total_ri + 1
+			total_i = total_i + 1
+		if r[3] == 'RD':
+			total_rd = total_rd + 1
+			total_i = total_i + 1
+		if r[3] == 'LTI':
+			total_lti = total_lti + 1
+			total_i = total_i + 1
+	total_rir = total_ri+total_rd+total_lti
+
+	hours_query = """
+			SELECT sum(hours) as num
+				FROM manhours
+				WHERE year = 2017
+				"""
+	cursor.execute(hours_query)
+	hour_results = cursor.fetchone()
+	manhours = hour_results[0]
+	fair = round(float(total_fa*200000)/float(manhours), 2)
+	rir = round(float(total_rir*200000)/float(manhours), 2)
+	lti = round(float(total_lti*200000)/float(manhours), 2)
+	ori = round(float(total_ri*200000)/float(manhours), 2)
+	tir = round(float(total_i*200000)/float(manhours), 2)
+
+	injury_rate = (fair, rir, lti, ori, tir)
+	db.close()
+
+	return injury_rate

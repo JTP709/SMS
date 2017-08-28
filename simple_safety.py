@@ -16,7 +16,7 @@ TODO:
 import sys
 print(sys.version)
 # Import custom functions
-from functions import connect, getCaseID, getAuditID, getActionsID, getUserIDNum, createUser, getUserInfo, getUserID, datetime_handler, getWeather
+from functions import connect, getCaseID, getAuditID, getActionsID, getUserIDNum, createUser, getUserInfo, getUserID, datetime_handler, getWeather, getInjuryRates
 # Import Flask operations
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, make_response, flash
 # Import oauth
@@ -151,7 +151,7 @@ def gdisconnect():
 def dashboard():
 	"""Loads the dashboard page"""
 	db, cursor = connect()
-	# Fetches most recent incidents
+	# Fetches most recent incidents and injury rates
 	incident_query = """
     		SELECT to_char(date_time, 'FMMonth FMDD, YYYY'),
     			to_char(date_time, 'HH24:MI'),
@@ -162,6 +162,8 @@ def dashboard():
             """
 	cursor.execute(incident_query)
 	results = cursor.fetchall()
+
+	injury_rate = getInjuryRates()
 	
 	# Fetches Audit Health
 
@@ -231,12 +233,12 @@ def dashboard():
 	actions = cursor.fetchall()
 	length = len(results)
 	db.close()
-	return render_template('dashboard.html',incidents = results, health = health, actions = actions, weather = weather)
+	return render_template('dashboard.html',incidents = results, health = health, actions = actions, weather = weather, injury_rate = injury_rate)
 
 @app.route('/incidents/')
 def incidents():
 	db, cursor = connect()
-	# need to add date
+
 	incident_query = """
     		SELECT case_num,
     				to_char(date_time, 'FMMonth FMDD, YYYY'),
@@ -254,47 +256,7 @@ def incidents():
 	results = cursor.fetchall()
 	length = len(results)
 
-	total_i = 0
-	total_fa = 0
-	total_ri = 0
-	total_rd = 0
-	total_lti = 0
-	for r in results:
-		if r[3] == 'FA':
-			total_fa = total_fa + 1
-			total_i = total_i + 1
-		if r[3] == 'RI':
-			total_ri = total_ri + 1
-			total_i = total_i + 1
-		if r[3] == 'RD':
-			total_rd = total_rd + 1
-			total_i = total_i + 1
-		if r[3] == 'LTI':
-			total_lti = total_lti + 1
-			total_i = total_i + 1
-	total_rir = total_ri+total_rd+total_lti
-
-	hours_query = """
-			SELECT sum(hours) as num
-				FROM manhours
-				WHERE year = 2017
-				"""
-	cursor.execute(hours_query)
-	hour_results = cursor.fetchone()
-	manhours = hour_results[0]
-	print("HOURS: "+str(manhours))
-	print("TIR: "+str(total_i))
-	print("FAIR: "+str(total_fa))
-	print("RIR: "+str(total_ri))
-	print("LTIR: "+str(total_lti))
-	print("RDR: "+str(total_rd))
-	fair = float(total_fa*200000)/float(manhours)
-	rir = float(total_rir*200000)/float(manhours)
-	lti = float(total_lti*200000)/float(manhours)
-	ori = float(total_ri*200000)/float(manhours)
-	tir = float(total_i*200000)/float(manhours)
-
-	injury_rate = (fair, rir, lti, ori, tir)
+	injury_rate = getInjuryRates()
 
 	return render_template('incidents.html',incidents = results, length = length, injury_rate = injury_rate)
 	db.close()

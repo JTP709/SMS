@@ -39,7 +39,27 @@
 	<div>
 		<h1>Safety Dashboard</h1>
 		<div>
-			<h3>Three Most Recent Injuries:</h3>
+			<br>
+			<h2>Injury Rates</h2>
+			<div>
+				<table style = "width: 100%">
+					<tr>
+						<th><b>First Aid Rate</b></th>
+						<th><b>Recordable Injury Rate</b></th>
+						<th><b>Lost Time Injury Rate</b></th>
+						<th><b>Other Recordable Injury Rate</b></th>
+						<th><b>Total Incident Rate</b></th>
+					</tr>
+					<tr>
+						<th>{{injury_rate[0]}}</th>
+						<th>{{injury_rate[1]}}</th>
+						<th>{{injury_rate[2]}}</th>
+						<th>{{injury_rate[3]}}</th>
+						<th>{{injury_rate[4]}}</th>
+					</tr>
+				</table>
+			</div>
+			<h2>Three Most Recent Injuries:</h2>
 			<table style="width:100%">
 				<tr>
 					<th><b>Date</b></th>
@@ -60,7 +80,7 @@
 			 </table>
 		</div>
 		<div>
-			<h3>Audit Health:</h3>
+			<h2>Audit Health:</h2>
 			<table style="width:100%">
 				<tr>
 					<th><b>Overall Audit Health</b></th>
@@ -77,7 +97,7 @@
 			</table>
 		</div>
 		<div>
-			<h3>Upcoming Action Items:</h3>
+			<h2>Upcoming Action Items:</h2>
 			<table style="width:100%">
 				<tr>
 					<th><b>Action Item ID</b></th>
@@ -118,7 +138,7 @@
 			</table>
 		</div>
 		<div>
-			<h3>Current Weather:</h3>
+			<h2>Current Weather:</h2>
 			<table style="width:100%">
 				<tr>
 					<th><b>Current Weather</b></th>
