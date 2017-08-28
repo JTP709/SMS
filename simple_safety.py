@@ -854,14 +854,14 @@ def incidentsReports():
 		property_damage = request.form.get('property_damage')
 		
 		search = (incident_type, incident_cat, injury, property_damage)
+		print(search)
+		#data = list()
+		#for i in search != None:
+		#	data.append(i)
 
-		data = list()
-		if i in search != None:
-			data.append(i)
-
-		print (data)
+		#print (data)
 		
-		cursor.execute(query, data)
+		cursor.execute(query, search)
 		results = cursor.fetchall()
 		length = len(results)
 		db.commit()
