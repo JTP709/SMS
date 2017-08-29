@@ -9,20 +9,20 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>Simple Safety</title>
+    <title>Dashboard Template for Bootstrap</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="{{ url_for('static', filename ='bootstrap.min.css') }}" rel="stylesheet">
+    <link href="../../dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="{{ url_for('static', filename ='ie10-viewport-bug-workaround.css') }}" rel="stylesheet">
+    <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="{{ url_for('static', filename ='style.css') }}" rel="stylesheet">
+    <link href="dashboard.css" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]
-    <script type="text/javascript" src="{{ url_for('static', filename = 'ie-emulation-modes-warning.js') }}"></script>-->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="../../assets/js/ie-emulation-modes-warning.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -42,16 +42,17 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Simple Safety Manager</a>
+          <a class="navbar-brand" href="#">Project name</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
             <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Settings</a></li>
             <li><a href="#">Profile</a></li>
             <li><a href="#">Help</a></li>
           </ul>
           <form class="navbar-form navbar-right">
-            <input type="text" class="form-control" placeholder="Search Case Numbers...">
+            <input type="text" class="form-control" placeholder="Search...">
           </form>
         </div>
       </div>
@@ -61,15 +62,22 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li class="active"><a href="#">Dashboard<span class="sr-only">(current)</span></a></li>
-            <li><a href="#">Incidents</a></li>
-            <li><a href="#">Audits</a></li>
-             <li><a href="#">Action Items</a></li>
+            <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
+            <li><a href="#">Reports</a></li>
+            <li><a href="#">Analytics</a></li>
+            <li><a href="#">Export</a></li>
           </ul>
           <ul class="nav nav-sidebar">
-            <li><a href="">Submit an Incident</a></li>
-            <li><a href="">Submit an Audit</a></li>
-            <li><a href="">Submit an Action Item</a></li>
+            <li><a href="">Nav item</a></li>
+            <li><a href="">Nav item again</a></li>
+            <li><a href="">One more nav</a></li>
+            <li><a href="">Another nav item</a></li>
+            <li><a href="">More navigation</a></li>
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li><a href="">Nav item again</a></li>
+            <li><a href="">One more nav</a></li>
+            <li><a href="">Another nav item</a></li>
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
@@ -78,48 +86,24 @@
           <div class="row placeholders">
             <div class="col-xs-6 col-sm-3 placeholder">
               <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Incidents</h4>
-              <span class="text-muted">Incident Manager</span>
+              <h4>Label</h4>
+              <span class="text-muted">Something else</span>
             </div>
             <div class="col-xs-6 col-sm-3 placeholder">
               <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Audits</h4>
-              <span class="text-muted">Audit Manager</span>
+              <h4>Label</h4>
+              <span class="text-muted">Something else</span>
             </div>
             <div class="col-xs-6 col-sm-3 placeholder">
               <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Action Items</h4>
-              <span class="text-muted">Actions Manager</span>
+              <h4>Label</h4>
+              <span class="text-muted">Something else</span>
             </div>
             <div class="col-xs-6 col-sm-3 placeholder">
               <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Resources</h4>
-              <span class="text-muted">Safety Resources</span>
+              <h4>Label</h4>
+              <span class="text-muted">Something else</span>
             </div>
-          </div>
-
-          <h2 class="sub-header">Injury Rates</h2>
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>First Aid Injury Rate</th>
-                  <th>Recordable Injury Rate</th>
-                  <th>Lost Time Injury Rate</th>
-                  <th>Other Recordable Injury Rate</th>
-                  <th>Total Incident Rate</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>{{injury_rate[0]}}</th>
-                  <th>{{injury_rate[1]}}</th>
-                  <th>{{injury_rate[2]}}</th>
-                  <th>{{injury_rate[3]}}</th>
-                  <th>{{injury_rate[4]}}</th>
-                </tr>
-              </tbody>
-            </table>
           </div>
 
           <h2 class="sub-header">Most Recent Injury Cases</h2>
@@ -127,7 +111,7 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>Case</th>
+                  <th>Case ID</th>
                   <th>Date</th>
                   <th>Time</th>
                   <th>Category</th>
@@ -175,13 +159,13 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Incident ID</th>
-                  <th>Audit ID</th>
+                  <th>Action Item ID</th>
+                  <th>Incident Report</th>
+                  <th>Audit Report</th>
                   <th>Date</th>
                   <th>Time</th>
                   <th>Finding</th>
-                  <th>Corrective Actions</th>
+                  <th>Corrective Action</th>
                   <th>Due Date</th>
                   <th>Open/Close</th>
                 </tr>
@@ -216,30 +200,6 @@
             </table>
           </div>
 
-            <h2 class="sub-header">Weather</h2>
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Current Weather</th>
-                  <th>Temperature</th>
-                  <th>High</th>
-                  <th>Low</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>{{weather[0]}}</th>
-                  <th>{{weather[2]}}&#176;</th>
-                  <th>{{weather[3]}}&#176;</th>
-                  <th>{{weather[4]}}&#176;</th>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          </div>
-
         </div>
       </div>
     </div>
@@ -248,9 +208,11 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script>window.jQuery || document.write("<script type='text/javascript' src='{{ url_for('static', filename='jquery.min.js') }}''><\/script>")</script>
-    <script type="text/javascript" src="{{ url_for('static', filename ='bootstrap.min.js') }}"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="../../dist/js/bootstrap.min.js"></script>
+    <!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+    <script src="../../assets/js/vendor/holder.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script type="text/javascript" src="{{ url_for('static', filename='ie10-viewport-bug-workaround.js') }}"></script>
+    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
   </body>
 </html>

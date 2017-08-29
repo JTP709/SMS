@@ -1,0 +1,160 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+	<!-- Left Menu Column -->
+	<div>
+		<a href="/login">Login</a>
+		<br>
+		<a href="/gdisconnect/">Disconnect</a>
+		<br>
+		<a href="/dashboard/">Dashboard</a>
+		<br>
+		<a href="/reports/">Custom Report</a>
+		<br>
+		<a href="/incidents/">Incidents</a>
+		<br>
+		<a href="/incidents/new/">Submit an Incident Report</a>
+		<br>
+		<a href="/audits/">Audits</a>
+		<br>
+		<a href="/audits/new">Submit an Audit</a>
+		<br>
+		<a href="/actions/">Action Items</a>
+		<br>
+		<a href="/actions/new">Submit an Action Item</a>
+	</div>
+	<!-- Main Content -->
+	{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			<ul class=flashes>
+			{% for message in messages %}
+	  			<li>{{ message }}</li>
+			{% endfor %}
+			</ul>
+		{% endif %}
+	{% endwith %}
+	<div>
+		<h1>Safety Dashboard</h1>
+		<div>
+			<br>
+			<h2>Injury Rates</h2>
+			<div>
+				<table style = "width: 100%">
+					<tr>
+						<th><b>First Aid Rate</b></th>
+						<th><b>Recordable Injury Rate</b></th>
+						<th><b>Lost Time Injury Rate</b></th>
+						<th><b>Other Recordable Injury Rate</b></th>
+						<th><b>Total Incident Rate</b></th>
+					</tr>
+					<tr>
+						<th>{{injury_rate[0]}}</th>
+						<th>{{injury_rate[1]}}</th>
+						<th>{{injury_rate[2]}}</th>
+						<th>{{injury_rate[3]}}</th>
+						<th>{{injury_rate[4]}}</th>
+					</tr>
+				</table>
+			</div>
+			<h2>Three Most Recent Injuries:</h2>
+			<table style="width:100%">
+				<tr>
+					<th><b>Date</b></th>
+					<th><b>Time</b></th>
+					<th><b>Case ID</b></th>
+					<th><b>Category</b></th>
+					<th><b>Description</b></th>
+				</tr>
+				{% for i in range(3) %}
+					<tr> 
+						<th>{{incidents[i][0]}}</th>
+						<th>{{incidents[i][1]}}</th>
+						<th><a href="/incidents/edit/{{incidents[i][2]}}/">{{incidents[i][2]}}</a></th>
+						<th>{{incidents[i][3]}}</th>
+						<th>{{incidents[i][4]}}</th>
+					</tr>
+				{% endfor %}
+			 </table>
+		</div>
+		<div>
+			<h2>Audit Health:</h2>
+			<table style="width:100%">
+				<tr>
+					<th><b>Overall Audit Health</b></th>
+					<th><b>Behavior Audit Health</b></th>
+					<th><b>Area Organization Audit Health</b></th>
+					<th><b>HAZWASTE Audit Health</b></th>
+				</tr>
+				<tr>
+					<th>{{health[0]}}%</th>
+					<th>{{health[1]}}%</th>
+					<th>{{health[2]}}%</th>
+					<th>{{health[3]}}%</th>
+				</tr>
+			</table>
+		</div>
+		<div>
+			<h2>Upcoming Action Items:</h2>
+			<table style="width:100%">
+				<tr>
+					<th><b>Action Item ID</b></th>
+					<th><b>Incident Report</b></th>
+					<th><b>Audit Report</b></th>
+					<th><b>Date</b></th>
+					<th><b>Time</b></th>
+					<th><b>Finding</b></th>
+					<th><b>Corrective Action</b></th>
+					<th><b>Due Date:</b></th>
+					<th><b>Open/Close</b></th>
+				</tr>
+				{% for j in range(5) %}
+					<tr>
+						<th><a href="/actions/edit/{{actions[j][0]}}">{{actions[j][0]}}</a></th>
+						{% if actions[j][3] != None: %}
+							<th><a href="/incidents/edit/{{actions[j][3]}}">{{actions[j][3]}}</a></th>
+						{% else: %}
+							<th>None</th>
+						{% endif %}
+						{% if actions[j][4] != None: %}
+							<th><a href="/audits/edit/{{actions[j][4]}}">{{actions[j][4]}}</a></th>
+						{% else: %}
+							<th>None</th>
+						{% endif %}
+						<th>{{actions[j][1]}}</th>
+						<th>{{actions[j][2]}}</th>
+						<th>{{actions[j][5]}}</th>
+						<th>{{actions[j][6]}}</th>
+						<th>{{actions[j][7]}}</th>
+						{% if actions[j][8] == True: %}
+							<th><a href="/actions/close/{{actions[j][0]}}">Open</a></th>
+						{% else: %}
+							<th>Closed</th>
+						{% endif %}
+					</tr>
+				{% endfor %}
+			</table>
+		</div>
+		<div>
+			<h2>Current Weather:</h2>
+			<table style="width:100%">
+				<tr>
+					<th><b>Current Weather</b></th>
+					<th><b>Current Temperature:</b></th>
+					<th><b>High Temperature:</b></th>
+					<th><b>Low Temperature:</b></th>
+				</tr>
+				<tr>
+					<th>{{weather[0]}}</th>
+					<th>{{weather[2]}}&#176;</th>
+					<th>{{weather[3]}}&#176;</th>
+					<th>{{weather[4]}}&#176;</th>
+				</tr>
+			</table>
+		</div>
+	</div>
+</body>
+
+</html>
