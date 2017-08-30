@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Simple Safety</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename ='bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="{{ url_for('static', filename ='ie10-viewport-bug-workaround.css') }}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename ='style.css') }}" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]
+    <script type="text/javascript" src="{{ url_for('static', filename = 'ie-emulation-modes-warning.js') }}"></script>-->
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
+    </script>
+    <script src="//apis.google.com/js/platform.js?onload=start"> </script>
+    <!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/dashboard/">Simple Safety Manager</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/dashboard/">Dashboard</a></li>
+            <li><a href="#">Profile</a></li>
+            <li><a href="#">Help</a></li>
+          </ul>
+          <form class="navbar-form navbar-right">
+            <input type="text" class="form-control" placeholder="Search Case Numbers...">
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li><a href="/dashboard/">Dashboard</a></li>
+            <li><a href="/incidents/">Incidents</a></li>
+            <li><a href="/audits/">Audits</a></li>
+            <li class="active"><a href="/actions/">Action Items<span class="sr-only">(current)</span></a></li>
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li><a href="/incidents/new/">Submit an Incident</a></li>
+            <li><a href="/audits/new/">Submit an Audit</a></li>
+            <li><a href="/actions/new/">Submit an Action Item</a></li>
+          </ul>
+        </div>
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header">Action Tracking Manager</h1>
+
+          <h2 class="sub-header">Action Items</h2>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Action Item ID</th>
+                  <th>Incident Report</th>
+                  <th>Audit Report</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Finding</th>
+                  <th>Corrective Action</th>
+                  <th>Due Date:</th>
+                  <th>Open/Close</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in range(length) %}
+                  <tr> 
+                    <th><a href="/actions/edit/{{actions[i][0]}}">{{actions[i][0]}}</a></th>
+                    {% if actions[i][3] != None: %}
+                      <th><a href="/incidents/edit/{{actions[i][3]}}">{{actions[i][3]}}</a></th>
+                    {% else: %}
+                      <th>None</th>
+                    {% endif %}
+                    {% if actions[i][4] != None: %}
+                      <th><a href="/audits/edit/{{actions[i][4]}}">{{actions[i][4]}}</a></th>
+                    {% else: %}
+                      <th>None</th>
+                    {% endif %}
+                    <th>{{actions[i][1]}}</th>
+                    <th>{{actions[i][2]}}</th>
+                    <th>{{actions[i][5]}}</th>
+                    <th>{{actions[i][6]}}</th>
+                    <th>{{actions[i][7]}}</th>
+                    {% if actions[i][8] == True: %}
+                      <th><a href="/actions/close/{{actions[i][0]}}">Open</a></th>
+                    {% else: %}
+                      <th>Closed</th>
+                    {% endif %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write("<script type='text/javascript' src='{{ url_for('static', filename='jquery.min.js') }}''><\/script>")</script>
+    <script type="text/javascript" src="{{ url_for('static', filename ='bootstrap.min.js') }}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script type="text/javascript" src="{{ url_for('static', filename='ie10-viewport-bug-workaround.js') }}"></script>
+  </body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Simple Safety</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename ='bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="{{ url_for('static', filename ='ie10-viewport-bug-workaround.css') }}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename ='style.css') }}" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]
+    <script type="text/javascript" src="{{ url_for('static', filename = 'ie-emulation-modes-warning.js') }}"></script>-->
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/dashboard/">Simple Safety Manager</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/dashboard/">Dashboard</a></li>
+            <li><a href="#">Profile</a></li>
+            <li><a href="#">Help</a></li>
+          </ul>
+          <form class="navbar-form navbar-right">
+            <input type="text" class="form-control" placeholder="Search Case Numbers...">
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li><a href="/dashboard/">Dashboard</a></li>
+            <li><a href="/incidents/">Incidents</a></li>
+            <li><a href="/audits/">Audits</a></li>
+             <li><a href="/actions/">Action Items</a></li>
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li class="active"><a href="/incidents/new/">Submit an Incident<span class="sr-only">(current)</span></a></li>
+            <li><a href="/audits/new/">Submit an Audit</a></li>
+            <li><a href="/actions/new/">Submit an Action Item</a></li>
+          </ul>
+        </div>
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header">Incident Manager</h1>
+
+          <h2 class="sub-header">Submit New Incident Report</h2>
+          
+          <form action="#" method = 'post'>
+
+            <h3>Date/Time:</h3>
+              <input type ='datetime-local' name='date_time'>
+              <br>
+            <h3>Incident Type</h3>
+              
+              <input type ='radio'  name='incident_type' value ='FA'>First Aid
+              <br>
+              <input type ='radio'  name='incident_type' value ='RI'>Recordable Injury
+              <br>
+              <input type ='radio'  name='incident_type' value ='RD'>Restricted Duty
+              <br>
+              <input type ='radio'  name='incident_type' value ='LTI'>Lost Time Injury
+              <br>
+              <input type ='radio'  name='incident_type' value ='PIT Incident'>PIT Incident
+              <br>
+              <input type ='radio'  name='incident_type' value ='Near Miss'>Near Miss
+              <br>
+              <input type ='radio'  name='incident_type' value ='HAZMAT'>HAZMAT
+              <br>
+            <h3>Incident Category</h3>
+              
+              <input type ='radio'  name='incident_cat' value ='Unsafe Act'>Unsafe Act
+              <br>
+              <input type ='radio'  name='incident_cat' value ='Unsafe Behavior'>Unsafe Behavior
+              <br>
+              <input type ='radio'  name='incident_cat' value ='Unsafe Condition'>Unsafe Condition
+              <br>
+            <h3>Injury</h3>
+              
+              <input type ='radio'  name='injury' value ='t'>True
+              <br>
+              <input type ='radio'  name='injury' value ='f'>False
+              <br>
+            <h3>Property Damage</h3>
+              
+              <input type ='radio'  name='property_damage' value ='t'>True
+              <br>
+              <input type ='radio'  name='property_damage' value ='f'>False
+              <br>
+            <h3>Description</h3>
+              
+              <input type="text" class="form-control" name='description'>
+              <br>
+            <h3>Root Cause:</h3>
+              
+              <input type="text" class="form-control" name='root_cause'>
+              <br>
+            <h3>Corrective Actions:</h3>
+              
+              <input type="text" class="form-control" name='corrective_action'>
+              <br>
+            <h3>Corrective Actions Due Date:</h3>
+              <input type ='datetime-local' name='due_date'>
+              <br>
+              <br>
+            <input type='submit' value='Submit'>
+          </form>
+
+      </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write("<script type='text/javascript' src='{{ url_for('static', filename='jquery.min.js') }}''><\/script>")</script>
+    <script type="text/javascript" src="{{ url_for('static', filename ='bootstrap.min.js') }}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script type="text/javascript" src="{{ url_for('static', filename='ie10-viewport-bug-workaround.js') }}"></script>
+  </body>
+</html>
