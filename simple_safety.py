@@ -147,6 +147,48 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
+@app.route('/profile/', methods = ['GET','POST'])
+def profile():
+	"""loads the user profile page"""
+	if 'username' not in session:
+		return redirect('/login')
+	if request.method == 'POST':
+		db, cursor = connect()
+		
+		email = session['email']
+		picture = request.form.get('picture')
+		position = request.form.get('position')
+
+		query = [[picture,'picture'],[position,'position']]
+
+		for i in range(len(query)):
+			if query[i][0] != '' and query[i][0] != None:
+				newdata = (query[i][0],email)
+				insert = ("UPDATE users SET "+query[i][1]+" = %s WHERE email = %s")
+				cursor.execute(insert,newdata)
+
+		db.commit()
+		db.close()
+
+		return redirect(url_for('profile'))
+	else:
+		db, cursor = connect()
+
+		query = """
+				SELECT position
+				FROM users
+				WHERE email = %s
+		"""
+
+		data = (session['email'],)
+
+		user_profile = (session['username'], session['picture'], session['email'])
+		cursor.execute(query,data)
+		results = cursor.fetchone()
+		return render_template('profile.html', email = results, user = user_profile)
+		db.close()
+
+
 @app.route('/')
 @app.route('/dashboard/')
 def dashboard():

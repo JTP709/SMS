@@ -67,7 +67,7 @@
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
             <li><a href="/dashboard/">Dashboard</a></li>
-            <li class="active"><a href="/incidents/">Incidents<span class="sr-only">(current)</span></a></li>
+            <li><a href="/incidents/">Incidents</a></li>
             <li><a href="/audits/">Audits</a></li>
              <li><a href="/actions/">Action Items</a></li>
           </ul>
@@ -81,126 +81,31 @@
         </div>
 
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Incident Manager</h1>
+          <h1 class="page-header">User Profile</h1>
+          <h2 class="sub-header">Welcome, {{user[0]}}</h2>
+            <img id="profile_picture" src="{{user[1]}}">
+            <hr>
+            <h4><b>Email: </b>{{user[2]}}</h4>
+            <hr>
+            <h4><b>Position: </b>{{email[0]}}</h4>
+            <hr>
 
-          <h2 class="sub-header">Incident Case #{{incidents[0][0]}}</h2>
-
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Case ID</th>
-                  <th>Date</th>
-                  <th>Time</th>
-                  <th>Type</th>
-                  <th>Category</th>
-                  <th>Injury Case</th>
-                  <th>Property Damage</th>
-                  <th>Description</th>
-                  <th>Root Cause</th>
-                  <th>Corrective Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>{{incidents[0][0]}}</th>
-                  <th>{{incidents[0][1]}}</th>
-                  <th>{{incidents[0][2]}}</th>
-                  <th>{{incidents[0][3]}}</th>
-                  <th>{{incidents[0][4]}}</th>
-                  <th>{{incidents[0][5]}}</th>
-                  <th>{{incidents[0][6]}}</th>
-                  <th>{{incidents[0][7]}}</th>
-                  <th>{{incidents[0][8]}}</th>
-                  <th>{{incidents[0][9]}}</th>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h2 class="sub-header">Edit Case Details</h2>
+          <h2 class="sub-header">Update Info</h2>
           
           <form action="#" method = 'post'>
-
-              <b>Date: </b>{{incidents[0][1]}}
-              <br>
-              <b>Time: </b>{{incidents[0][2]}}
+              <b>Picture URL:</b>
               <br>
               <br>
-              <b>New Date/Time: </b>
-              <br>
-              <input type ='datetime-local' name='date_time'>
+              <input type ='text' class="form-control" name='picture'>
               <hr>
-              <b>Type: </b>{{incidents[0][3]}}
+              <b>Position:</b>
+              <br>
+              <br>
+              <input type ='text' class="form-control" name='position'>
               <hr>
-              <b>New Type:</b>
-              <br>
-              <br>
-              <input type ='radio'  name='incident_type' value ='FA'>First Aid
-              <br>
-              <input type ='radio'  name='incident_type' value ='RI'>Recordable Injury
-              <br>
-              <input type ='radio'  name='incident_type' value ='RD'>Restricted Duty
-              <br>
-              <input type ='radio'  name='incident_type' value ='LTI'>Lost Time Injury
-              <br>
-              <input type ='radio'  name='incident_type' value ='PIT Incident'>PIT Incident
-              <br>
-              <input type ='radio'  name='incident_type' value ='Near Miss'>Near Miss
-              <br>
-              <input type ='radio'  name='incident_type' value ='HAZMAT'>HAZMAT
-              <hr>
-              <b>Incident Category: </b>{{incidents[0][4]}}
-              <br>
-              <br>
-              <input type ='radio'  name='incident_cat' value ='Unsafe Act'>Unsafe Act
-              <br>
-              <input type ='radio'  name='incident_cat' value ='Unsafe Behavior'>Unsafe Behavior
-              <br>
-              <input type ='radio'  name='incident_cat' value ='Unsafe Condition'>Unsafe Condition
-              <hr>
-              <b>Injury: </b>{{incidents[0][5]}}
-              <br>
-              <br>
-              <input type ='radio'  name='injury' value ='t'>True
-              <br>
-              <input type ='radio'  name='injury' value ='f'>False
-              <hr>
-              <b>Property Damage: </b>{{incidents[0][6]}}
-              <br>
-              <br>
-              <input type ='radio'  name='property_damage' value ='t'>True
-              <br>
-              <input type ='radio'  name='property_damage' value ='f'>False
-              <hr>
-              <b>Description: </b>{{incidents[0][7]}}
-              <br>
-              <br>
-              <input type ='text' class="form-control" name='description'>
-              <hr>
-              <b>Root Cause: </b>{{incidents[0][8]}}
-              <br>
-              <br>
-              <input type ='text' class="form-control" name='root_cause'>
-              <hr>
-              <b>Corrective Actions: </b>{{incidents[0][9]}}
-              <br>
-              <br>
-              <input type ='text' class="form-control" name='corrective_action'>
-              <hr>
-              <b>Due Date: </b>{{incidents[0][10]}}
-              <br>
-              <br>
-              <input type ='datetime-local' name='due_date'>
-              <br>
-              <br>
-            <input type='submit' value='Update'>
+              <input type='submit' value='Update'>
             <br>
           </form>
-          <hr>
-          <form action="/incidents/delete/{{incidents[0][0]}}">
-              <input type = "submit" value="Delete">
-        </form>
       </div>
 
     <!-- Bootstrap core JavaScript
