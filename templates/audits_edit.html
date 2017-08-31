@@ -29,6 +29,10 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
+    </script>
+    <script src="//apis.google.com/js/platform.js?onload=start"> </script>
+    <!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
   </head>
 
   <body>
@@ -62,9 +66,9 @@
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
             <li><a href="/dashboard/">Dashboard</a></li>
-            <li class="active"><a href="/incidents/">Incidents<span class="sr-only">(current)</span></a></li>
-            <li><a href="/audits/">Audits</a></li>
-             <li><a href="/actions/">Action Items</a></li>
+            <li><a href="/incidents/">Incidents</a></li>
+            <li class="active"><a href="/audits/">Audits<span class="sr-only">(current)</span></a></li>
+            <li><a href="/actions/">Action Items</a></li>
           </ul>
           <ul class="nav nav-sidebar">
             <li><a href="/incidents/new/">Submit an Incident</a></li>
@@ -74,67 +78,105 @@
         </div>
 
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Incident Manager</h1>
+          <h1 class="page-header">Audit Manager</h1>
 
-          <h2 class="sub-header">Injury Rates</h2>
+          <h2 class="sub-header">Audit Reports</h2>
           <div class="table-responsive">
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>First Aid Injury Rate</th>
-                  <th>Recordable Injury Rate</th>
-                  <th>Lost Time Injury Rate</th>
-                  <th>Other Recordable Injury Rate</th>
-                  <th>Total Incident Rate</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>{{injury_rate[0]}}</th>
-                  <th>{{injury_rate[1]}}</th>
-                  <th>{{injury_rate[2]}}</th>
-                  <th>{{injury_rate[3]}}</th>
-                  <th>{{injury_rate[4]}}</th>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h2 class="sub-header">Incident Cases</h2>
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Case ID</th>
+                  <th>Audit ID</th>
                   <th>Date</th>
                   <th>Time</th>
                   <th>Type</th>
-                  <th>Category</th>
-                  <th>Injury Case</th>
-                  <th>Property Damage</th>
-                  <th>Description</th>
-                  <th>Root Cause</th>
+                  <th>Corrective Action</th>
                 </tr>
               </thead>
               <tbody>
-              {% for i in range(length) %}
                 <tr>
-                  <th><a href="/incidents/edit/{{incidents[i][0]}}">{{incidents[i][0]}}</a></th>
-                  <th>{{incidents[i][1]}}</th>
-                  <th>{{incidents[i][2]}}</th>
-                  <th>{{incidents[i][3]}}</th>
-                  <th>{{incidents[i][4]}}</th>
-                  <th>{{incidents[i][5]}}</th>
-                  <th>{{incidents[i][6]}}</th>
-                  <th>{{incidents[i][7]}}</th>
-                  <th>{{incidents[i][8]}}</th>
+                    <th>{{audits[0][0]}}</th>
+                    <th>{{audits[0][1]}}</th>
+                    <th>{{audits[0][2]}}</th>
+                    <th>{{audits[0][3]}}</th>
+                    <th>{{audits[0][12]}}</th>
                 </tr>
-              {% endfor %}
               </tbody>
             </table>
           </div>
 
+          <h1>New Incident Report</h1>
+
+          <form action="#" method = 'post'>
+            <b>Date: </b>{{audits[0][1]}}
+            <br>
+            <b>Time: </b>{{audits[0][2]}}
+            <br>
+            <br>
+            <input type ='datetime-local' name='date_time'>
+            <hr>
+            <b>Question 1: </b>{{audits[0][4]}}
+            <br>
+            <br>
+            <p>Answer: </p>{{audits[0][7]}}
+            <br>
+            <br>
+            <input type ='radio'  name='answer_1' value ='t'>Yes
+            <br>
+            <input type ='radio'  name='answer_1' value ='f'>No
+            <hr>
+            <b>Question 2: </b>{{audits[0][5]}}
+            <br>
+            <br>
+            <b>Answer:</b> {{audits[0][8]}}
+            <br>
+            <br>
+            <input type ='radio'  name='answer_2' value ='t'>Yes
+            <br>
+            <input type ='radio'  name='answer_2' value ='f'>No
+            <hr>  
+            <b>Question 3: </b>{{audits[0][6]}}
+            <br>
+            <br>
+            <b>Answer: </b>{{audits[0][9]}}
+            <br>
+            <br>
+            <input type ='radio'  name='answer_3' value ='t'>Yes
+            <br>
+            <input type ='radio'  name='answer_3' value ='f'>No
+            <hr>        
+            <b>Corrective Action Finding</b>
+            <br>
+            <br>
+            {{audits[0][11]}}
+            <br>
+            <br>
+            <input type ='text' class="form-control" name='description'>
+            <hr>
+            <b>Corrective Actions:</b>
+            <br>
+            <br>
+            {{audits[0][12]}}
+            <br>
+            <br>
+            <input type ='text' class="form-control" name='corrective_action'>
+            <hr>
+          <b>Due Date/Time:</b> {{audits[0][13]}}
+            <br>
+            <br>
+            <input type ='datetime-local' name='due_date'>
+            <hr>
+            <input type='submit' value='Update'>
+          </form>
+          <hr>
+          <form action="/audits/delete/{{audits[0][0]}}/">
+            <input type = "submit" value="Delete">
+          </form>
+
+          </div>
+
+        </div>
       </div>
+    </div>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->

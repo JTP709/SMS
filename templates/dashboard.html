@@ -18,7 +18,7 @@
     <link href="{{ url_for('static', filename ='ie10-viewport-bug-workaround.css') }}" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="{{ url_for('static', filename ='style.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename ='style.css') }}" type="text/css" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]
@@ -51,7 +51,12 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
             <li><a href="/dashboard/">Dashboard</a></li>
-            <li><a href="#">Profile</a></li>
+            {% if user_profile != None: %}
+            <li><a href="/profile/">Profile</a></li>
+            <li><a href="/gdisconnect/">Logout</a></li>
+            {% else: %}
+            <li><a href="/login/">Login</a></li>
+            {% endif %}
             <li><a href="#">Help</a></li>
           </ul>
           <form class="navbar-form navbar-right">
@@ -70,11 +75,13 @@
             <li><a href="/audits/">Audits</a></li>
              <li><a href="/actions/">Action Items</a></li>
           </ul>
+          {% if user_profile != None: %}
           <ul class="nav nav-sidebar">
             <li><a href="/incidents/new/">Submit an Incident</a></li>
             <li><a href="/audits/new/">Submit an Audit</a></li>
             <li><a href="/actions/new/">Submit an Action Item</a></li>
           </ul>
+          {% endif %}
         </div>
 
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
@@ -82,25 +89,33 @@
 
           <div class="row placeholders">
             <div class="col-xs-6 col-sm-3 placeholder">
-              <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+              <a href="/incidents/"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail"></a>
               <h4>Incidents</h4>
               <span class="text-muted">Incident Manager</span>
             </div>
             <div class="col-xs-6 col-sm-3 placeholder">
-              <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+              <a href="/audits/"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail"></a>
               <h4>Audits</h4>
               <span class="text-muted">Audit Manager</span>
             </div>
             <div class="col-xs-6 col-sm-3 placeholder">
-              <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+              <a href="/actions/"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail"></a>
               <h4>Action Items</h4>
               <span class="text-muted">Actions Manager</span>
             </div>
+            {% if user_profile != None: %}
             <div class="col-xs-6 col-sm-3 placeholder">
-              <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Resources</h4>
-              <span class="text-muted">Safety Resources</span>
+              <a href="/resources/"><img src="{{user_profile[1]}}" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail"></a>
+              <h4>{{user_profile[0]}}</h4>
+              <span class="text-muted">Profile Manager</span>
             </div>
+            {% else: %}
+            <div class="col-xs-6 col-sm-3 placeholder">
+              <a href="/login/"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail"></a>
+              <h4>Login Here</h4>
+              <span class="text-muted">Profile Manager</span>
+            </div>
+            {% endif %}
           </div>
 
           <h2 class="sub-header">Injury Rates</h2>

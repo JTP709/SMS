@@ -150,6 +150,9 @@ def gdisconnect():
 @app.route('/dashboard/')
 def dashboard():
 	"""Loads the dashboard page"""
+	user_profile = None
+	if 'username' in session:
+		user_profile = (session['username'], session['picture'])
 	db, cursor = connect()
 	# Fetches most recent incidents and injury rates
 	incident_query = """
@@ -233,7 +236,7 @@ def dashboard():
 	actions = cursor.fetchall()
 	length = len(results)
 	db.close()
-	return render_template('dashboard.html',incidents = results, health = health, actions = actions, weather = weather, injury_rate = injury_rate)
+	return render_template('dashboard.html',incidents = results, health = health, actions = actions, weather = weather, injury_rate = injury_rate, user_profile = user_profile)
 
 @app.route('/incidents/')
 def incidents():
@@ -505,7 +508,7 @@ def newAudit():
 					INSERT INTO action_items (
 									audit_id,
 									finding,
-									corrective_action
+									corrective_action,
 									due_date,
 									open_close,
 									user_id
@@ -519,7 +522,7 @@ def newAudit():
 		open_close = 't'
 		user_id	 = session['user_id']
 
-		data_a = (new_id, finding, corrective_action, due_date, open_close)
+		data_a = (new_id, finding, corrective_action, due_date, open_close, user_id)
 
 		cursor.execute(action_items, data_a)
 		db.commit()
@@ -681,7 +684,7 @@ def newActionItem():
 		open_close = 't'
 		user_id	 = getUserID(session['email'])
 
-		data = (new_id, date_time, finding, corrective_action, due_date, open_close)
+		data = (new_id, date_time, finding, corrective_action, due_date, open_close, user_id)
 
 		cursor.execute(insert, data)
 		

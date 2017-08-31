@@ -31,34 +31,26 @@
 			<a href="/incidents/edit/{{actions[0][4]}}">Audit: {{actions[0][4]}}</a>
 		{% endif %}
 		<form action="#" method = 'post'>
-
-			<p>Date/Time:</p>
-				<br>
-				{{actions[0][1]}}
-				{{actions[0][2]}}
-				<br>
-				<input type ='datetime-local' name='date_time'>
-				<br>
-			<p>Finding:</p>
-				<br>
-				{{actions[0][5]}}
-				<br>
-				<input type ='text' size='2000' name='finding'>
-				<br>
-			<p>Corrective Action:</p>
-				<br>
-				{{actions[0][6]}}
-				<br>
-				<input type ='text' size='2000' name='corrective_action'>
-				<br>
-			<p>Due Date:</p>
-				<br>
-				{{actions[0][7]}}
-				<br>
-				<input type ='datetime-local' name='due_date'>
-				<br>
+			<b>Date: </b>{{actions[0][1]}}
+			<b>Time: </b>{{actions[0][2]}}
+			<br>
+			<input type ='datetime-local' name='date_time'>
+			<hr>
+			<b>Finding: </b>{{actions[0][5]}}
+			<br>
+			<input type ='text' size='2000' name='finding'>
+			<hr>
+			<b>Corrective Action: </b>{{actions[0][6]}}
+			<br>
+			<input type ='text' size='2000' name='corrective_action'>
+			<hr>
+			<b>Due Date: </b>{{actions[0][7]}}
+			<br>
+			<input type ='datetime-local' name='due_date'>
+			<hr>
 			<input type='submit' value='Create'>
 		</form>
+		<hr>
 		<form action="/actions/delete/{{actions[0][0]}}/">
 			<input type = "submit" value="Delete">
 		</form>

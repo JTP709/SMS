@@ -48,6 +48,18 @@ body {
     border-right: 1px solid #eee;
   }
 }
+/* Profile */
+#user_name .user_name p{
+  padding: 10px;
+  text-align: middle;
+}
+#user_pic .user_pic img{
+  width: 150px;
+  height: 150px;
+  border-radius: 150px;
+  -webkit-border-radius: 150px;
+  -moz-border-radius: 150px;
+}
 
 /* Sidebar navigation */
 .nav-sidebar {
