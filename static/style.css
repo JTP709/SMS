@@ -167,3 +167,8 @@ body {
   -webkit-border-radius: 150px;
   -moz-border-radius: 150px;
 }
+.flash_msg {
+  background: #93ff9e;
+  font-size: large;
+  font-weight: bold;
+}

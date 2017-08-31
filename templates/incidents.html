@@ -81,6 +81,17 @@
         </div>
 
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <ul class=flashes>
+              {% for message in messages %}
+                <li class="flask_msg">{{ message }}</li>
+              {% endfor %}
+              </ul>
+            {% endif %}
+          {% endwith %}
+
           <h1 class="page-header">Incident Manager</h1>
 
           <h2 class="sub-header">Injury Rates</h2>

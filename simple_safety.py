@@ -443,12 +443,8 @@ def editIncident(id):
 		results = cursor.fetchall()
 		creator = getUserInfo(str(results[0][11]))
 		if 'username' not in session or int(creator[0]) != int(session['user_id'][0]):
-			output = ''
-			output += "<h1>I'm sorry, "
-			output += session['username']
-			output += '! You are not authorized to edit this incident.</h1>'
-			output += "Please return to the <a href ='/incidients/'>Incidents Page.</a>"
-			return output 
+			flash("Sorry, %s, you are not authorized ot edit this incident." % session['username'])
+			return redirect('/incidents/')
 		else:
 			user_profile = (session['username'], session['picture'])
 			return render_template('incidents_edit.html',incidents = results, user_profile = user_profile)
@@ -663,12 +659,8 @@ def editAudit(id):
 		results = cursor.fetchall()
 		creator = getUserInfo(str(results[0][14]))
 		if 'username' not in session or int(creator[0]) != int(session['user_id'][0]):
-			output = ''
-			output += "<h1>I'm sorry, "
-			output += session['username']
-			output += '! You are not authorized to edit this audit.</h1>'
-			output += "Please return to the <a href ='/audits/'>Incidents Page.</a>"
-			return output 
+			flash("Sorry, %s, you are not authorized ot edit this Audit." % session['username'])
+			return redirect('/audits/')
 		else:
 			return render_template('audits_edit.html',audits = results, user_profile = user_profile)
 		db.close()
@@ -813,12 +805,8 @@ def editActionItem(id):
 		results = cursor.fetchall()
 		creator = getUserInfo(str(results[0][8]))
 		if 'username' not in session or int(creator[0]) != int(session['user_id'][0]):
-			output = ''
-			output += "<h1>I'm sorry, "
-			output += session['username']
-			output += '! You are not authorized to edit this action item.</h1>'
-			output += "Please return to the <a href ='/actions/'>Incidents Page.</a>"
-			return output 
+			flash("Sorry, %s, you are not authorized ot edit this action item." % session['username'])
+			return redirect('/actions/')
 		else:
 			return render_template('actions_edit.html',actions = results, user_profile = user_profile)
 		db.close()
