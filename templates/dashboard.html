@@ -18,7 +18,7 @@
     <link href="{{ url_for('static', filename ='ie10-viewport-bug-workaround.css') }}" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="{{ url_for('static', filename ='style.css') }}" type="text/css" rel="stylesheet">
+    <link href="{{ url_for('static', filename ='style.css') }}" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]
@@ -57,7 +57,7 @@
             {% else: %}
             <li><a href="/login/">Login</a></li>
             {% endif %}
-            <li><a href="#">Help</a></li>
+            <li><a href="/resources/">Help</a></li>
           </ul>
           <form class="navbar-form navbar-right">
             <input type="text" class="form-control" placeholder="Search Case Numbers...">
@@ -237,26 +237,26 @@
           </div>
 
             <h2 class="sub-header">Weather - Cincinnati, OH</h2>
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Current Weather</th>
-                  <th>Temperature</th>
-                  <th>High</th>
-                  <th>Low</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>{{weather[0]}}</th>
-                  <th>{{weather[2]}}&#176;</th>
-                  <th>{{weather[3]}}&#176;</th>
-                  <th>{{weather[4]}}&#176;</th>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Current Weather</th>
+                    <th>Temperature</th>
+                    <th>High</th>
+                    <th>Low</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>{{weather[0]}}</th>
+                    <th>{{weather[2]}}&#176;</th>
+                    <th>{{weather[3]}}&#176;</th>
+                    <th>{{weather[4]}}&#176;</th>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
           </div>
 

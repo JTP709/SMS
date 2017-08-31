@@ -51,8 +51,13 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
             <li><a href="/dashboard/">Dashboard</a></li>
-            <li><a href="#">Profile</a></li>
-            <li><a href="#">Help</a></li>
+            {% if user_profile != None: %}
+            <li><a href="/profile/">Profile</a></li>
+            <li><a href="/gdisconnect/">Logout</a></li>
+            {% else: %}
+            <li><a href="/login/">Login</a></li>
+            {% endif %}
+            <li><a href="/resources/">Help</a></li>
           </ul>
           <form class="navbar-form navbar-right">
             <input type="text" class="form-control" placeholder="Search Case Numbers...">
@@ -70,11 +75,13 @@
             <li><a href="/audits/">Audits</a></li>
             <li class="active"><a href="/actions/">Action Items<span class="sr-only">(current)</span></a></li>
           </ul>
+          {% if user_profile != None: %}
           <ul class="nav nav-sidebar">
             <li><a href="/incidents/new/">Submit an Incident</a></li>
             <li><a href="/audits/new/">Submit an Audit</a></li>
             <li><a href="/actions/new/">Submit an Action Item</a></li>
           </ul>
+          {% endif %}
         </div>
 
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">

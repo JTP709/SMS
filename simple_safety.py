@@ -35,6 +35,7 @@ app = Flask(__name__)
 @app.route('/login/')
 def showLogin():
 	"""Routes to Login Page"""
+	user_profile = None
 	state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
 	session['state'] = state
 	return render_template('login.html', STATE=state)
@@ -140,7 +141,7 @@ def gdisconnect():
         del session['picture']
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
-        return response
+        return redirect('/dashboard/')
     else:
         response = make_response(json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
@@ -240,6 +241,10 @@ def dashboard():
 
 @app.route('/incidents/')
 def incidents():
+	"""Loads the incidents page"""
+	user_profile = None
+	if 'username' in session:
+		user_profile = (session['username'], session['picture'])
 	db, cursor = connect()
 
 	incident_query = """
@@ -261,11 +266,12 @@ def incidents():
 
 	injury_rate = getInjuryRates()
 
-	return render_template('incidents.html',incidents = results, length = length, injury_rate = injury_rate)
+	return render_template('incidents.html',incidents = results, length = length, injury_rate = injury_rate, user_profile = user_profile)
 	db.close()
 
 @app.route('/incidents/new/', methods = ['GET','POST'])
 def newIncident():
+	"""Loads the page to submit a new incident report"""
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
@@ -325,10 +331,12 @@ def newIncident():
 
 		return redirect(url_for('incidents'))
 	else:
-		return render_template('incidents_new.html')
+		user_profile = (session['username'], session['picture'])
+		return render_template('incidents_new.html', user_profile = user_profile)
 
 @app.route('/incidents/edit/<int:id>/', methods = ['GET','POST'])
 def editIncident(id):
+	"""Page to edit an existing incident report"""
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
@@ -369,6 +377,7 @@ def editIncident(id):
 		return redirect(url_for('incidents'))
 
 	else:
+		user_profile = (session['username'], session['picture'])
 		db, cursor = connect()
 		
 		query = """
@@ -399,11 +408,13 @@ def editIncident(id):
 			output += "Please return to the <a href ='/incidients/'>Incidents Page.</a>"
 			return output 
 		else:
-			return render_template('incidents_edit.html',incidents = results)
+			user_profile = (session['username'], session['picture'])
+			return render_template('incidents_edit.html',incidents = results, user_profile = user_profile)
 		db.close()
 
 @app.route('/incidents/delete/<int:id>/', methods = ['GET','POST'])
 def deleteIncident(id):
+	"""Page to delete an existing incident report"""
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
@@ -424,6 +435,10 @@ def deleteIncident(id):
 
 @app.route('/audits/')
 def audits():
+	"""Page to view existing audits"""
+	user_profile = None
+	if 'username' in session:
+		user_profile = (session['username'], session['picture'])
 	db, cursor = connect()
 	# need to add date
 	query = """
@@ -454,11 +469,12 @@ def audits():
 		
 	length = len(results)
 
-	return render_template('audits.html',audits = results, length = length, health = health)
+	return render_template('audits.html',audits = results, length = length, health = health, user_profile = user_profile)
 	db.close()
 
 @app.route('/audits/new/', methods = ['GET','POST'])
 def newAudit():
+	"""Page to submit a new audit"""
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
@@ -530,10 +546,12 @@ def newAudit():
 
 		return redirect(url_for('audits'))
 	else:
-		return render_template('audits_new.html')
+		user_profile = (session['username'], session['picture'])
+		return render_template('audits_new.html', user_profile = user_profile)
 
 @app.route('/audits/edit/<int:id>/', methods = ['GET','POST'])
 def editAudit(id):
+	"""Page to edit an audit"""
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
@@ -575,6 +593,7 @@ def editAudit(id):
 		return redirect(url_for('audits'))
 
 	else:
+		user_profile = (session['username'], session['picture'])
 		db, cursor = connect()
 		
 		query = """
@@ -609,11 +628,12 @@ def editAudit(id):
 			output += "Please return to the <a href ='/audits/'>Incidents Page.</a>"
 			return output 
 		else:
-			return render_template('audits_edit.html',audits = results)
+			return render_template('audits_edit.html',audits = results, user_profile = user_profile)
 		db.close()
 
 @app.route('/audits/delete/<int:id>/', methods = ['GET','POST'])
 def deleteAudit(id):
+	"""Page to delete an audit"""
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
@@ -630,10 +650,15 @@ def deleteAudit(id):
 		db.close()
 		return redirect(url_for('audits'))
 	else:
-		return render_template('audits_delete.html', id = id)
+		user_profile = (session['username'], session['picture'])
+		return render_template('audits_delete.html', id = id, user_profile = user_profile)
 
 @app.route('/actions/')
 def actions():
+	"""Page to view open action items"""
+	user_profile = None
+	if 'username' in session:
+		user_profile = (session['username'], session['picture'])
 	db, cursor = connect()
 	
 	query = """
@@ -654,11 +679,12 @@ def actions():
 			
 	length = len(results)
 
-	return render_template('actions.html',actions = results, length = length)
+	return render_template('actions.html',actions = results, length = length, user_profile = user_profile)
 	db.close()
 
 @app.route('/actions/new/', methods = ['GET','POST'])
 def newActionItem():
+	"""Page to submit a new action item"""
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
@@ -693,10 +719,12 @@ def newActionItem():
 
 		return redirect(url_for('actions'))
 	else:
-		return render_template('actions_new.html')
+		user_profile = (session['username'], session['picture'])
+		return render_template('actions_new.html', user_profile = user_profile)
 
 @app.route('/actions/edit/<int:id>/', methods = ['GET','POST'])
 def editActionItem(id):
+	"""Page to edit existing action item"""
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
@@ -722,6 +750,7 @@ def editActionItem(id):
 		return redirect(url_for('actions'))
 
 	else:
+		user_profile = (session['username'], session['picture'])
 		db, cursor = connect()
 		
 		query = """
@@ -749,11 +778,12 @@ def editActionItem(id):
 			output += "Please return to the <a href ='/actions/'>Incidents Page.</a>"
 			return output 
 		else:
-			return render_template('actions_edit.html',actions = results)
+			return render_template('actions_edit.html',actions = results, user_profile = user_profile)
 		db.close()
 
 @app.route('/actions/delete/<int:id>/', methods = ['GET','POST'])
 def deleteActionItem(id):
+	"""Page to delete action item"""
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
@@ -768,10 +798,12 @@ def deleteActionItem(id):
 		db.close()
 		return redirect(url_for('actions'))
 	else:
-		return render_template('actions_delete.html', id = id)
+		user_profile = (session['username'], session['picture'])
+		return render_template('actions_delete.html', id = id, user_profile = user_profile)
 
 @app.route('/actions/close/<int:id>/', methods = ['GET','POST'])
 def closeActionItem(id):
+	"""Page to close action items"""
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
@@ -787,12 +819,17 @@ def closeActionItem(id):
 		db.close()
 		return redirect(url_for('actions'))
 	else:
-		return render_template('actions_close.html', id = id)
+		user_profile = (session['username'], session['picture'])
+		return render_template('actions_close.html', id = id, user_profile = user_profile)
 
 # Custom Report Generator
 
 @app.route('/incidents/reports/', methods = ['GET','POST'])
 def incidentsReports():
+	"""Page to create custom incident reports"""
+	user_profile = None
+	if 'username' in session:
+		user_profile = (session['username'], session['picture'])
 	if request.method == 'POST':
 		db, cursor = connect()
 		
@@ -836,7 +873,7 @@ def incidentsReports():
 		length = len(results)
 		db.close()
 
-		return render_template('incidents_reports.html',incidents = results, length = length)
+		return render_template('incidents_reports.html',incidents = results, length = length, user_profile = user_profile)
 
 	else:
 		db, cursor = connect()
@@ -857,7 +894,7 @@ def incidentsReports():
 		cursor.execute(query)
 		results = cursor.fetchall()
 		length = len(results)
-		return render_template('incidents_reports.html',incidents = results, length = length)
+		return render_template('incidents_reports.html',incidents = results, length = length, user_profile = user_profile)
 		db.close()
 
 @app.route('/audits/reports/')
