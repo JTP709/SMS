@@ -9,9 +9,20 @@ The Simple Safety Manager accomplishes the requirements of the Item Catalogue pr
 
 The application allows a user to capture incident investigation details and compliance audit reports. The user may also track action items developed from the incident cases or audit reports and tie them to those submissions or input an action item independantly.
 
-All of the data can be read by anybody, but a user must log in to submit new information. A user may only edit or delete information they created. 
+All of the data can be read by anybody, but a user must log in to submit new information. A user may only edit or delete information they created.
 
 Authentication is managed by a third party OAuth through Google.
+
+API endpoints are available to provide JSON formatted data from the database.
+	/incidents/json 		- provides all items in the incidents database.
+	/incidents/json/*id* 	- provides a specific item in the incidents database by id number.
+	/audits/json 			- provides all items in the audits database.
+	/audits/json*id* 		- provides a specific item in the audits database by id number.
+	/actions/json 			- provides all items in the actions database.
+	/actions/json*id* 		- provides a specific item in the actions database by id number.
+	/users/json 			- provides all items in the users database.
+	/users/json*id* 		- provides a specific item in the users database by id number.
+
 _________________________________________________________________
 
 Installation:
@@ -42,9 +53,6 @@ _________________________________________________________________
 Free online images used:
 
 Incident clip art: http://www.clker.com/clipart-warning-exclamation-triangle.html
-
 Audit clip art: http://www.clipartpanda.com/clipart_images/downloads-2959318
-
 Action Item clip art: https://www.1001freedownloads.com/free-clipart/checkbox-checked-3
-
 User clip art: http://www.freeiconspng.com/img/909
