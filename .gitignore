@@ -1,3 +1,4 @@
-*.sql
+*.pyc
 *.zip
 templates/old/*
+__pycache__
