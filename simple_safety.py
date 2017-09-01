@@ -440,7 +440,7 @@ def editIncident(id):
 		results = cursor.fetchall()
 		creator = getUserInfo(str(results[0][11]))
 		if 'username' not in session or int(creator[0]) != int(session['user_id'][0]):
-			flash("Sorry, %s, you are not authorized ot edit this incident." % session['username'])
+			flash("Sorry, %s, you are not authorized to edit this incident." % session['username'])
 			return redirect('/incidents/')
 		else:
 			user_profile = (session['username'], session['picture'])
@@ -656,7 +656,7 @@ def editAudit(id):
 		results = cursor.fetchall()
 		creator = getUserInfo(str(results[0][14]))
 		if 'username' not in session or int(creator[0]) != int(session['user_id'][0]):
-			flash("Sorry, %s, you are not authorized ot edit this Audit." % session['username'])
+			flash("Sorry, %s, you are not authorized to edit this Audit." % session['username'])
 			return redirect('/audits/')
 		else:
 			return render_template('audits_edit.html',audits = results, user_profile = user_profile)
@@ -802,7 +802,7 @@ def editActionItem(id):
 		results = cursor.fetchall()
 		creator = getUserInfo(str(results[0][8]))
 		if 'username' not in session or int(creator[0]) != int(session['user_id'][0]):
-			flash("Sorry, %s, you are not authorized ot edit this action item." % session['username'])
+			flash("Sorry, %s, you are not authorized to edit this action item." % session['username'])
 			return redirect('/actions/')
 		else:
 			return render_template('actions_edit.html',actions = results, user_profile = user_profile)
