@@ -8,6 +8,7 @@ TODO:
 	- Allow CRUD operations through RESTful API endpoints
 	- Implement OAuth for API endpoints
 """
+#Print python version for troubleshooting purposes; must be Pyton 3 or higher.
 import sys
 print(sys.version)
 # Import custom functions
@@ -19,7 +20,7 @@ from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
 # Import advanced python scheduler for scheduled weather api calls
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
-
+# Import required python libraries
 import psycopg2, random, string, httplib2, json, requests, datetime
 
 CLIENT_ID = json.loads(open('client_secrets.json','r').read())['web']['client_id']
@@ -113,6 +114,7 @@ def gconnect():
 
 @app.route('/gdisconnect/')
 def gdisconnect():
+	"""Allows user to logout from Google authentication"""
     access_token = session.get('credentials')
     if access_token is None:
         print('Access Token is None')
@@ -218,6 +220,7 @@ def dashboard():
 	cursor.execute(query)
 	audit_results = cursor.fetchall()
 	length = len(audit_results)
+	# Set the totals as floats at 0
 	audit_def = 0.0
 	b_total = 0.0
 	audit_b_def = 0.0
@@ -244,7 +247,7 @@ def dashboard():
 			for k in range(len(i)):
 				if i[k] == True:
 					audit_h_def = audit_h_def + 1.0
-	audit_perc = int(float(audit_def/(length*3)*100))
+	audit_perc = int(float(audit_def/(length*3)*100)) # creates percentage
 	health.append(audit_perc)
 	audit_a_perc = int(float(audit_a_def/a_total*100))
 	health.append(audit_a_perc)
@@ -299,7 +302,7 @@ def incidents():
 	cursor.execute(incident_query)
 	results = cursor.fetchall()
 	length = len(results)
-
+	# Get the injury rates
 	injury_rate = getInjuryRates()
 
 	return render_template('incidents.html',incidents = results, length = length, injury_rate = injury_rate, user_profile = user_profile)
@@ -472,7 +475,6 @@ def audits():
 	if 'username' in session:
 		user_profile = (session['username'], session['picture'])
 	db, cursor = connect()
-	# need to add date
 	query = """
     		SELECT a.id,
     				to_char(a.date_time, 'FMMonth FMDD, YYYY'),
@@ -491,6 +493,7 @@ def audits():
 	cursor.execute(query)
 	results = cursor.fetchall()
 	health = []
+	# Creates health percentage
 	for i in results:
 		audit_def = 0.0
 		for j in range(len(i)):
@@ -534,7 +537,7 @@ def newAudit():
 		answer_2 = request.form['answer_2']
 		answer_3 = request.form['answer_3']
 		user_id	 = getUserID(session['email'])
-
+		# Auto populates the question field based on audit type selected.
 		if audit_type == 'Behavior':
 			question_1 = 'Was the employee wearing their PPE?'
 			question_2 = 'Does the area have designated locations for all carts, tools, pallets, inventory, and non-inventory items?'
@@ -612,7 +615,7 @@ def editAudit(id):
 		due_date = request.form.get('due_date')
 
 		action_query = [[date_time,'date_time'],[finding,'finding'],[corrective_action,'corrective_action'], [due_date, 'due_date']]
-
+		# Creates a seperate insert execution per input generated. This allows the user to only update the information they'd like to change.
 		for j in range(len(action_query)):
 			if action_query[j][0] != '' and action_query[j][0] != None:
 				newActionData = (action_query[j][0],audit_id[0])
@@ -850,13 +853,14 @@ def closeActionItem(id):
 
 @app.route('/resources/')
 @app.route('/help/')
+"""Produces a Help/Resources page"""
 def resources():
 	user_profile = None
 	if 'username' in session:
 		user_profile = (session['username'], session['picture'])
 	return render_template('resources.html', user_profile = user_profile)
 
-# Custom Report Generator
+# Custom Report Generator - still a Work in Progress; not functional
 
 @app.route('/incidents/reports/', methods = ['GET','POST'])
 def incidentsReports():
@@ -1068,9 +1072,12 @@ def usersJSONID(id):
 		return json.dumps(results)
 
 if __name__ == '__main__':
+	# Generates initial weather information
 	weather = getWeather()
+	# Starts apscheduler in the background
 	scheduler = BackgroundScheduler()
 	scheduler.start()
+	# Creats a job for apscheduler to update the weather information every hour
 	scheduler.add_job(
 		func = getWeather, 
 		trigger = (IntervalTrigger(hours = 1)),
