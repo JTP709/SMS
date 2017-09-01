@@ -114,7 +114,7 @@ def gconnect():
 
 @app.route('/gdisconnect/')
 def gdisconnect():
-	"""Allows user to logout from Google authentication"""
+    """Allows user to logout from Google authentication"""
     access_token = session.get('credentials')
     if access_token is None:
         print('Access Token is None')
@@ -853,8 +853,8 @@ def closeActionItem(id):
 
 @app.route('/resources/')
 @app.route('/help/')
-"""Produces a Help/Resources page"""
 def resources():
+	"""Produces a Help/Resources page"""
 	user_profile = None
 	if 'username' in session:
 		user_profile = (session['username'], session['picture'])
