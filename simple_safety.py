@@ -7,11 +7,6 @@ TODO:
 - JSON
 	- Allow CRUD operations through RESTful API endpoints
 	- Implement OAuth for API endpoints
-- User Profile Page
-    - Specific Site Locations
-    - User's job title/position
-    - Local Weather API
-	    - Severe Weather Notifications sent to e-mail
 """
 import sys
 print(sys.version)
@@ -113,7 +108,6 @@ def gconnect():
 	output += '<img src="'
 	output += session['picture']
 	output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-	flash("you are now logged in as %s" % session['username'])
 	print("done!")
 	return output
 
@@ -852,6 +846,16 @@ def closeActionItem(id):
 		user_profile = (session['username'], session['picture'])
 		return render_template('actions_close.html', id = id, user_profile = user_profile)
 
+# Resources/Help Page
+
+@app.route('/resources/')
+@app.route('/help/')
+def resources():
+	user_profile = None
+	if 'username' in session:
+		user_profile = (session['username'], session['picture'])
+	return render_template('resources.html', user_profile = user_profile)
+
 # Custom Report Generator
 
 @app.route('/incidents/reports/', methods = ['GET','POST'])
@@ -862,8 +866,6 @@ def incidentsReports():
 		user_profile = (session['username'], session['picture'])
 	if request.method == 'POST':
 		db, cursor = connect()
-		
-		search = []
 
 		incident_type = request.form.get('incident_type')
 		incident_cat = request.form.get('incident_cat')
@@ -871,13 +873,13 @@ def incidentsReports():
 		property_damage = request.form.get('property_damage')
 
 		if incident_type != None:
-			search.append(('incident_type = ', incident_type))
+			data = ('incident_type = ', incident_type)
 		if incident_cat != None:
-			search.append('incident_cat = ', incident_cat)
+			data = ('incident_cat = ', incident_cat)
 		if injury != None:
-			search.append('injury = ', incident_type)
+			data = ('injury = ', incident_type)
 		if property_damage != None:
-			search.append('property_damage = ', property_damage)
+			data = ('property_damage = ', property_damage)
 		print(search)
 
 		for i in range(len(search)):

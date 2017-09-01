@@ -70,7 +70,7 @@
             <li><a href="/dashboard/">Dashboard</a></li>
             <li><a href="/incidents/">Incidents</a></li>
             <li><a href="/audits/">Audits</a></li>
-            <li><a href="/actions/">Action Items</a></li>
+             <li><a href="/actions/">Action Items</a></li>
           </ul>
           {% if user_profile != None: %}
           <ul class="nav nav-sidebar">
@@ -82,35 +82,19 @@
         </div>
 
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Action Tracking Manager</h1>
+          <h1 class="page-header">Safety Resources</h1>
 
-          <h2 class="sub-header">Submit a New Action Item</h2>
-        
-          <form action="#" method = 'post'>
-
-            <h4>Date/Time:</h4>
-              <br>
-              <input type ='datetime-local' name='date_time'>
-              <br>
-              <br>
-            <h4>Finding:</h4>
-              <br>
-              <input type ='text' class="form-control" name='finding'>
-              <br>
-              <br>
-            <h4>Corrective Action:</h4>
-              <br>
-              <input type ='text' class="form-control" name='corrective_action'>
-              <br>
-              <br>
-            <h4>Due Date:</h4>
-              <br>
-              <input type ='datetime-local' name='due_date'>
-              <br>
-              <br>
-            <input type='submit' value='Submit'>
-          </form>
-
+          <h2 class="sub-header">How to Use this Site</h2>
+          <p>Welcome to <b>Simple Safety Manager</b>, the easy to use solution to maintaining safety compliance for your business.</p>
+          <p>This web application offers an intuitive method to track incident investigations, compliance audits, and action tracking to help you maintain a safe work environment for your employees.</p>
+          <p>The application is brokwn down into three main processes:</p>
+          <ul>
+            <li><i>Incident Manager:</i> tracks and categorizes incident and injury investigations.</li>
+            <li><i>Audit Manager:</i> submit audits to track policy and regulatory compliance.</li>
+            <li><i>Action Item Manager:</i> submit action items for your team to track to completion when an incident occurs or a deficiency is discovered during an audit. Action items can be independant, or linked to an existing incident case or audit report (these are submitted during the submission of an incident or audit).</li>
+          </ul>
+          <p>Site security is maintained by signing in useing a third party Authorization platform from Google. Google does not have access to this web application's information, but this site does build your profile using your name, e-mail address, and profile picture from your Google account.</p>
+          <p>To help maintain accurate recordkeeping, only users who submitted the incident case, audit report, or action item may edit or delete the submission. You must be signed into your account before you can submit a new incident, audit, or action item.</p>
         </div>
       </div>
     </div>
