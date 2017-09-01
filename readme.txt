@@ -13,6 +13,8 @@ All of the data can be read by anybody, but a user must log in to submit new inf
 
 Authentication is managed by a third party OAuth through Google.
 
+The application takes advantage of a simple and free open weather API from https://openweathermap.org/api to provide the user current weather information. The weather currently provides local information for my location in Cincinnati, OH.
+
 API endpoints are available to provide JSON formatted data from the database.
 	/incidents/json 		- provides all items in the incidents database.
 	/incidents/json/*id* 	- provides a specific item in the incidents database by id number.
