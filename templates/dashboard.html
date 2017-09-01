@@ -86,29 +86,29 @@
 
           <div class="row placeholders">
             <div class="col-xs-6 col-sm-3 placeholder">
-              <a href="/incidents/"><img src="{{ url_for('static', filename ='incident.png') }}" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail"></a>
+              <a href="/incidents/"><img src="{{ url_for('static', filename ='incident.png') }}" width="200" height="200" class="img-responsive" alt="Incident Manager"></a>
               <h4>Incidents</h4>
               <span class="text-muted">Incident Manager</span>
             </div>
             <div class="col-xs-6 col-sm-3 placeholder">
-              <a href="/audits/"><img src="{{ url_for('static', filename ='audit.png') }}" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail"></a>
+              <a href="/audits/"><img src="{{ url_for('static', filename ='audit.png') }}" width="200" height="200" class="img-responsive" alt="Audit Manager"></a>
               <h4>Audits</h4>
               <span class="text-muted">Audit Manager</span>
             </div>
             <div class="col-xs-6 col-sm-3 placeholder">
-              <a href="/actions/"><img src="{{ url_for('static', filename ='action.png') }}" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail"></a>
+              <a href="/actions/"><img src="{{ url_for('static', filename ='action.png') }}" width="200" height="200" class="img-responsive" alt="Action Item Manager"></a>
               <h4>Action Items</h4>
               <span class="text-muted">Actions Manager</span>
             </div>
             {% if user_profile != None: %}
             <div class="col-xs-6 col-sm-3 placeholder">
-              <a href="/profile/"><img src="{{user_profile[1]}}" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail"></a>
+              <a href="/profile/"><img src="{{user_profile[1]}}" width="200" height="200" class="img-responsive" alt="User Profile Manager"></a>
               <h4>{{user_profile[0]}}</h4>
               <span class="text-muted">Profile Manager</span>
             </div>
             {% else: %}
             <div class="col-xs-6 col-sm-3 placeholder">
-              <a href="/login/"><img src="{{ url_for('static', filename ='user.png') }}" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail"></a>
+              <a href="/login/"><img src="{{ url_for('static', filename ='user.png') }}" width="200" height="200" class="img-responsive" alt="User Profile Manager"></a>
               <h4>Login Here</h4>
               <span class="text-muted">Profile Manager</span>
             </div>
