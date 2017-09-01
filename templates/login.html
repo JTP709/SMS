@@ -81,9 +81,9 @@
           {% endif %}
         </div>
 
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" id="result">
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           
-          <form class="form-signin">
+          <form class="form-signin" id="result">
             <h2 class="form-signin-heading">Please Sign In:</h2>
             <!-- Login Section Removed until backend implementation
             <label for="inputEmail" class="sr-only">Email address</label>
@@ -141,7 +141,7 @@
         success: function(result) {
           // Handle or verify the server response if necessary.
           if (result) {
-            $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+            $('#result').html('<h2>Login Successful!</h2></br>'+ result + '</br></br><h3>Redirecting...</h3>')
             setTimeout(function() {
               window.location.href = "/dashboard";
             }, 4000);
