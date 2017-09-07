@@ -80,7 +80,7 @@
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <h1 class="page-header">Incident Manager</h1>
 
-          <h2 class="sub-header">Incident Case #{{incidents[0][0]}}</h2>
+          <h2 class="sub-header">Incident Case #{{incidents[0]}}</h2>
 
           <div class="table-responsive">
             <table class="table table-striped">
@@ -96,20 +96,22 @@
                   <th>Description</th>
                   <th>Root Cause</th>
                   <th>Corrective Actions</th>
+                  <th>Due Date</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <th>{{incidents[0][0]}}</th>
-                  <th>{{incidents[0][1]}}</th>
-                  <th>{{incidents[0][2]}}</th>
-                  <th>{{incidents[0][3]}}</th>
-                  <th>{{incidents[0][4]}}</th>
-                  <th>{{incidents[0][5]}}</th>
-                  <th>{{incidents[0][6]}}</th>
-                  <th>{{incidents[0][7]}}</th>
-                  <th>{{incidents[0][8]}}</th>
-                  <th>{{incidents[0][9]}}</th>
+                  <th>{{incidents[0]}}</th>
+                  <th>{{incidents[1]}}</th>
+                  <th>{{incidents[2]}}</th>
+                  <th>{{incidents[3]}}</th>
+                  <th>{{incidents[4]}}</th>
+                  <th>{{incidents[5]}}</th>
+                  <th>{{incidents[6]}}</th>
+                  <th>{{incidents[7]}}</th>
+                  <th>{{incidents[8]}}</th>
+                  <th>{{actions[0]}}</th>
+                  <th>{{actions[1]}}</th>
                 </tr>
               </tbody>
             </table>
@@ -119,16 +121,16 @@
           
           <form action="#" method = 'post'>
 
-              <b>Date: </b>{{incidents[0][1]}}
+              <b>Date: </b>{{incidents[1]}}
               <br>
-              <b>Time: </b>{{incidents[0][2]}}
+              <b>Time: </b>{{incidents[2]}}
               <br>
               <br>
               <b>New Date/Time: </b>
               <br>
               <input type ='datetime-local' name='date_time'>
               <hr>
-              <b>Type: </b>{{incidents[0][3]}}
+              <b>Type: </b>{{incidents[3]}}
               <hr>
               <b>New Type:</b>
               <br>
@@ -147,7 +149,7 @@
               <br>
               <input type ='radio'  name='incident_type' value ='HAZMAT'>HAZMAT
               <hr>
-              <b>Incident Category: </b>{{incidents[0][4]}}
+              <b>Incident Category: </b>{{incidents[4]}}
               <br>
               <br>
               <input type ='radio'  name='incident_cat' value ='Unsafe Act'>Unsafe Act
@@ -156,36 +158,36 @@
               <br>
               <input type ='radio'  name='incident_cat' value ='Unsafe Condition'>Unsafe Condition
               <hr>
-              <b>Injury: </b>{{incidents[0][5]}}
+              <b>Injury: </b>{{incidents[5]}}
               <br>
               <br>
               <input type ='radio'  name='injury' value ='t'>True
               <br>
               <input type ='radio'  name='injury' value ='f'>False
               <hr>
-              <b>Property Damage: </b>{{incidents[0][6]}}
+              <b>Property Damage: </b>{{incidents[6]}}
               <br>
               <br>
               <input type ='radio'  name='property_damage' value ='t'>True
               <br>
               <input type ='radio'  name='property_damage' value ='f'>False
               <hr>
-              <b>Description: </b>{{incidents[0][7]}}
+              <b>Description: </b>{{incidents[7]}}
               <br>
               <br>
               <input type ='text' class="form-control" name='description'>
               <hr>
-              <b>Root Cause: </b>{{incidents[0][8]}}
+              <b>Root Cause: </b>{{incidents[8]}}
               <br>
               <br>
               <input type ='text' class="form-control" name='root_cause'>
               <hr>
-              <b>Corrective Actions: </b>{{incidents[0][9]}}
+              <b>Corrective Actions: </b>{{actions[0]}}
               <br>
               <br>
               <input type ='text' class="form-control" name='corrective_action'>
               <hr>
-              <b>Due Date: </b>{{incidents[0][10]}}
+              <b>Due Date: </b>{{actions[1]}}
               <br>
               <br>
               <input type ='datetime-local' name='due_date'>
@@ -195,7 +197,7 @@
             <br>
           </form>
           <hr>
-          <form action="/incidents/delete/{{incidents[0][0]}}">
+          <form action="/incidents/delete/{{incidents[0]}}">
               <input type = "submit" value="Delete">
         </form>
       </div>

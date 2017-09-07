@@ -98,11 +98,11 @@
               </thead>
               <tbody>
                 <tr>
-                    <th>{{audits[0][0]}}</th>
-                    <th>{{audits[0][1]}}</th>
-                    <th>{{audits[0][2]}}</th>
-                    <th>{{audits[0][3]}}</th>
-                    <th>{{audits[0][12]}}</th>
+                    <th>{{audits[0]}}</th>
+                    <th>{{audits[1]}}</th>
+                    <th>{{audits[2]}}</th>
+                    <th>{{audits[3]}}</th>
+                    <th>{{audits[12]}}</th>
                 </tr>
               </tbody>
             </table>
@@ -111,37 +111,37 @@
           <h1>New Incident Report</h1>
 
           <form action="#" method = 'post'>
-            <b>Date: </b>{{audits[0][1]}}
+            <b>Date: </b>{{audits[1]}}
             <br>
-            <b>Time: </b>{{audits[0][2]}}
+            <b>Time: </b>{{audits[2]}}
             <br>
             <br>
             <input type ='datetime-local' name='date_time'>
             <hr>
-            <b>Question 1: </b>{{audits[0][4]}}
+            <b>Question 1: </b>{{audits[4]}}
             <br>
             <br>
-            <p>Answer: </p>{{audits[0][7]}}
+            <p>Answer: </p>{{audits[7]}}
             <br>
             <br>
             <input type ='radio'  name='answer_1' value ='t'>Yes
             <br>
             <input type ='radio'  name='answer_1' value ='f'>No
             <hr>
-            <b>Question 2: </b>{{audits[0][5]}}
+            <b>Question 2: </b>{{audits[5]}}
             <br>
             <br>
-            <b>Answer:</b> {{audits[0][8]}}
+            <b>Answer:</b> {{audits[8]}}
             <br>
             <br>
             <input type ='radio'  name='answer_2' value ='t'>Yes
             <br>
             <input type ='radio'  name='answer_2' value ='f'>No
             <hr>  
-            <b>Question 3: </b>{{audits[0][6]}}
+            <b>Question 3: </b>{{audits[6]}}
             <br>
             <br>
-            <b>Answer: </b>{{audits[0][9]}}
+            <b>Answer: </b>{{audits[9]}}
             <br>
             <br>
             <input type ='radio'  name='answer_3' value ='t'>Yes
@@ -151,7 +151,7 @@
             <b>Corrective Action Finding</b>
             <br>
             <br>
-            {{audits[0][11]}}
+            {{audits[11]}}
             <br>
             <br>
             <input type ='text' class="form-control" name='description'>
@@ -159,12 +159,12 @@
             <b>Corrective Actions:</b>
             <br>
             <br>
-            {{audits[0][12]}}
+            {{audits[12]}}
             <br>
             <br>
             <input type ='text' class="form-control" name='corrective_action'>
             <hr>
-          <b>Due Date/Time:</b> {{audits[0][13]}}
+          <b>Due Date/Time:</b> {{audits[13]}}
             <br>
             <br>
             <input type ='datetime-local' name='due_date'>
@@ -172,7 +172,7 @@
             <input type='submit' value='Update'>
           </form>
           <hr>
-          <form action="/audits/delete/{{audits[0][0]}}/">
+          <form action="/audits/delete/{{audits[0]}}/">
             <input type = "submit" value="Delete">
           </form>
 

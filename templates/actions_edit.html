@@ -102,24 +102,24 @@
               </thead>
               <tbody>
                   <tr> 
-                    <th>{{actions[0][0]}}</th>
-                    {% if actions[0][3] != None: %}
-                      <th><a href="/incidents/edit/{{actions[0][3]}}">{{actions[0][3]}}</a></th>
+                    <th>{{actions[0]}}</th>
+                    {% if actions[3] != None: %}
+                      <th><a href="/incidents/edit/{{actions[3]}}">{{actions[3]}}</a></th>
                     {% else: %}
                       <th>None</th>
                     {% endif %}
-                    {% if actions[0][4] != None: %}
-                      <th><a href="/audits/edit/{{actions[0][4]}}">{{actions[0][4]}}</a></th>
+                    {% if actions[4] != None: %}
+                      <th><a href="/audits/edit/{{actions[4]}}">{{actions[4]}}</a></th>
                     {% else: %}
                       <th>None</th>
                     {% endif %}
-                    <th>{{actions[0][1]}}</th>
-                    <th>{{actions[0][2]}}</th>
-                    <th>{{actions[0][5]}}</th>
-                    <th>{{actions[0][6]}}</th>
-                    <th>{{actions[0][7]}}</th>
-                    {% if actions[0][8] == True: %}
-                      <th><a href="/actions/close/{{actions[0][0]}}">Open</a></th>
+                    <th>{{actions[1]}}</th>
+                    <th>{{actions[2]}}</th>
+                    <th>{{actions[5]}}</th>
+                    <th>{{actions[6]}}</th>
+                    <th>{{actions[7]}}</th>
+                    {% if actions[8] == True: %}
+                      <th><a href="/actions/close/{{actions[0]}}">Open</a></th>
                     {% else: %}
                       <th>Closed</th>
                     {% endif %}
@@ -128,40 +128,40 @@
             </table>
           </div>
 
-          <h2>Edit Action Item #{{actions[0][0]}}:</h2>
+          <h2>Edit Action Item #{{actions[0]}}:</h2>
           <br>
-            {% if actions[0][3] != None: %}
-              <a href="/incidents/edit/{{actions[0][3]}}">Case: {{actions[0][3]}}</a>
+            {% if actions[3] != None: %}
+              <a href="/incidents/edit/{{actions[3]}}">Case: {{actions[3]}}</a>
             {% endif %}
-            {% if actions[0][4] != None: %}
-              <a href="/incidents/edit/{{actions[0][4]}}">Audit: {{actions[0][4]}}</a>
+            {% if actions[4] != None: %}
+              <a href="/incidents/edit/{{actions[4]}}">Audit: {{actions[4]}}</a>
             {% endif %}
             <form action="#" method = 'post'>
-              <b>Date: </b>{{actions[0][1]}}
-              <b>Time: </b>{{actions[0][2]}}
+              <b>Date: </b>{{actions[1]}}
+              <b>Time: </b>{{actions[2]}}
               <br>
               <br>
               <b>New Date/Time: </b><input type ='datetime-local' name='date_time'>
               <hr>
-              <b>Finding: </b>{{actions[0][5]}}
+              <b>Finding: </b>{{actions[5]}}
               <br>
               <br>
               <b>New Finding</b><input type ='text' size='2000' name='finding'>
               <hr>
-              <b>Corrective Action: </b>{{actions[0][6]}}
+              <b>Corrective Action: </b>{{actions[6]}}
               <br>
               <br>
               <b>New Corrective Action:</b><input type ='text' size='2000' name='corrective_action'>
               <hr>
-              <b>Due Date: </b>{{actions[0][7]}}
+              <b>Due Date: </b>{{actions[7]}}
               <br>
               <br>
               <b>New Due Date: </b><input type ='datetime-local' name='due_date'>
               <hr>
-              <input type='submit' value='Create'>
+              <input type='submit' value='Update'>
             </form>
             <hr>
-            <form action="/actions/delete/{{actions[0][0]}}/">
+            <form action="/actions/delete/{{actions[0]}}/">
               <input type = "submit" value="Delete">
             </form>
 

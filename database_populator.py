@@ -2,7 +2,10 @@ import psycopg2
 import datetime
 import re
 from random import randint
-from config import config
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from database_setup import Base, Users, Incidents, Audits, Actions, Manhours
+from functions import connect
 
 # Add dates to incidents, audits. Rebuild Audit Tables.
 
@@ -119,123 +122,87 @@ def dueDate(time_stamp):
 	due_date = finding_date + week
 	return due_date
 
-def populate():
-	params = config()
-	# connect to the PostgreSQL server
-	conn = psycopg2.connect("dbname = safety")
-	cur = conn.cursor()
+# Connect to the database
+con = connect()
+Base.metadata.bind = con
+print("Connection Created!")
+# Creates a session
+DBSession = sessionmaker(bind = con)
+session = DBSession()
+print("Session created!")
 
-	user_insert = (
-			"""
-			INSERT INTO users (
-				id,
-				name,
-				email,
-				position
-				)
-			VALUES (%s,%s,%s,%s)""")
-	user_data = (1, 'John Smith', 'john.smith@sms.com', 'Site Safety Manager')
-	cur.execute(user_insert,user_data)
-	print("User added!")
+def populate():
+	insert = Users(name = 'John Smith', email = 'john.smith@sms.com', position = 'Site Safety Manager', picture = '')
+	session.add(insert)
+	session.commit()
+	print("User Added!")
 
 	for i in range(len(injuries)):
-		incident = (
-			"""
-			INSERT INTO incident (
-							case_num,
-							date_time,
-							incident_type,
-							incident_cat,
-							injury,
-							property_damage,
-							description,
-							root_cause,
-							user_id
-							)
-				VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""")
-		
-		cur.execute(incident, injuries[i])
-		print("Injury case added!")
+		incident = Incidents(date_time = injuries[i][1],
+								incident_type = injuries[i][2],
+								incident_cat = injuries[i][3],
+								injury = injuries[i][4],
+								property_damage = injuries[i][5],
+								description = injuries[i][6],
+								root_cause = injuries[i][7],
+								user_id = injuries[i][8])
+		session.add(incident)
+		session.commit()
+		print("Incident Case #"+str(i)+" added!")
 
 		incident_due_date = dueDate(injuries[i])
-		audit_data = (str(i+1), injuries[i][1], injuries[i][6], actions_i[i], incident_due_date, 't','1')
-
-		action_items = (
-			"""
-			INSERT INTO action_items (
-							case_id,
-							date_time,
-							finding,
-							corrective_action,
-							due_date,
-							open_close,
-							user_id
-							)
-				VALUES (%s,%s,%s,%s,%s,%s,%s)""")
-		
-		cur.execute(action_items, audit_data)
-		print("Action item added!")
+		data = (injuries[i][1], injuries[i][6], actions_i[i], incident_due_date, 't','1')
+		case_id = str(i+1)
+		action_item = Actions(date_time = data[0],
+								finding = data[1],
+								corrective_action = data[2],
+								due_date = data[3],
+								open_close = data[4],
+								user_id = data[5],
+								case_id = case_id)
+		session.add(action_item)
+		session.commit()
+		print("Action Item for Incident Case #"+str(i)+" added!")
 
 	for j in range(len(audits)):
-		audit = (
-			"""
-			INSERT INTO audit (
-							id,
-							date_time,
-							type,
-							que_1,
-							que_2,
-							que_3,
-							ans_1,
-							ans_2,
-							ans_3,
-							user_id
-							)
-				VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""")
-		
-		cur.execute(audit, audits[j])
-		print("Audit added!")
+		audit = Audits(date_time = audits[j][1],
+						type = audits[j][2],
+						que_1 = audits[j][3],
+						que_2 = audits[j][4],
+						que_3 = audits[j][5],
+						ans_1 = audits[j][6],
+						ans_2 = audits[j][7],
+						ans_3 = audits[j][8],
+						user_id = audits[j][9])
+		session.add(audit)
+		session.commit()
+		print("Audit Report #"+str(j)+" added!")
 
 		action_due_date = dueDate(audits[j])
-		action_data = (str(j+1), audits[j][1], 'Audit deficiency', actions_a[j], action_due_date, 't','1')
- 
- 		action_items_a = (
-			"""
-			INSERT INTO action_items (
-							audit_id,
-							date_time,
-							finding,
-							corrective_action,
-							due_date,
-							open_close,
-							user_id
-							)
-				VALUES (%s,%s,%s,%s,%s,%s,%s)""")
-		
-		cur.execute(action_items_a, action_data)
-		print("Action item added!")
+		data = (audits[j][1], 'Audit deficiency', actions_a[j], action_due_date, 't','1')
+		audit_id = str(j+1)
+		action_item = Actions(date_time = data[0],
+								finding = data[1],
+								corrective_action = data[2],
+								due_date = data[3],
+								open_close = data[4],
+								user_id = data[5],
+								audit_id = audit_id)
+		session.add(action_item)
+		session.commit()
+		print("Action Item for Audit Report #"+str(j)+" added!")
 
 	week = 1
 	for mh in range(34):
 		hours = randint(3000,5000)
 		year = 2017
-		hours_data = (year,week,hours)
 		week += 1
 
-		hours = (
-			"""
-			INSERT INTO manhours (
-							year,
-							week,
-							hours
-							)
-				VALUES (%s,%s,%s)
-			"""
-			)
-		cur.execute(hours, hours_data)
-		print("Hours added!")
-
-	cur.close()
-	conn.commit()
+		insert = Manhours(year = year,
+							week = week,
+							hours = hours)
+		session.add(insert)
+		session.commit()
+		print("Man Hours added for Week #"+str(mh))
 
 populate()

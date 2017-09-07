@@ -1,18 +1,31 @@
 #!/usr/bin/python3
 
+#### TODO #####################################################
 """
-TODO:
 - Generate Custom Reports
 	- Filter options for custom report
 - JSON
 	- Allow CRUD operations through RESTful API endpoints
 	- Implement OAuth for API endpoints
+
+SQL Alchemy Port -
+	- serialized json?
 """
+###############################################################
+
 #Print python version for troubleshooting purposes; must be Pyton 3 or higher.
 import sys
 print(sys.version)
+
+# Import connect function
+#from connect import connect
 # Import custom functions
-from functions import connect, getCaseID, getAuditID, getActionsID, getUserIDNum, createUser, getUserInfo, getUserID, datetime_handler, getWeather, getInjuryRates
+from functions import connect, createUser, getUserInfo, getUserID, datetime_handler, getWeather, getInjuryRates
+# Import database objects
+from database_setup import Base, Users, Incidents, Audits, Actions, Manhours
+# Import SQL Alchemy functions/operations
+from sqlalchemy import func, desc
+from sqlalchemy.orm import sessionmaker
 # Import Flask operations
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, make_response, flash
 # Import oauth
@@ -27,6 +40,10 @@ CLIENT_ID = json.loads(open('client_secrets.json','r').read())['web']['client_id
 APPLICATION_NAME = "Safety Management System"
 
 app = Flask(__name__)
+
+########################
+#### Authentication ####
+########################
 
 @app.route('/login/')
 def showLogin():
@@ -150,41 +167,45 @@ def profile():
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
-		db, cursor = connect()
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
 		
 		email = session['email']
 		picture = request.form.get('picture')
 		position = request.form.get('position')
 
-		query = [[picture,'picture'],[position,'position']]
-
-		for i in range(len(query)):
-			if query[i][0] != '' and query[i][0] != None:
-				newdata = (query[i][0],email)
-				insert = ("UPDATE users SET "+query[i][1]+" = %s WHERE email = %s")
-				cursor.execute(insert,newdata)
-
-		db.commit()
-		db.close()
-
+		if picture != '' and picture != None:
+			session['picture'] = picture
+		if position != '' and position != None:
+			data = dbsession.query(Users).filter_by(email = email).one()
+			data.position = position
+			dbsession.commit()
+				
 		return redirect(url_for('profile'))
 	else:
-		db, cursor = connect()
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+		
+		email = session['email']
 
-		query = """
-				SELECT position
-				FROM users
-				WHERE email = %s
-		"""
+		data = dbsession.query(Users).filter_by(email = email).one()
 
-		data = (session['email'],)
+		position = data.position
 
-		user_profile = (session['username'], session['picture'], session['email'])
-		cursor.execute(query,data)
-		results = cursor.fetchone()
-		return render_template('profile.html', email = results, user = user_profile)
-		db.close()
+		user_profile = (session['username'], session['picture'], session['email'], position)
+		return render_template('profile.html',user = user_profile)
 
+#############################
+#### Main Page/Dashbaord ####
+#############################
 
 @app.route('/')
 @app.route('/dashboard/')
@@ -193,34 +214,27 @@ def dashboard():
 	user_profile = None
 	if 'username' in session:
 		user_profile = (session['username'], session['picture'])
-	db, cursor = connect()
+	# Connect to the database
+	con = connect()
+	Base.metadata.bind = con
+	# Creates a session
+	DBSession = sessionmaker(bind = con)
+	dbsession = DBSession()
+
 	# Fetches most recent incidents and injury rates
-	incident_query = """
-    		SELECT to_char(date_time, 'FMMonth FMDD, YYYY'),
-    			to_char(date_time, 'HH24:MI'),
-    			case_num, incident_cat, description
-    			FROM incident
-    			WHERE incident.injury = TRUE
-    			ORDER BY date_time desc;
-            """
-	cursor.execute(incident_query)
-	results = cursor.fetchall()
-
+	results = dbsession.query(func.to_char(Incidents.date_time, 'FMMonth FMDD, YYYY'),
+									func.to_char(Incidents.date_time, 'HH24:MI'),
+									Incidents.case_num,
+									Incidents.incident_cat,
+									Incidents.description).filter(Incidents.injury == True).order_by(desc(Incidents.case_num)).all()
 	injury_rate = getInjuryRates()
-	
-	# Fetches Audit Health
+	length = len(results)
 
+	# Fetches Audit Health
 	health = []
-	query = """
-    		SELECT type,
-	    			ans_1,
-	    			ans_2,
-	    			ans_3
-	    		FROM audit;
-            """
-	cursor.execute(query)
-	audit_results = cursor.fetchall()
+	audit_results = dbsession.query(Audits.type, Audits.ans_1, Audits.ans_2, Audits.ans_3).all()
 	length = len(audit_results)
+
 	# Set the totals as floats at 0
 	audit_def = 0.0
 	b_total = 0.0
@@ -258,26 +272,21 @@ def dashboard():
 	health.append(audit_h_perc)
 	
 	# Fetches Upcoming Action Items
-
-	query = """
-			SELECT id,
-					to_char(date_time, 'FMMonth FMDD, YYYY'),
-					to_char(date_time, 'HH24:MI'), 
-					case_id,
-					audit_id,
-					finding,
-					corrective_action,
-					to_char(due_date, 'FMMonth FMDD, YYYY'),
-					open_close
-				FROM action_items
-				ORDER BY date_time
-				LIMIT 5;
-			"""
-	cursor.execute(query)
-	actions = cursor.fetchall()
-	length = len(results)
-	db.close()
+	actions = dbsession.query(Actions.id,
+							func.to_char(Actions.date_time, 'FMMonth FMDD, YYYY'),
+							func.to_char(Actions.date_time, 'HH24:MI'),
+							Actions.case_id,
+							Actions.audit_id,
+							Actions.finding,
+							Actions.corrective_action,
+							func.to_char(Actions.due_date, 'FMMonth FMDD, YYYY'),
+							Actions.open_close).order_by(Actions.due_date)
+	
 	return render_template('dashboard.html',incidents = results, health = health, actions = actions, weather = weather, injury_rate = injury_rate, user_profile = user_profile)
+
+##########################
+#### Incident Manager ####
+##########################
 
 @app.route('/incidents/')
 def incidents():
@@ -285,23 +294,22 @@ def incidents():
 	user_profile = None
 	if 'username' in session:
 		user_profile = (session['username'], session['picture'])
-	db, cursor = connect()
+	# Connect to the database
+	con = connect()
+	Base.metadata.bind = con
+	# Creates a session
+	DBSession = sessionmaker(bind = con)
+	dbsession = DBSession()
 
-	incident_query = """
-    		SELECT case_num,
-    				to_char(date_time, 'FMMonth FMDD, YYYY'),
-	    			to_char(date_time, 'HH24:MI'), 
-	    			incident_type, 
-	    			incident_cat, 
-	    			injury, 
-	    			property_damage,
-	    			description,
-	    			root_cause
-    			FROM incident
-    			ORDER BY case_num desc;
-            """
-	cursor.execute(incident_query)
-	results = cursor.fetchall()
+	results = dbsession.query(Incidents.case_num,
+									func.to_char(Incidents.date_time, 'FMMonth FMDD, YYYY'),
+									func.to_char(Incidents.date_time, 'HH24:MI'),
+									Incidents.incident_type,
+									Incidents.incident_cat,
+									Incidents.injury,
+									Incidents.property_damage,
+									Incidents.description,
+									Incidents.root_cause).order_by(desc(Incidents.case_num)).all()
 	length = len(results)
 	# Get the injury rates
 	injury_rate = getInjuryRates()
@@ -315,59 +323,35 @@ def newIncident():
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
-		db, cursor = connect()
-		insert = ("""
-				INSERT INTO incident (
-								case_num,
-								date_time,
-								incident_type,
-								incident_cat,
-								injury,
-								property_damage,
-								description,
-								root_cause,
-								user_id
-								)
-					VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-				""")
-		case_id = getCaseID()
-		new_id = str(int(case_id)+1)
-		date_time = request.form['date_time']
-		incident_type = request.form['incident_type']
-		incident_cat = request.form['incident_cat']
-		injury = request.form['injury']
-		property_damage = request.form['property_damage']
-		description = request.form['description']
-		root_cause = request.form['root_cause']
-		user_id	 = getUserID(session['email'])
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+		user_id = getUserID(session['email'])
+		print(user_id)
+		incidents = Incidents(date_time = request.form['date_time'],
+								incident_type = request.form['incident_type'],
+								incident_cat = request.form['incident_cat'],
+								injury = request.form['injury'],
+								property_damage = request.form['property_damage'],
+								description = request.form['description'],
+								root_cause = request.form['root_cause'],
+								user_id	 = user_id)
+		dbsession.add(incidents)
+		dbsession.commit()
+		getcase_id = dbsession.query(Incidents.case_num).order_by(desc(Incidents.case_num)).first()
+		case_id = getcase_id[0]
+		action_items = Actions(finding = request.form['description'],
+								corrective_action = request.form['corrective_action'],
+								due_date = request.form['due_date'],
+								open_close = 't',
+								user_id	 = user_id,
+								case_id	= case_id)
 
-		data = (new_id, date_time, incident_type, incident_cat, injury, property_damage, description, root_cause, user_id)
-
-		cursor.execute(insert, data)
-
-		action_items = ("""
-					INSERT INTO action_items (
-									case_id,
-									finding,
-									corrective_action,
-									due_date,
-									open_close,
-									user_id
-									)
-						VALUES (%s,%s,%s,%s,%s,%s)
-					""")
-
-		finding = request.form['description']
-		corrective_action = request.form['corrective_action']
-		due_date = request.form['due_date']
-		open_close = 't'
-		user_id	 = session['user_id']
-
-		data_a = (new_id, finding, corrective_action, due_date, open_close, user_id)
-
-		cursor.execute(action_items, data_a)
-		db.commit()
-		db.close()
+		dbsession.add(action_items)
+		dbsession.commit()
 
 		return redirect(url_for('incidents'))
 	else:
@@ -380,9 +364,13 @@ def editIncident(id):
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
-		db, cursor = connect()
-		
-		case_id = (int(id),)
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+
 		date_time = request.form.get('date_time')
 		incident_type = request.form.get('incident_type')
 		incident_cat = request.form.get('incident_cat')
@@ -391,62 +379,80 @@ def editIncident(id):
 		description = request.form.get('description')
 		root_cause = request.form.get('root_cause')
 
-		query = [[date_time,'date_time'],[incident_type,'incident_type'],[incident_cat,'incident_cat'],[injury,'injury'],[property_damage,'property_damage'],[description, 'description'], [root_cause,'root_cause']]
+		data = dbsession.query(Incidents).filter_by(case_num = id).one()
 
-		for i in range(len(query)):
-			if query[i][0] != '' and query[i][0] != None:
-				newdata = (query[i][0],case_id[0])
-				insert = ("UPDATE incident SET "+query[i][1]+" = %s WHERE case_num = %s")
-				cursor.execute(insert,newdata)
+		# Creates a seperate insert execution per input generated. This allows the user to only update the information they'd like to change.
+		
+		if date_time != '' and date_time != None:
+			data.date_time = date_time
+			dbsession.commit()
+		if incident_type != '' and incident_type != None:
+			data.incident_type = incident_type
+			dbsession.commit()
+		if incident_cat != '' and incident_cat != None:
+			data.incident_cat = incident_cat
+			dbsession.commit()
+		if injury != '' and injury != None:
+			data.injury = injury
+			dbsession.commit()
+		if property_damage != '' and property_damage != None:
+			data.property_damage = property_damage
+			dbsession.commit()
+		if description != '' and description != None:
+			data.description = description
+			dbsession.commit()
+		if root_cause != '' and root_cause != None:
+			data.root_cause = root_cause
+			dbsession.commit()
 		
 		finding = request.form.get('description')
 		corrective_action = request.form.get('corrective_action')
 		due_date = request.form.get('due_date')
 
-		action_query = [[date_time,'date_time'],[finding,'finding'],[corrective_action,'corrective_action'], [due_date, 'due_date']]
+		action = dbsession.query(Actions).filter_by(case_id = id).one()
 
-		for j in range(len(action_query)):
-			if action_query[j][0] != '' and action_query[j][0] != None:
-				newActionData = (action_query[j][0],case_id[0])
-				insertAction = ("UPDATE action_items SET "+action_query[j][1]+" = %s WHERE case_id = %s")
-				cursor.execute(insertAction,newActionData)
-
-		db.commit()
-		db.close()
+		if finding != '' and finding != None:
+			action.finding = finding
+			dbsession.commit()
+		if corrective_action != '' and corrective_action != None:
+			action.corrective_action = corrective_action
+			dbsession.commit()
+		if due_date != '' and due_date != None:
+			action.due_date = due_date
+			dbsession.commit()
 
 		return redirect(url_for('incidents'))
 
 	else:
 		user_profile = (session['username'], session['picture'])
-		db, cursor = connect()
-		
-		query = """
-	    		SELECT i.case_num,
-	    				to_char(i.date_time, 'FMMonth FMDD, YYYY'),
-		    			to_char(i.date_time, 'HH24:MI'),
-		    			i.incident_type, 
-		    			i.incident_cat, 
-		    			i.injury, 
-		    			i.property_damage,
-		    			i.description,
-		    			i.root_cause,
-		    			a.corrective_action,
-		    			a.due_date,
-		    			i.user_id
-	    			FROM incident as i, action_items as a
-	    			WHERE i.case_num = a.case_id AND i.case_num = %s;
-	            """
-		data = (str(id),)
-		cursor.execute(query, data)
-		results = cursor.fetchall()
-		creator = getUserInfo(str(results[0][11]))
-		if 'username' not in session or int(creator[0]) != int(session['user_id'][0]):
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+
+		incidents = dbsession.query(Incidents.case_num,
+									func.to_char(Incidents.date_time, 'FMMonth FMDD, YYYY'),
+									func.to_char(Incidents.date_time, 'HH24:MI'),
+									Incidents.incident_type,
+									Incidents.incident_cat,
+									Incidents.injury,
+									Incidents.property_damage,
+									Incidents.description,
+									Incidents.root_cause,
+									Incidents.user_id).filter_by(case_num = id).first()
+		actions = dbsession.query(Actions.corrective_action,
+									func.to_char(Actions.due_date, 'FMMonth FMDD, YYYY')).filter_by(case_id = id).first()
+		print(incidents)
+		print(actions)
+
+		if 'username' not in session or incidents[9] != session['user_id']:
 			flash("Sorry, %s, you are not authorized to edit this incident." % session['username'])
 			return redirect('/incidents/')
 		else:
 			user_profile = (session['username'], session['picture'])
-			return render_template('incidents_edit.html',incidents = results, user_profile = user_profile)
-		db.close()
+			return render_template('incidents_edit.html',incidents = incidents, actions = actions, user_profile = user_profile)
 
 @app.route('/incidents/delete/<int:id>/', methods = ['GET','POST'])
 def deleteIncident(id):
@@ -454,20 +460,27 @@ def deleteIncident(id):
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
-		db, cursor = connect()
-		delete = """
-				DELETE FROM action_items
-				WHERE case_id = %s;
-				DELETE FROM incident
-				WHERE case_num = %s;
-				"""
-		case = (str(id),str(id))
-		cursor.execute(delete,case)
-		db.commit()
-		db.close()
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+		
+		action = dbsession.query(Actions).filter_by(case_id = id).first()
+		dbsession.delete(action)
+		dbsession.commit()
+
+		incident = dbsession.query(Incidents).filter_by(case_num = id).first()
+		dbsession.delete(incident)
+		dbsession.commit()
+
 		return redirect(url_for('incidents'))
 	else:
 		return render_template('incidents_delete.html', id = id)
+
+#######################
+#### Audit Manager ####
+#######################
 
 @app.route('/audits/')
 def audits():
@@ -475,24 +488,22 @@ def audits():
 	user_profile = None
 	if 'username' in session:
 		user_profile = (session['username'], session['picture'])
-	db, cursor = connect()
-	query = """
-    		SELECT a.id,
-    				to_char(a.date_time, 'FMMonth FMDD, YYYY'),
-	    			to_char(a.date_time, 'HH24:MI'), 
-	    			a.type,
-	    			a.ans_1,
-	    			a.ans_2,
-	    			a.ans_3,
-	    			i.id,
-	    			i.finding,
-	    			i.corrective_action
-    			FROM audit as a, action_items as i
-    			WHERE a.id = i.audit_id
-    			ORDER BY a.id desc;
-            """
-	cursor.execute(query)
-	results = cursor.fetchall()
+	# Connect to the database
+	con = connect()
+	Base.metadata.bind = con
+	# Creates a session
+	DBSession = sessionmaker(bind = con)
+	dbsession = DBSession()
+
+	results = dbsession.query(Audits.id,
+								func.to_char(Audits.date_time, 'FMMonth FMDD, YYYY'),
+								func.to_char(Audits.date_time, 'HH24:MI'),
+								Audits.type,
+								Audits.ans_1,
+								Audits.ans_2,
+								Audits.ans_3,
+								Actions.finding,
+								Actions.corrective_action).join(Actions, Audits.id ==Actions.audit_id).order_by(desc(Audits.id)).all()
 	health = []
 	# Creates health percentage
 	for i in results:
@@ -514,30 +525,15 @@ def newAudit():
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
-		db, cursor = connect()
-		insert = ("""
-				INSERT INTO audit (
-								id,
-								date_time,
-								type,
-								que_1,
-								que_2,
-								que_3,
-								ans_1,
-								ans_2,
-								ans_3,
-								user_id
-								)
-					VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-				""")
-		audit_id = getAuditID()
-		new_id = str(int(audit_id)+1)
-		date_time = request.form['date_time']
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+
+		user_id = getUserID(session['email'])
 		audit_type = request.form['audit_type']
-		answer_1 = request.form['answer_1']
-		answer_2 = request.form['answer_2']
-		answer_3 = request.form['answer_3']
-		user_id	 = getUserID(session['email'])
 		# Auto populates the question field based on audit type selected.
 		if audit_type == 'Behavior':
 			question_1 = 'Was the employee wearing their PPE?'
@@ -552,33 +548,29 @@ def newAudit():
 			question_2 = 'Is the area clean and free from trip hazards?'
 			question_3 = 'Are the appropriate HAZWASTE items stored in the proper container?'
 
-		data = (new_id, date_time, audit_type, question_1, question_2, question_3, answer_1, answer_2, answer_3, user_id)
+		audits = Audits(date_time = request.form['date_time'],
+						type = audit_type,
+						ans_1 = request.form['answer_1'],
+						ans_2 = request.form['answer_2'],
+						ans_3 = request.form['answer_3'],
+						que_1 = question_1,
+						que_2 = question_2,
+						que_3 = question_3,
+						user_id	 = user_id)
+		dbsession.add(audits)
+		dbsession.commit()
 
-		cursor.execute(insert, data)
+		getaudit_id = dbsession.query(Audits.id).order_by(desc(Audits.id)).first()
+		audit_id = getaudit_id[0]
+		action_items = Actions(finding = request.form['description'],
+								corrective_action = request.form['corrective_action'],
+								due_date = request.form['due_date'],
+								open_close = 't',
+								user_id	 = user_id,
+								audit_id = audit_id)
 
-		action_items = ("""
-					INSERT INTO action_items (
-									audit_id,
-									finding,
-									corrective_action,
-									due_date,
-									open_close,
-									user_id
-									)
-						VALUES (%s,%s,%s,%s,%s,%s)
-					""")
-
-		finding = request.form['description']
-		corrective_action = request.form['corrective_action']
-		due_date = request.form['due_date']
-		open_close = 't'
-		user_id	 = session['user_id']
-
-		data_a = (new_id, finding, corrective_action, due_date, open_close, user_id)
-
-		cursor.execute(action_items, data_a)
-		db.commit()
-		db.close()
+		dbsession.add(action_items)
+		dbsession.commit()
 
 		return redirect(url_for('audits'))
 	else:
@@ -591,72 +583,80 @@ def editAudit(id):
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
-		db, cursor = connect()
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
 		
-		audit_id = (int(id),)
 		date_time = request.form.get('date_time')
-		audit_type = request.form.get('audit_type')
-		question_1 = request.form.get('question_1')
-		question_2 = request.form.get('question_2')
-		question_3 = request.form.get('question_3')
 		answer_1 = request.form.get('ansewr_1')
 		answer_2 = request.form.get('ansewr_2')
 		answer_3 = request.form.get('ansewr_3')
 
-		query = [[date_time,'date_time'],[audit_type,'type'],[question_1,'question_1'],[question_2,'question_2'],[question_3,'question_3'],[answer_1,'answer_1'],[answer_2,'answer_2'],[answer_3,'answer_3']]
+		data = dbsession.query(Audits).filter_by(id = id).one()
 
-		for i in range(len(query)):
-			if query[i][0] != '' and query[i][0] != None:
-				newdata = (query[i][0],audit_id[0])
-				insert = ("UPDATE audit SET "+query[i][1]+" = %s WHERE id = %s")
-				cursor.execute(insert,newdata)
+		# Creates a seperate insert execution per input generated. This allows the user to only update the information they'd like to change.
+		
+		if date_time != '' and date_time != None:
+			data.date_time = date_time
+			dbsession.commit()
+		if answer_1 != '' and answer_1 != None:
+			data.ans_1 = answer_1
+			dbsession.commit()
+		if answer_2 != '' and answer_2 != None:
+			data.ans_2 = answer_2
+		if answer_3 != '' and answer_3 != None:
+			data.ans_3 = answer_3
 		
 		finding = request.form.get('description')
 		corrective_action = request.form.get('corrective_action')
 		due_date = request.form.get('due_date')
+		
+		action = dbsession.query(Actions).filter_by(audit_id = id).one()
 
-		action_query = [[date_time,'date_time'],[finding,'finding'],[corrective_action,'corrective_action'], [due_date, 'due_date']]
-		# Creates a seperate insert execution per input generated. This allows the user to only update the information they'd like to change.
-		for j in range(len(action_query)):
-			if action_query[j][0] != '' and action_query[j][0] != None:
-				newActionData = (action_query[j][0],audit_id[0])
-				insertAction = ("UPDATE action_items SET "+action_query[j][1]+" = %s WHERE audit_id = %s")
-				cursor.execute(insertAction,newActionData)
-
-		db.commit()
-		db.close()
+		if finding != '' and finding != None:
+			action.finding = finding
+			dbsession.commit()
+		if corrective_action != '' and corrective_action != None:
+			action.corrective_action = corrective_action
+			dbsession.commit()
+		if due_date != '' and due_date != None:
+			action.due_date = due_date
+			dbsession.commit()
 
 		return redirect(url_for('audits'))
 
 	else:
 		user_profile = (session['username'], session['picture'])
-		db, cursor = connect()
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
 		
-		query = """
-	    		SELECT a.id,
-    				to_char(a.date_time, 'FMMonth FMDD, YYYY'),
-	    			to_char(a.date_time, 'HH24:MI'), 
-	    			a.type,
-	    			a.que_1,
-	    			a.que_2,
-	    			a.que_3,
-	    			a.ans_1,
-	    			a.ans_2,
-	    			a.ans_3,
-	    			i.id,
-	    			i.finding,
-	    			i.corrective_action,
-	    			i.due_date,
-	    			i.user_id
-    			FROM audit as a, action_items as i
-    			WHERE a.id = i.audit_id
-    			ORDER BY a.id desc;
-	            """
-		data = (str(id),)
-		cursor.execute(query, data)
-		results = cursor.fetchall()
-		creator = getUserInfo(str(results[0][14]))
-		if 'username' not in session or int(creator[0]) != int(session['user_id'][0]):
+		results = dbsession.query(Audits.id,
+									func.to_char(Audits.date_time, 'FMMonth FMDD, YYYY'),
+									func.to_char(Audits.date_time, 'HH24:MI'),
+									Audits.type,
+									Audits.que_1,
+									Audits.que_2,
+									Audits.que_3,
+									Audits.ans_1,
+									Audits.ans_2,
+									Audits.ans_3,
+									Actions.id,
+									Actions.finding,
+									Actions.corrective_action,
+									Actions.due_date,
+									Actions.user_id,
+									Audits.user_id).filter_by(id = id).join(Actions, Audits.id ==Actions.audit_id).first()
+		print(results[14])
+		print(session['user_id'])
+
+		if 'username' not in session or int(results[14]) != int(session['user_id']):
 			flash("Sorry, %s, you are not authorized to edit this Audit." % session['username'])
 			return redirect('/audits/')
 		else:
@@ -665,25 +665,32 @@ def editAudit(id):
 
 @app.route('/audits/delete/<int:id>/', methods = ['GET','POST'])
 def deleteAudit(id):
-	"""Page to delete an audit"""
+	"""Page to delete an existing incident report"""
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
-		db, cursor = connect()
-		delete = """
-				DELETE FROM action_items
-				WHERE audit_id = %s;
-				DELETE FROM audit
-				WHERE id = %s;
-				"""
-		case = (str(id),str(id))
-		cursor.execute(delete,case)
-		db.commit()
-		db.close()
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+		
+		action = dbsession.query(Actions).filter_by(audit_id = id).first()
+		dbsession.delete(action)
+		dbsession.commit()
+
+		audit = dbsession.query(Audits).filter_by(id = id).first()
+		dbsession.delete(audit)
+		dbsession.commit()
+
 		return redirect(url_for('audits'))
 	else:
 		user_profile = (session['username'], session['picture'])
 		return render_template('audits_delete.html', id = id, user_profile = user_profile)
+
+#############################
+#### Action Item Manager ####
+#############################
 
 @app.route('/actions/')
 def actions():
@@ -691,28 +698,26 @@ def actions():
 	user_profile = None
 	if 'username' in session:
 		user_profile = (session['username'], session['picture'])
-	db, cursor = connect()
-	
-	query = """
-    		SELECT id,
-    				to_char(date_time, 'FMMonth FMDD, YYYY'),
-	    			to_char(date_time, 'HH24:MI'), 
-    				case_id,
-    				audit_id,
-    				finding,
-    				corrective_action,
-    				to_char(due_date, 'FMMonth FMDD, YYYY'),
-    				open_close
-    			FROM action_items
-    			ORDER BY id desc;
-            """
-	cursor.execute(query)
-	results = cursor.fetchall()
+	# Connect to the database
+	con = connect()
+	Base.metadata.bind = con
+	# Creates a session
+	DBSession = sessionmaker(bind = con)
+	dbsession = DBSession()
+
+	results = dbsession.query(Actions.id,
+								func.to_char(Actions.date_time, 'FMMonth FMDD, YYYY'),
+								func.to_char(Actions.date_time, 'HH24:MI'),
+								Actions.case_id,
+								Actions.audit_id,
+								Actions.finding,
+								Actions.corrective_action,
+								func.to_char(Actions.due_date, 'FMMonth FMDD, YYYY'),
+								Actions.open_close).order_by(desc(Actions.id)).all()
 			
 	length = len(results)
 
 	return render_template('actions.html',actions = results, length = length, user_profile = user_profile)
-	db.close()
 
 @app.route('/actions/new/', methods = ['GET','POST'])
 def newActionItem():
@@ -720,34 +725,23 @@ def newActionItem():
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
-		db, cursor = connect()
-		insert = ("""
-				INSERT INTO action_items (
-								id,
-								date_time,
-								finding,
-								corrective_action,
-								due_date,
-								open_close,
-								user_id
-								)
-					VALUES (%s,%s,%s,%s,%s,%s,%s)
-				""")
-		case_id = getActionsID()
-		new_id = str(int(case_id)+1)
-		date_time = request.form['date_time']
-		finding = request.form['finding']
-		corrective_action = request.form['corrective_action']
-		due_date = request.form['due_date']
-		open_close = 't'
-		user_id	 = getUserID(session['email'])
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
 
-		data = (new_id, date_time, finding, corrective_action, due_date, open_close, user_id)
+		user_id = getUserID(session['email'])
 
-		cursor.execute(insert, data)
-		
-		db.commit()
-		db.close()
+		actions = Actions(date_time = request.form['date_time'],
+							finding = request.form['finding'],
+							corrective_action = request.form['corrective_action'],
+							due_date = request.form['due_date'],
+							open_close = 't',
+							user_id	 = user_id)
+		dbsession.add(actions)
+		dbsession.commit()
 
 		return redirect(url_for('actions'))
 	else:
@@ -760,53 +754,59 @@ def editActionItem(id):
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
-		db, cursor = connect()
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
 		
-		case_id = (int(id),)
 		date_time = request.form.get('date_time')
 		finding = request.form.get('finding')
 		corrective_action = request.form.get('corrective_action')
 		due_date = request.form.get('due_date')
 
-		query = [[date_time,'date_time'],[finding,'finding'],[corrective_action,'corrective_action'], [due_date, 'due_date']]
+		data = dbsession.query(Actions).filter_by(id = id).one()
 
-		for i in range(len(query)):
-			if query[i][0] != '' and query[i][0] != None:
-				newdata = (query[i][0],case_id[0])
-				insert = ("UPDATE action_items SET "+query[i][1]+" = %s WHERE id = %s")
-				cursor.execute(insert,newdata)
-
-		db.commit()
-		db.close()
+		if date_time != '' and date_time != None:
+			data.date_time = date_time
+			dbsession.commit()
+		if finding != '' and finding != None:
+			data.finding = finding
+			dbsession.commit()
+		if corrective_action != '' and corrective_action != None:
+			data.corrective_action = corrective_action
+			dbsession.commit()
+		if due_date != '' and due_date != None:
+			data.due_date = due_date
+			dbsession.commit()
 
 		return redirect(url_for('actions'))
 
 	else:
 		user_profile = (session['username'], session['picture'])
-		db, cursor = connect()
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+
+		actions = dbsession.query(Actions.id,
+								func.to_char(Actions.date_time, 'FMMonth FMDD, YYYY'),
+								func.to_char(Actions.date_time, 'HH24:MI'),
+								Actions.case_id,
+								Actions.audit_id,
+								Actions.finding,
+								Actions.corrective_action,
+								func.to_char(Actions.due_date, 'FMMonth FMDD, YYYY'),
+								Actions.user_id).filter_by(id = id).first()
 		
-		query = """
-	    		SELECT id,
-    				to_char(date_time, 'FMMonth FMDD, YYYY'),
-	    			to_char(date_time, 'HH24:MI'), 
-    				case_id,
-    				audit_id,
-    				finding,
-    				corrective_action,
-    				due_date,
-    				user_id
-    			FROM action_items
-    			WHERE id = %s;
-	            """
-		data = (str(id),)
-		cursor.execute(query, data)
-		results = cursor.fetchall()
-		creator = getUserInfo(str(results[0][8]))
-		if 'username' not in session or int(creator[0]) != int(session['user_id'][0]):
+		if 'username' not in session or int(actions[8]) != int(session['user_id']):
 			flash("Sorry, %s, you are not authorized to edit this action item." % session['username'])
 			return redirect('/actions/')
 		else:
-			return render_template('actions_edit.html',actions = results, user_profile = user_profile)
+			return render_template('actions_edit.html',actions = actions, user_profile = user_profile)
 		db.close()
 
 @app.route('/actions/delete/<int:id>/', methods = ['GET','POST'])
@@ -815,15 +815,15 @@ def deleteActionItem(id):
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
-		db, cursor = connect()
-		delete = """
-				DELETE FROM action_items
-				WHERE id = %s;
-				"""
-		case = (str(id),)
-		cursor.execute(delete,case)
-		db.commit()
-		db.close()
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+		
+		action = dbsession.query(Actions).filter_by(id = id).first()
+		dbsession.delete(action)
+		dbsession.commit()
 		return redirect(url_for('actions'))
 	else:
 		user_profile = (session['username'], session['picture'])
@@ -835,22 +835,25 @@ def closeActionItem(id):
 	if 'username' not in session:
 		return redirect('/login')
 	if request.method == 'POST':
-		db, cursor = connect()
-		close = """
-				UPDATE action_items
-					SET open_close = 'f'
-					WHERE id = %s
-				"""
-		action_id = (int(id),)
-		cursor.execute(close, action_id)
-		db.commit()
-		db.close()
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+
+		close = dbsession.query(Actions).filter_by(id = id).one()
+		close.open_close = 'f'
+		dbsession.commit()
+
 		return redirect(url_for('actions'))
 	else:
 		user_profile = (session['username'], session['picture'])
 		return render_template('actions_close.html', id = id, user_profile = user_profile)
 
-# Resources/Help Page
+########################
+#### Resources/Help ####
+########################
 
 @app.route('/resources/')
 @app.route('/help/')
@@ -861,7 +864,9 @@ def resources():
 		user_profile = (session['username'], session['picture'])
 	return render_template('resources.html', user_profile = user_profile)
 
-# Custom Report Generator - still a Work in Progress; not functional
+######################################################################
+# Custom Report Generator - still a Work in Progress; not functional #
+######################################################################
 
 @app.route('/incidents/reports/', methods = ['GET','POST'])
 def incidentsReports():
@@ -942,7 +947,9 @@ def auditsReports():
 def actionsReports():
 	return "This page will be used to generate custom reports and injury/incident trends."
 
-# JSON API EndPoints
+##########################
+### JSON API EndPoints ###
+##########################
 
 @app.route('/incidents/json/')
 def incidentsJSON():
