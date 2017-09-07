@@ -955,129 +955,121 @@ def actionsReports():
 def incidentsJSON():
 	if request.method == 'GET':
 		# Returns all incidents in the Database
-		db, cursor = connect()
-		query = """
-				SELECT *
-					FROM incident
-				"""
-		cursor.execute(query)
-		results = cursor.fetchall()
-		db.commit()
-		db.close()
-		return json.dumps(results, default=datetime_handler)
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+		
+		results = dbsession.query(Incidents).all()
+
+		return jsonify(Incidents = [i.serialize for i in results])
 
 @app.route('/audits/json')
 def auditsJSON():
 	if request.method == 'GET':
 		# Returns all incidents in the Database
-		db, cursor = connect()
-		query = """
-				SELECT *
-					FROM audit
-				"""
-		cursor.execute(query)
-		results = cursor.fetchall()
-		db.commit()
-		db.close()
-		return json.dumps(results, default=datetime_handler)
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+		
+		results = dbsession.query(Audits).all()
+
+		return jsonify(Audits = [i.serialize for i in results])
 
 @app.route('/actions/json')
 def actionsJSON():
 	if request.method == 'GET':
 		# Returns all incidents in the Database
-		db, cursor = connect()
-		query = """
-				SELECT *
-					FROM action_items
-				"""
-		cursor.execute(query)
-		results = cursor.fetchall()
-		db.commit()
-		db.close()
-		return json.dumps(results, default=datetime_handler)
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+		
+		results = dbsession.query(Actions).all()
+
+		return jsonify(Actions = [i.serialize for i in results])
 
 @app.route('/users/json')
 def usersJSON():
 	if request.method == 'GET':
 		# Returns all incidents in the Database
-		db, cursor = connect()
-		query = """
-				SELECT *
-					FROM users
-				"""
-		cursor.execute(query)
-		results = cursor.fetchall()
-		db.commit()
-		db.close()
-		return json.dumps(results)
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+		
+		results = dbsession.query(Users).all()
+
+		return jsonify(Users = [i.serialize for i in results])
 
 @app.route('/incidents/json/<int:id>/')
 def incidentsJSONID(id):
 	if request.method == 'GET':
 		# Returns all incidents in the Database
-		db, cursor = connect()
-		query = """
-				SELECT *
-					FROM incident
-					WHERE id = %s;
-				"""
-		data = (str(id),)
-		cursor.execute(query, data)
-		results = cursor.fetchall()
-		db.commit()
-		db.close()
-		return json.dumps(results, default=datetime_handler)
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+		
+		results = dbsession.query(Incidents).filter_by(case_num = id).all()
+
+		return jsonify(Incidents = [i.serialize for i in results])
 
 @app.route('/audits/json/<int:id>/')
 def auditsJSONID(id):
 	if request.method == 'GET':
 		# Returns all incidents in the Database
-		db, cursor = connect()
-		query = """
-				SELECT *
-					FROM audit
-					WHERE id = %s;
-				"""
-		data = (str(id),)
-		cursor.execute(query, data)
-		results = cursor.fetchall()
-		db.commit()
-		db.close()
-		return json.dumps(results, default=datetime_handler)
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+		
+		results = dbsession.query(Audits).filter_by(id = id).all()
+
+		return jsonify(Audits = [i.serialize for i in results])
 
 @app.route('/actions/json/<int:id>/')
 def actionsJSONID(id):
 	if request.method == 'GET':
 		# Returns all incidents in the Database
-		db, cursor = connect()
-		query = """
-				SELECT *
-					FROM action_items
-					WHERE id = %s;
-				"""
-		data = (str(id),)
-		cursor.execute(query, data)
-		results = cursor.fetchall()
-		db.commit()
-		db.close()
-		return json.dumps(results, default=datetime_handler)
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+		
+		results = dbsession.query(Actions).filter_by(id = id).all()
+
+		return jsonify(Actions = [i.serialize for i in results])
 
 @app.route('/users/json/<int:id>/')
 def usersJSONID(id):
 	if request.method == 'GET':
 		# Returns all incidents in the Database
-		db, cursor = connect()
-		query = """
-				SELECT *
-					FROM users
-					WHERE id = %s;
-				"""
-		data = (str(id),)
-		cursor.execute(query, data)
-		results = cursor.fetchall()
-		db.commit()
-		db.close()
-		return json.dumps(results)
+		# Connect to the database
+		con = connect()
+		Base.metadata.bind = con
+		# Creates a session
+		DBSession = sessionmaker(bind = con)
+		dbsession = DBSession()
+		
+		results = dbsession.query(Users).filter_by(id=id).all()
+
+		return jsonify(Users = [i.serialize for i in results])
 
 if __name__ == '__main__':
 	# Generates initial weather information
