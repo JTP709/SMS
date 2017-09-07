@@ -99,7 +99,7 @@
           <h2 class="sub-header">Action Items</h2>
 
           <div class="table-responsive">
-            <table class="table table-striped">
+            <table id = "actions" class="table table-striped">
               <thead>
                 <tr>
                   <th>Action Item ID</th>
@@ -159,5 +159,14 @@
     <script type="text/javascript" src="{{ url_for('static', filename ='bootstrap.min.js') }}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script type="text/javascript" src="{{ url_for('static', filename='ie10-viewport-bug-workaround.js') }}"></script>
+    <!-- Datatable Format -->
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+          $('#actions').DataTable();
+      } );
+    </script>
   </body>
 </html>
