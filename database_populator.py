@@ -113,14 +113,14 @@ audits = (audit_1, audit_2, audit_3, audit_4, audit_5, audit_6, audit_7, audit_8
 actions_a = (actions_audits_1, actions_audits_2, actions_audits_3, actions_audits_4, actions_audits_5, actions_audits_6, actions_audits_7, actions_audits_8, actions_audits_9)
 
 def dueDate(time_stamp):
-	date = time_stamp[1]
-	dateRegex = re.compile(r'\d\d\d\d-\d\d-\d\d')
-	mo = dateRegex.search(date)
-	num = mo.group()
-	finding_date = datetime.datetime.strptime(num, "%Y-%m-%d")
-	week = datetime.timedelta(days = 7)
-	due_date = finding_date + week
-	return due_date
+    date = time_stamp[1]
+    dateRegex = re.compile(r'\d\d\d\d-\d\d-\d\d')
+    mo = dateRegex.search(date)
+    num = mo.group()
+    finding_date = datetime.datetime.strptime(num, "%Y-%m-%d")
+    week = datetime.timedelta(days = 7)
+    due_date = finding_date + week
+    return due_date
 
 # Connect to the database
 con = connect()
@@ -132,77 +132,77 @@ session = DBSession()
 print("Session created!")
 
 def populate():
-	insert = Users(name = 'John Smith', email = 'john.smith@sms.com', position = 'Site Safety Manager', picture = '')
-	session.add(insert)
-	session.commit()
-	print("User Added!")
+    insert = Users(name = 'John Smith', email = 'john.smith@sms.com', position = 'Site Safety Manager', picture = '')
+    session.add(insert)
+    session.commit()
+    print("User Added!")
 
-	for i in range(len(injuries)):
-		incident = Incidents(date_time = injuries[i][1],
-								incident_type = injuries[i][2],
-								incident_cat = injuries[i][3],
-								injury = injuries[i][4],
-								property_damage = injuries[i][5],
-								description = injuries[i][6],
-								root_cause = injuries[i][7],
-								user_id = injuries[i][8])
-		session.add(incident)
-		session.commit()
-		print("Incident Case #"+str(i)+" added!")
+    for i in range(len(injuries)):
+        incident = Incidents(date_time = injuries[i][1],
+                                incident_type = injuries[i][2],
+                                incident_cat = injuries[i][3],
+                                injury = injuries[i][4],
+                                property_damage = injuries[i][5],
+                                description = injuries[i][6],
+                                root_cause = injuries[i][7],
+                                user_id = injuries[i][8])
+        session.add(incident)
+        session.commit()
+        print("Incident Case #"+str(i)+" added!")
 
-		incident_due_date = dueDate(injuries[i])
-		data = (injuries[i][1], injuries[i][6], actions_i[i], incident_due_date, 't','1')
-		case_id = str(i+1)
-		action_item = Actions(date_time = data[0],
-								finding = data[1],
-								corrective_action = data[2],
-								due_date = data[3],
-								open_close = data[4],
-								user_id = data[5],
-								case_id = case_id)
-		session.add(action_item)
-		session.commit()
-		print("Action Item for Incident Case #"+str(i)+" added!")
+        incident_due_date = dueDate(injuries[i])
+        data = (injuries[i][1], injuries[i][6], actions_i[i], incident_due_date, 't','1')
+        case_id = str(i+1)
+        action_item = Actions(date_time = data[0],
+                                finding = data[1],
+                                corrective_action = data[2],
+                                due_date = data[3],
+                                open_close = data[4],
+                                user_id = data[5],
+                                case_id = case_id)
+        session.add(action_item)
+        session.commit()
+        print("Action Item for Incident Case #"+str(i)+" added!")
 
-	for j in range(len(audits)):
-		audit = Audits(date_time = audits[j][1],
-						type = audits[j][2],
-						que_1 = audits[j][3],
-						que_2 = audits[j][4],
-						que_3 = audits[j][5],
-						ans_1 = audits[j][6],
-						ans_2 = audits[j][7],
-						ans_3 = audits[j][8],
-						user_id = audits[j][9])
-		session.add(audit)
-		session.commit()
-		print("Audit Report #"+str(j)+" added!")
+    for j in range(len(audits)):
+        audit = Audits(date_time = audits[j][1],
+                        type = audits[j][2],
+                        que_1 = audits[j][3],
+                        que_2 = audits[j][4],
+                        que_3 = audits[j][5],
+                        ans_1 = audits[j][6],
+                        ans_2 = audits[j][7],
+                        ans_3 = audits[j][8],
+                        user_id = audits[j][9])
+        session.add(audit)
+        session.commit()
+        print("Audit Report #"+str(j)+" added!")
 
-		action_due_date = dueDate(audits[j])
-		data = (audits[j][1], 'Audit deficiency', actions_a[j], action_due_date, 't','1')
-		audit_id = str(j+1)
-		action_item = Actions(date_time = data[0],
-								finding = data[1],
-								corrective_action = data[2],
-								due_date = data[3],
-								open_close = data[4],
-								user_id = data[5],
-								audit_id = audit_id)
-		session.add(action_item)
-		session.commit()
-		print("Action Item for Audit Report #"+str(j)+" added!")
+        action_due_date = dueDate(audits[j])
+        data = (audits[j][1], 'Audit deficiency', actions_a[j], action_due_date, 't','1')
+        audit_id = str(j+1)
+        action_item = Actions(date_time = data[0],
+                                finding = data[1],
+                                corrective_action = data[2],
+                                due_date = data[3],
+                                open_close = data[4],
+                                user_id = data[5],
+                                audit_id = audit_id)
+        session.add(action_item)
+        session.commit()
+        print("Action Item for Audit Report #"+str(j)+" added!")
 
-	week = 1
-	for mh in range(34):
-		hours = randint(3000,5000)
-		year = 2017
-		week += 1
+    week = 1
+    for mh in range(34):
+        hours = randint(3000,5000)
+        year = 2017
+        week += 1
 
-		insert = Manhours(year = year,
-							week = week,
-							hours = hours)
-		session.add(insert)
-		session.commit()
-		print("Man Hours added for Week #"+str(mh))
+        insert = Manhours(year = year,
+                            week = week,
+                            hours = hours)
+        session.add(insert)
+        session.commit()
+        print("Man Hours added for Week #"+str(mh))
 
 populate()
