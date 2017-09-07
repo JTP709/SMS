@@ -110,6 +110,7 @@ def getInjuryRates():
 	total_lti = query_lti[0][0]
 
 	total_rir = total_ri+total_rd+total_lti
+	total_tir = total_ri+total_rd+total_lti+total_fa
 
 	hours_query = dbsession.query(func.sum(Manhours.hours)).filter_by(year = 2017)
 	manhours = hours_query[0][0]
@@ -119,7 +120,7 @@ def getInjuryRates():
 	rir = round(float(total_rir*200000)/float(manhours), 2)
 	lti = round(float(total_lti*200000)/float(manhours), 2)
 	ori = round(float(total_ri*200000)/float(manhours), 2)
-	tir = round(float(total_rir*200000)/float(manhours), 2)
+	tir = round(float(total_tir*200000)/float(manhours), 2)
 
 	injury_rate = (fair, rir, lti, ori, tir)
 
