@@ -88,45 +88,66 @@
           
           <form action="#" method = 'post'>
 
-            <h3>Date/Time:</h3>
+            <h3><b>Date/Time:</b></h3>
               <input type ='datetime-local' name='date_time'>
               <br>
-            <h3>Audit Type</h3>
+            <h3><b>Audit Type</b></h3>
               <br>
-              <input type ='radio'  name='audit_type' value ='Behavior'>Behavior
+              <input onclick="auditQuestions('beh')" type ='radio'  name='audit_type' value ='Behavior'>Behavior
               <br>
-              <input type ='radio'  name='audit_type' value ='Area Organization'>Area Organization
+              <input onclick="auditQuestions('ao')" type ='radio'  name='audit_type' value ='Area Organization'>Area Organization
               <br>
-              <input type ='radio'  name='audit_type' value ='HAZWASTE'>HAZWASTE
+              <input onclick="auditQuestions('haz')" type ='radio'  name='audit_type' value ='HAZWASTE'>HAZWASTE
               <br>
             <h3><b>Question 1:</b></h3>
-            <p><b>Behavior: </b>Was the employee wearing their PPE?</p>
-            <p><b>Area Organization: </b>Does the area have designated locations for all carts, tools, pallets, inventory, and non-inventory items?</p>
-            <p><b>HAZWASTE: </b>Are all barrels in good condition?</p>
             <br>
-            <h4>Answer:</h4>
+            <div id = "Behavior1">
+              <h4><b>Behavior: </b>Was the employee wearing their PPE?</h4>
+            </div>
+            <div id="AreaOrganization1">
+              <h4><b>Area Organization: </b>Does the area have designated locations for all carts, tools, pallets, inventory, and non-inventory items?</h4>
+            </div>
+            <div id="HAZWASTE1">
+              <h4><b>HAZWASTE: </b>Are all barrels in good condition?</h4>
+            </div>
+            <br>
+            <h3><b>Answer:</b></h3>
               <br>
               <input type ='radio'  name='answer_1' value ='t'>Yes
               <br>
               <input type ='radio'  name='answer_1' value ='f'>No
               <br>
             <h3><b>Question 2:</b></h3>
-            <p><b>Behavior: </b>Was the employee using proper lifting techniques?</p>
-            <p><b>Area Organization: </b>Are all carts, pallets, tools, and items in a designated location?</p>
-            <p><b>HAZWASTE: </b>Are all barrels properly labelled?</p>
             <br>
-            <h4>Answer:</h3>
+            <div id = "Behavior2">
+              <h4><b>Behavior: </b>Was the employee using proper lifting techniques?</h4>
+            </div>
+            <div id = "AreaOrganization2">
+              <h4><b>Area Organization: </b>Are all carts, pallets, tools, and items in a designated location?</h4>
+            </div>
+            <div id = "HAZWASTE2">
+              <h4><b>HAZWASTE: </b>Are all barrels properly labelled?</h4>
+            </div>
+            <br>
+            <h3><b>Answer:</b></h3>
               <br>
               <input type ='radio'  name='answer_2' value ='t'>Yes
               <br>
               <input type ='radio'  name='answer_2' value ='f'>No
-              <br>  
+              <br>   
             <h3><b>Question 3:</b></h3>
-            <p><b>Behavior: </b>Was the employee's work area clean?</p>
-            <p><b>Area Organization: </b>Is the area clean and free from trip hazards?</p>
-            <p><b>HAZWASTE: </b>Are the appropriate HAZWASTE items stored in the proper container?</p>
             <br>
-            <h4>Answer:</h4>
+            <div id = "Behavior3">
+              <h4><b>Behavior: </b>Was the employee's work area clean?</h4>
+            </div>
+            <div id = "AreaOrganization3">
+              <h4><b>Area Organization: </b>Is the area clean and free from trip hazards?</h4>
+            </div>
+            <div id="HAZWASTE3">
+              <h4><b>HAZWASTE: </b>Are the appropriate HAZWASTE items stored in the proper container?</h4>
+            </div>
+            <br>
+            <h3><b>Answer:</b></h3>
               <br>
               <input type ='radio'  name='answer_3' value ='t'>Yes
               <br>
@@ -160,5 +181,103 @@
     <script type="text/javascript" src="{{ url_for('static', filename ='bootstrap.min.js') }}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script type="text/javascript" src="{{ url_for('static', filename='ie10-viewport-bug-workaround.js') }}"></script>
+    <!-- Audit Question based on selection -->
+    <script>
+      var beh_div1 = document.getElementById('Behavior1');
+      var ao_div1 = document.getElementById('AreaOrganization1');
+      var haz_div1 = document.getElementById('HAZWASTE1');
+
+      var beh_div2 = document.getElementById('Behavior2');
+      var ao_div2 = document.getElementById('AreaOrganization2');
+      var haz_div2 = document.getElementById('HAZWASTE2');
+      
+      var beh_div3 = document.getElementById('Behavior3');
+      var ao_div3 = document.getElementById('AreaOrganization3');
+      var haz_div3 = document.getElementById('HAZWASTE3');
+      
+      beh_div1.style.display = 'none';
+      ao_div1.style.display = 'none';
+      haz_div1.style.display = 'none';
+      
+      beh_div2.style.display = 'none';
+      ao_div2.style.display = 'none';
+      haz_div2.style.display = 'none';
+      
+      beh_div3.style.display = 'none';
+      ao_div3.style.display = 'none';
+      haz_div3.style.display = 'none';
+
+    function auditQuestions(x) {
+      if (x === 'beh') {
+        if (beh_div1.style.display === 'none') {
+            beh_div1.style.display = 'block';
+            ao_div1.style.display = 'none';
+            haz_div1.style.display = 'none';
+        } else {
+            beh_div1.style.display = 'none';
+        }
+        if (beh_div2.style.display === 'none') {
+            beh_div2.style.display = 'block';
+            ao_div2.style.display = 'none';
+            haz_div2.style.display = 'none';
+        } else {
+            beh_div2.style.display = 'none';
+        }
+        if (beh_div3.style.display === 'none') {
+            beh_div3.style.display = 'block';
+            ao_div3.style.display = 'none';
+            haz_div3.style.display = 'none';
+        } else {
+            beh_div3.style.display = 'none';
+        }
+      }
+      if (x === 'ao') {
+        if (ao_div1.style.display === 'none') {
+            ao_div1.style.display = 'block';
+            beh_div1.style.display = 'none';
+            haz_div1.style.display = 'none';
+        } else {
+            ao_div1.style.display = 'none';
+        }
+        if (ao_div2.style.display === 'none') {
+            ao_div2.style.display = 'block';
+            beh_div2.style.display = 'none';
+            haz_div2.style.display = 'none';
+        } else {
+            ao_div2.style.display = 'none';
+        }
+        if (ao_div3.style.display === 'none') {
+            ao_div3.style.display = 'block';
+            beh_div3.style.display = 'none';
+            haz_div3.style.display = 'none';
+        } else {
+            ao_div3.style.display = 'none';
+        }
+      }
+      if (x === 'haz') {
+        if (haz_div1.style.display === 'none') {
+            haz_div1.style.display = 'block';
+            ao_div1.style.display = 'none';
+            beh_div1.style.display = 'none';
+        } else {
+            haz_div1.style.display = 'none';
+        }
+        if (haz_div2.style.display === 'none') {
+            haz_div2.style.display = 'block';
+            ao_div2.style.display = 'none';
+            beh_div2.style.display = 'none';
+        } else {
+            haz_div2.style.display = 'none';
+        }
+        if (haz_div3.style.display === 'none') {
+            haz_div3.style.display = 'block';
+            ao_div3.style.display = 'none';
+            beh_div3.style.display = 'none';
+        } else {
+            haz_div3.style.display = 'none';
+        }
+      }
+    }
+    </script>
   </body>
 </html>

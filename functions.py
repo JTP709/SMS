@@ -58,7 +58,7 @@ def getUserID(email):
 
     query = dbsession.query(Users).filter_by(email = email).first()
     
-    if query.id == None:
+    if query == None:
         user = None
     else:
         user = str(query.id)
