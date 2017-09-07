@@ -953,8 +953,8 @@ def actionsReports():
 
 @app.route('/incidents/json/')
 def incidentsJSON():
+	"""Returns all Incidents in the database"""
 	if request.method == 'GET':
-		# Returns all incidents in the Database
 		# Connect to the database
 		con = connect()
 		Base.metadata.bind = con
@@ -968,8 +968,8 @@ def incidentsJSON():
 
 @app.route('/audits/json')
 def auditsJSON():
+	"""Returns all Audits in the database"""
 	if request.method == 'GET':
-		# Returns all incidents in the Database
 		# Connect to the database
 		con = connect()
 		Base.metadata.bind = con
@@ -983,8 +983,8 @@ def auditsJSON():
 
 @app.route('/actions/json')
 def actionsJSON():
+	"""Returns all Action Items in the database"""
 	if request.method == 'GET':
-		# Returns all incidents in the Database
 		# Connect to the database
 		con = connect()
 		Base.metadata.bind = con
@@ -998,8 +998,8 @@ def actionsJSON():
 
 @app.route('/users/json')
 def usersJSON():
+	"""Returns all users in the database"""
 	if request.method == 'GET':
-		# Returns all incidents in the Database
 		# Connect to the database
 		con = connect()
 		Base.metadata.bind = con
@@ -1014,7 +1014,6 @@ def usersJSON():
 @app.route('/incidents/json/<int:id>/')
 def incidentsJSONID(id):
 	if request.method == 'GET':
-		# Returns all incidents in the Database
 		# Connect to the database
 		con = connect()
 		Base.metadata.bind = con
@@ -1029,7 +1028,6 @@ def incidentsJSONID(id):
 @app.route('/audits/json/<int:id>/')
 def auditsJSONID(id):
 	if request.method == 'GET':
-		# Returns all incidents in the Database
 		# Connect to the database
 		con = connect()
 		Base.metadata.bind = con
@@ -1044,7 +1042,6 @@ def auditsJSONID(id):
 @app.route('/actions/json/<int:id>/')
 def actionsJSONID(id):
 	if request.method == 'GET':
-		# Returns all incidents in the Database
 		# Connect to the database
 		con = connect()
 		Base.metadata.bind = con
@@ -1059,7 +1056,6 @@ def actionsJSONID(id):
 @app.route('/users/json/<int:id>/')
 def usersJSONID(id):
 	if request.method == 'GET':
-		# Returns all incidents in the Database
 		# Connect to the database
 		con = connect()
 		Base.metadata.bind = con
