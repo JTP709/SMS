@@ -7,9 +7,6 @@
 - JSON
 	- Allow CRUD operations through RESTful API endpoints
 	- Implement OAuth for API endpoints
-
-SQL Alchemy Port -
-	- serialized json?
 """
 ###############################################################
 
@@ -227,7 +224,7 @@ def dashboard():
 									Incidents.case_num,
 									Incidents.incident_cat,
 									Incidents.description).filter(Incidents.injury == True).order_by(desc(Incidents.case_num)).all()
-	injury_rate = getInjuryRates()
+	injury_rate, manhours = getInjuryRates()
 	length = len(results)
 
 	# Fetches Audit Health
@@ -282,7 +279,7 @@ def dashboard():
 							func.to_char(Actions.due_date, 'FMMonth FMDD, YYYY'),
 							Actions.open_close).order_by(Actions.due_date)
 	
-	return render_template('dashboard.html',incidents = results, health = health, actions = actions, weather = weather, injury_rate = injury_rate, user_profile = user_profile)
+	return render_template('dashboard.html',incidents = results, health = health, actions = actions, weather = weather, injury_rate = injury_rate, user_profile = user_profile, manhours = manhours)
 
 ##########################
 #### Incident Manager ####
@@ -312,9 +309,9 @@ def incidents():
 									Incidents.root_cause).order_by(desc(Incidents.case_num)).all()
 	length = len(results)
 	# Get the injury rates
-	injury_rate = getInjuryRates()
+	injury_rate, manhours = getInjuryRates()
 
-	return render_template('incidents.html',incidents = results, length = length, injury_rate = injury_rate, user_profile = user_profile)
+	return render_template('incidents.html',incidents = results, length = length, injury_rate = injury_rate, user_profile = user_profile, manhours = manhours)
 	db.close()
 
 @app.route('/incidents/new/', methods = ['GET','POST'])

@@ -102,7 +102,8 @@ def getInjuryRates():
 	query_ri = dbsession.query(func.count(Incidents.incident_type)).filter_by(incident_type = 'RI')
 	query_rd = dbsession.query(func.count(Incidents.incident_type)).filter_by(incident_type = 'RD')
 	query_lti = dbsession.query(func.count(Incidents.incident_type)).filter_by(incident_type = 'LTI')
-
+	print(query_fa)
+	print(query_fa[0][0])
 	total_fa = query_fa[0][0]
 	total_ri = query_ri[0][0]
 	total_rd = query_rd[0][0]
@@ -112,6 +113,7 @@ def getInjuryRates():
 
 	hours_query = dbsession.query(func.sum(Manhours.hours)).filter_by(year = 2017)
 	manhours = hours_query[0][0]
+	print(manhours)
 
 	fair = round(float(total_fa*200000)/float(manhours), 2)
 	rir = round(float(total_rir*200000)/float(manhours), 2)
@@ -121,4 +123,4 @@ def getInjuryRates():
 
 	injury_rate = (fair, rir, lti, ori, tir)
 
-	return injury_rate
+	return injury_rate, manhours
