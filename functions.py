@@ -1,7 +1,6 @@
 import psycopg2, datetime, json, httplib2
 from sqlalchemy import func
 from sqlalchemy.orm import sessionmaker
-from connect import connect
 from database_setup import Base, Users, Incidents, Audits, Actions, Manhours
 from sqlalchemy import create_engine
 
