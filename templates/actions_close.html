@@ -85,13 +85,12 @@
           <h1 class="page-header">Action Tracking Manager</h1>
 
             <form action="#" method = 'post'>
-              <h3>Delete Action Item?</h3>
+              <h3>Close Action Item?</h3>
               <p>Are you sure you want to close Action Item #{{id}}?</p>
               <input type='submit' value="YES">
-            </form>
-            <hr>
-            <form action="/audits/edit/{{id}}">
-              <input type="submit" value="NO">
+              <form action="/audits/edit/{{id}}">
+                <input type="submit" value="NO">
+              </form>
             </form>
 
           </div>
