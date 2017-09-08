@@ -444,7 +444,7 @@ def editIncident(id):
         print(incidents)
         print(actions)
 
-        if 'username' not in session or incidents[9] != session['user_id']:
+        if 'username' not in session or int(incidents[9]) != int(session['user_id']):
             flash("Sorry, %s, you are not authorized to edit this incident." % session['username'])
             return redirect('/incidents/')
         else:

@@ -5,6 +5,8 @@ Author: Jonathan Prell
 v1.0	9/1/2017
 _________________________________________________________________
 
+About:
+
 The Simple Safety Manager accomplishes the requirements of the Item Catalogue project and more. I decided to build this application in substitution of the original project to demonstrate my ability to build a corporate grade solution for a real world problem.
 
 The application allows a user to capture incident investigation details and compliance audit reports. The user may also track action items developed from the incident cases or audit reports and tie them to those submissions or input an action item independantly.
@@ -14,6 +16,9 @@ All of the data can be read by anybody, but a user must log in to submit new inf
 Authentication is managed by a third party OAuth through Google.
 
 The application takes advantage of a simple and free open weather API from https://openweathermap.org/api to provide the user current weather information. The weather currently provides local information for my location in Cincinnati, OH.
+_________________________________________________________________
+
+API Endpoints:
 
 API endpoints are available to provide JSON formatted data from the database.
 	/incidents/json 		- provides all items in the incidents database.
@@ -24,7 +29,6 @@ API endpoints are available to provide JSON formatted data from the database.
 	/actions/json*id* 		- provides a specific item in the actions database by id number.
 	/users/json 			- provides all items in the users database.
 	/users/json*id* 		- provides a specific item in the users database by id number.
-
 _________________________________________________________________
 
 Installation:
