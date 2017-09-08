@@ -1,4 +1,4 @@
 *.pyc
 *.zip
 templates/old/*
-__pycache__
+__pycache__/*
