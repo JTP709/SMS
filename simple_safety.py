@@ -510,10 +510,51 @@ def audits():
                 audit_def = audit_def + 1.0
         audit_perc = int(float(audit_def/3)*100)
         health.append(audit_perc)
+
+    # Fetches Audit Health
+    health_rates = []
+    audit_results = dbsession.query(Audits.type, Audits.ans_1, Audits.ans_2, Audits.ans_3).all()
+    length = len(audit_results)
+
+    # Set the totals as floats at 0
+    audit_def = 0.0
+    b_total = 0.0
+    audit_b_def = 0.0
+    a_total = 0.0
+    audit_a_def = 0.0
+    h_total = 0.0
+    audit_h_def = 0.0
+    for i in audit_results:
+        for j in range(len(i)):
+            if i[j] == True:
+                audit_def = audit_def + 1.0
+        if i[0] == 'Behavior':
+            b_total = b_total + 3 # adding 3 because there are 3 answers total per audit.
+            for k in range(len(i)):
+                if i[k] == True:
+                    audit_b_def = audit_b_def + 1.0
+        if i[0] == 'Area Organization':
+            a_total = a_total + 3
+            for k in range(len(i)):
+                if i[k] == True:
+                    audit_a_def = audit_a_def + 1.0
+        if i[0] == 'HAZWASTE':
+            h_total = h_total + 3
+            for k in range(len(i)):
+                if i[k] == True:
+                    audit_h_def = audit_h_def + 1.0
+    audit_perc = int(float(audit_def/(length*3)*100)) # creates percentage
+    health_rates.append(audit_perc)
+    audit_a_perc = int(float(audit_a_def/a_total*100))
+    health_rates.append(audit_a_perc)
+    audit_b_perc = int(float(audit_b_def/b_total*100))
+    health_rates.append(audit_b_perc)
+    audit_h_perc = int(float(audit_h_def/h_total*100))
+    health_rates.append(audit_h_perc)
         
     length = len(results)
 
-    return render_template('audits.html',audits = results, length = length, health = health, user_profile = user_profile)
+    return render_template('audits.html',audits = results, length = length, health = health, health_rates = health_rates, user_profile = user_profile)
     db.close()
 
 @app.route('/audits/new/', methods = ['GET','POST'])

@@ -97,6 +97,28 @@
             {% endif %}
           {% endwith %}
 
+          <h2 class="sub-header">Audit Health</h2>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Overall Audit Health</th>
+                  <th>Behavior Audit Health</th>
+                  <th>Area Organization Audit Health</th>
+                  <th>HAZWASTE Audit Health</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>{{health_rates[0]}}%</th>
+                  <th>{{health_rates[1]}}%</th>
+                  <th>{{health_rates[2]}}%</th>
+                  <th>{{health_rates[3]}}%</th>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <h2 class="sub-header">Audit Reports</h2>
 
           <div class="table-responsive">
