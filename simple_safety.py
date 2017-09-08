@@ -277,7 +277,7 @@ def dashboard():
                             Actions.finding,
                             Actions.corrective_action,
                             func.to_char(Actions.due_date, 'FMMonth FMDD, YYYY'),
-                            Actions.open_close).order_by(Actions.due_date)
+                            Actions.open_close).filter_by(open_close = 't').order_by(Actions.due_date)
     
     return render_template('dashboard.html',incidents = results, health = health, actions = actions, weather = weather, injury_rate = injury_rate, user_profile = user_profile, manhours = manhours)
 
