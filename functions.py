@@ -1,15 +1,16 @@
 import psycopg2, datetime, json, httplib2
 from sqlalchemy import func
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Users, Incidents, Audits, Actions, Manhours
+from database_setup import connect, Base, Users, Incidents, Audits, Actions, Manhours
 from sqlalchemy import create_engine
 
-def connect(user='safety', password='safety',db='safety_v2', host='localhost', port=5432):
-    """Returns a connection and a metadata object"""
-    url = 'postgresql://{}:{}@{}:{}/{}'
-    url = url.format(user, password,host, port, db)
-    con = create_engine(url, client_encoding ='utf8')
-    return con
+def session():
+    """Creates a database session"""
+    con = connect()
+    Base.metadata.bind = con
+    DBsession = session(bind = con)
+    dbsession = DBSession()
+    return dbsession
 
 def createUser(session):
     # Connect to the database

@@ -17,9 +17,9 @@ print(sys.version)
 # Import connect function
 #from connect import connect
 # Import custom functions
-from functions import connect, createUser, getUserInfo, getUserID, datetime_handler, getWeather, getInjuryRates
+from functions import createUser, getUserInfo, getUserID, datetime_handler, getWeather, getInjuryRates
 # Import database objects
-from database_setup import Base, Users, Incidents, Audits, Actions, Manhours
+from database_setup import connect, Base, Users, Incidents, Audits, Actions, Manhours
 # Import SQL Alchemy functions/operations
 from sqlalchemy import func, desc
 from sqlalchemy.orm import sessionmaker
@@ -164,12 +164,7 @@ def profile():
     if 'username' not in session:
         return redirect('/login')
     if request.method == 'POST':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
         
         email = session['email']
         picture = request.form.get('picture')
@@ -184,12 +179,7 @@ def profile():
                 
         return redirect(url_for('profile'))
     else:
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
         
         email = session['email']
 
@@ -320,12 +310,7 @@ def newIncident():
     if 'username' not in session:
         return redirect('/login')
     if request.method == 'POST':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
         user_id = getUserID(session['email'])
         print(user_id)
         incidents = Incidents(date_time = request.form['date_time'],
@@ -361,12 +346,7 @@ def editIncident(id):
     if 'username' not in session:
         return redirect('/login')
     if request.method == 'POST':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
 
         date_time = request.form.get('date_time')
         incident_type = request.form.get('incident_type')
@@ -422,12 +402,7 @@ def editIncident(id):
 
     else:
         user_profile = (session['username'], session['picture'])
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
 
         incidents = dbsession.query(Incidents.case_num,
                                     func.to_char(Incidents.date_time, 'FMMonth FMDD, YYYY'),
@@ -563,12 +538,7 @@ def newAudit():
     if 'username' not in session:
         return redirect('/login')
     if request.method == 'POST':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
 
         user_id = getUserID(session['email'])
         audit_type = request.form['audit_type']
@@ -621,12 +591,7 @@ def editAudit(id):
     if 'username' not in session:
         return redirect('/login')
     if request.method == 'POST':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
         
         date_time = request.form.get('date_time')
         answer_1 = request.form.get('ansewr_1')
@@ -668,12 +633,7 @@ def editAudit(id):
 
     else:
         user_profile = (session['username'], session['picture'])
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
         
         results = dbsession.query(Audits.id,
                                     func.to_char(Audits.date_time, 'FMMonth FMDD, YYYY'),
@@ -763,12 +723,7 @@ def newActionItem():
     if 'username' not in session:
         return redirect('/login')
     if request.method == 'POST':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
 
         user_id = getUserID(session['email'])
 
@@ -792,12 +747,7 @@ def editActionItem(id):
     if 'username' not in session:
         return redirect('/login')
     if request.method == 'POST':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
         
         date_time = request.form.get('date_time')
         finding = request.form.get('finding')
@@ -823,12 +773,7 @@ def editActionItem(id):
 
     else:
         user_profile = (session['username'], session['picture'])
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
 
         actions = dbsession.query(Actions.id,
                                 func.to_char(Actions.date_time, 'FMMonth FMDD, YYYY'),
@@ -873,12 +818,7 @@ def closeActionItem(id):
     if 'username' not in session:
         return redirect('/login')
     if request.method == 'POST':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
 
         close = dbsession.query(Actions).filter_by(id = id).one()
         close.open_close = 'f'
@@ -993,12 +933,7 @@ def actionsReports():
 def incidentsJSON():
     """Returns all Incidents in the database"""
     if request.method == 'GET':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
         
         results = dbsession.query(Incidents).all()
 
@@ -1008,12 +943,7 @@ def incidentsJSON():
 def auditsJSON():
     """Returns all Audits in the database"""
     if request.method == 'GET':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
         
         results = dbsession.query(Audits).all()
 
@@ -1023,12 +953,7 @@ def auditsJSON():
 def actionsJSON():
     """Returns all Action Items in the database"""
     if request.method == 'GET':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
         
         results = dbsession.query(Actions).all()
 
@@ -1038,12 +963,7 @@ def actionsJSON():
 def usersJSON():
     """Returns all users in the database"""
     if request.method == 'GET':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
         
         results = dbsession.query(Users).all()
 
@@ -1052,12 +972,7 @@ def usersJSON():
 @app.route('/incidents/json/<int:id>/')
 def incidentsJSONID(id):
     if request.method == 'GET':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
         
         results = dbsession.query(Incidents).filter_by(case_num = id).all()
 
@@ -1066,12 +981,7 @@ def incidentsJSONID(id):
 @app.route('/audits/json/<int:id>/')
 def auditsJSONID(id):
     if request.method == 'GET':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
         
         results = dbsession.query(Audits).filter_by(id = id).all()
 
@@ -1080,12 +990,7 @@ def auditsJSONID(id):
 @app.route('/actions/json/<int:id>/')
 def actionsJSONID(id):
     if request.method == 'GET':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
         
         results = dbsession.query(Actions).filter_by(id = id).all()
 
@@ -1094,12 +999,7 @@ def actionsJSONID(id):
 @app.route('/users/json/<int:id>/')
 def usersJSONID(id):
     if request.method == 'GET':
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind = con)
-        dbsession = DBSession()
+        dbsession = session()
         
         results = dbsession.query(Users).filter_by(id=id).all()
 

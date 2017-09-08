@@ -4,8 +4,7 @@ import re
 from random import randint
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Users, Incidents, Audits, Actions, Manhours
-from functions import connect
+from database_setup import connect, Base, Users, Incidents, Audits, Actions, Manhours
 
 # Add dates to incidents, audits. Rebuild Audit Tables.
 

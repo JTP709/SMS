@@ -1,12 +1,18 @@
 # Configuration
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Enum, Float
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Enum, Float, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from connect import connect
 
 Base = declarative_base()
+
+def connect(user='safety', password='safety',db='safety_v2', host='localhost', port=5432):
+    """Returns a connection and a metadata object"""
+    url = 'postgresql://{}:{}@{}:{}/{}'
+    url = url.format(user, password,host, port, db)
+    con = create_engine(url, client_encoding ='utf8')
+    return con
 
 def dump_datetime(value):
     """Deserialize datetime object into string for JSON processing"""
