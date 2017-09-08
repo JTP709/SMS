@@ -1,16 +1,9 @@
 import psycopg2, datetime, json, httplib2
 from sqlalchemy import func
 from sqlalchemy.orm import sessionmaker
-from database_setup import connect, Base, Users, Incidents, Audits, Actions, Manhours
+from database_setup import Base, Users, Incidents, Audits, Actions, Manhours
 from sqlalchemy import create_engine
-
-def session():
-    """Creates a database session"""
-    con = connect()
-    Base.metadata.bind = con
-    DBsession = session(bind = con)
-    dbsession = DBSession()
-    return dbsession
+from connect import connect
 
 def createUser(session):
     # Connect to the database
