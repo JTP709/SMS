@@ -7,7 +7,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" src="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" href="../../favicon.ico">
 
     <title>Simple Safety</title>
 
@@ -117,7 +117,8 @@
 
           <h2 class="sub-header">Weather - Cincinnati, OH</h2>
             <div class="table-responsive">
-              <h3>{{weather[0]}} <img src="http://openweathermap.org/img/w/{{weather[3]}}.png" alt="Weather Icon"> {{weather[2]}}&#176;</h3>
+              <h4><b>Current:</b> {{weather[0]}}</h4>
+              <h4><b>Temperature:</b> {{weather[2]}}&#176;</h4>
             </div>
 
           <h2 class="sub-header">Injury Rates</h2>

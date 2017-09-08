@@ -84,10 +84,9 @@ def getWeather():
 
     weather_main = results['list'][0]['weather'][0]['main']
     weather_desc = results['list'][0]['weather'][0]['description']
-    weather_icon = results['list'][0]['weather'][0]['icon']
     weather_temp = results['list'][0]['main']['temp']
 
-    weather_data = (weather_main, weather_desc, weather_temp, weather_icon)
+    weather_data = (weather_main, weather_desc, weather_temp)
     print("Weather API Updated")
     return weather_data
 
