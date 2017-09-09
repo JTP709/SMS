@@ -7,53 +7,53 @@ _________________________________________________________________
 
 ## About:
 
-The Simple Safety Manager accomplishes the requirements of the Item Catalogue project and more. I decided to build this application in substitution of the original project to demonstrate my ability to build a corporate grade solution for a real world problem.
+The Simple Safety Manager accomplishes the requirements of the Item Catalogue project and more. I dec-id-ed to build this application in substitution of the original project to demonstrate my ability to build a corporate grade solution for a real world problem.
 
-The application allows a user to capture incident investigation details and compliance audit reports. The user may also track action items developed from the incident cases or audit reports and tie them to those submissions or input an action item independantly.
+The application allows a user to capture inc-id-ent investigation details and compliance audit reports. The user may also track action items developed from the inc-id-ent cases or audit reports and tie them to those submissions or input an action item independantly.
 
 All of the data can be read by anybody, but a user must log in to submit new information. A user may only edit or delete information they created.
 
 Authentication is managed by a third party OAuth through Google.
 
-The application takes advantage of a simple and free open weather API from [Open Weather Map](https://openweathermap.org/api) to provide the user current weather information. The weather currently provides local information for my location in Cincinnati, OH.
+The application takes advantage of a simple and free open weather API from [Open Weather Map](https://openweathermap.org/api) to prov-id-e the user current weather information. The weather currently prov-id-es local information for my location in Cincinnati, OH.
 _________________________________________________________________
 
 ## How to Use:
 
-Any user may review the Incidents, Audits, or Action Items in the database.
+Any user may review the Inc-id-ents, Audits, or Action Items in the database.
 
 To submit a case or report, the user must login.
 
-Once the user is logged in, they may submit an Incident, Audit, or Action Item. These options will be available on the sidebar menu. All fields must be completed before the report can be submitted.
+Once the user is logged in, they may submit an Inc-id-ent, Audit, or Action Item. These options will be available on the s-id-ebar menu. All fields must be completed before the report can be submitted.
 
-Action Items are automatically submitted and attached to an Incident Case or Audit. Individual Action Items related to safety may be submitted independantly. Once an Action Item has been completed, a logged in user may close the item.
+Action Items are automatically submitted and attached to an Inc-id-ent Case or Audit. Indiv-id-ual Action Items related to safety may be submitted independantly. Once an Action Item has been completed, a logged in user may close the item.
 
-Users may only edit Incidents, Audits, or Action Items they have submitted themselves.
+Users may only edit Inc-id-ents, Audits, or Action Items they have submitted themselves.
 _________________________________________________________________
 
 ## API Endpoints:
 
-API endpoints are available to provide JSON formatted data from the database.
-* /incidents/json
-	* Provides all items in the incidents database.
-* /incidents/json/id
-	* Provides a specific item in the incidents database by id number.
-	* Replace id with the case id number.
+API endpoints are available to prov-id-e JSON formatted data from the database.
+* /inc-id-ents/json
+	* Prov-id-es all items in the inc-id-ents database.
+* /inc-id-ents/json/-id-
+	* Prov-id-es a specific item in the inc-id-ents database by -id- number.
+	* Replace -id- with the case -id- number.
 * /audits/json
-	* Provides all items in the audits database.
-* /audits/json/id
-	* Provides a specific item in the audits database by id number.
-	* Replace id with the audit id number.
+	* Prov-id-es all items in the audits database.
+* /audits/json/-id-
+	* Prov-id-es a specific item in the audits database by -id- number.
+	* Replace -id- with the audit -id- number.
 * /actions/json
-	* Provides all items in the actions database.
-* /actions/json/id
-	* Provides a specific item in the actions database by id number.
-	* Replace id with the actions id number.
+	* Prov-id-es all items in the actions database.
+* /actions/json/-id-
+	* Prov-id-es a specific item in the actions database by -id- number.
+	* Replace -id- with the actions -id- number.
 * /users/json
-	* Provides all items in the users database.
-* /users/json/id
-	* Provides a specific item in the users database by id number.
-	* Replace id with the user id number.
+	* Prov-id-es all items in the users database.
+* /users/json/-id-
+	* Prov-id-es a specific item in the users database by -id- number.
+	* Replace -id- with the user -id- number.
 _________________________________________________________________
 
 ## Installation:
@@ -107,7 +107,7 @@ _________________________________________________________________
 
 ## Free online images used:
 
-* [Incident clip art](http://www.clker.com/clipart-warning-exclamation-triangle.html)
+* [Inc-id-ent clip art](http://www.clker.com/clipart-warning-exclamation-triangle.html)
 * [Audit clip art](http://www.clipartpanda.com/clipart_images/downloads-2959318)
 * [Action Item clip art](https://www.1001freedownloads.com/free-clipart/checkbox-checked-3)
 * [User clip art](http://www.freeiconspng.com/img/909)
