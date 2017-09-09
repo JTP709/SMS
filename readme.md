@@ -73,6 +73,7 @@ Open postgres and run the following command:
 CREATE DATABASE safety
 ```
 Note: you may change the name of the database if necessary.
+
 Open the connect.py file and update the username, password, and database name fields.
 ```
 python database.py
