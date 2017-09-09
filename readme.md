@@ -18,6 +18,19 @@ Authentication is managed by a third party OAuth through Google.
 The application takes advantage of a simple and free open weather API from [Open Weather Map](https://openweathermap.org/api) to provide the user current weather information. The weather currently provides local information for my location in Cincinnati, OH.
 _________________________________________________________________
 
+## How to Use:
+
+Any user may review the Incidents, Audits, or Action Items in the database.
+
+To submit a case or report, the user must login.
+
+Once the user is logged in, they may submit an Incident, Audit, or Action Item. These options will be available on the sidebar menu. All fields must be completed before the report can be submitted.
+
+Action Items are automatically submitted and attached to an Incident Case or Audit. Individual Action Items related to safety may be submitted independantly. Once an Action Item has been completed, a logged in user may close the item.
+
+Users may only edit Incidents, Audits, or Action Items they have submitted themselves.
+_________________________________________________________________
+
 ## API Endpoints:
 
 API endpoints are available to provide JSON formatted data from the database.
