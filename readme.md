@@ -64,7 +64,7 @@ Prerequisite Programs:
 * [SQL Alchemy](https://www.sqlalchemy.org/)
 
 Please run the following programs to set up the application on a vagrant virtual machine:
-* Please following these instructions for setting up the vagrant VM:
+* Follow these instructions to set up the vagrant VM:
 	* https://www.udacity.com/wiki/ud088/vagrant
 
 ### Installing the database:
@@ -76,15 +76,25 @@ Note: you may change the name of the database if necessary.
 
 Open the connect.py file and update the username, password, and database name fields.
 ```
+# Update the user and password for your database
+user = 'yourusername'
+password ='yourpassword'
+database = 'safety'
+```
+
+In your vagrant VM please run the following command:
+```
 python database.py
 ```
 
 ### Populating the database:
+In your vagrant VM please run the following command:
 ```
 python database_populator.py
 ```
 
 ### Running the Safety Management System:
+In your vagrant VM please run the following command:
 ```
 python3 simple_safety.py
 ```
