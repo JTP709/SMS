@@ -46,13 +46,14 @@ Please run the following programs to set up the application on a vagrant virtual
 	* https://www.udacity.com/wiki/ud088/vagrant
 
 Installing the database:
-    python database.py
-
+'''python database.py
+'''
 Populating the database:
-    python database_populator.py
-
+'''python database_populator.py
+'''
 Running the Safety Management System:
-    python3 simple_safety.py
+'''python3 simple_safety.py
+'''
 * note: must run using python 3
 _________________________________________________________________
 
