@@ -58,6 +58,43 @@ def showLogin():
                            user_profile=user_profile)
 
 
+@app.route('/register/', methods = ['GET', 'POST'])
+def newUser():
+    if 'username' in session:
+        return redirect('/dashboard/')
+    if request.method == 'POST':
+        # Connect to the database
+        con = connect()
+        Base.metadata.bind = con
+        # Creates a session
+        DBSession = sessionmaker(bind=con)
+        dbsession = DBSession()
+
+        name = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        v_password = request.form['v_password']
+
+        if password != v_password:
+            flash("Your passwords do not match.")
+            return redirect(url_for('newUser'))
+        else:
+            user = Users(name=name,
+                        email=email)
+            user.hash_password(password)
+            dbsession.add(user)
+            dbsession.commit()
+            flash("You are now registered and may log in.")
+            return redirect(url_for('showLogin'))
+    else:
+        user_profile = None
+        state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                        for x in range(32))
+        session['state'] = state
+        return render_template('register.html',
+                               STATE=state,
+                               user_profile=user_profile)
+
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     """Connects to Google Plus OAuth API"""
@@ -377,7 +414,6 @@ def newIncident():
         DBSession = sessionmaker(bind=con)
         dbsession = DBSession()
         user_id = getUserID(session['email'])
-        print(user_id)
         incidents = Incidents(date_time=request.form['date_time'],
                               incident_type=request.form['incident_type'],
                               incident_cat=request.form['incident_cat'],
@@ -1019,6 +1055,21 @@ def resources():
     return render_template('resources.html', user_profile=user_profile)
 
 # JSON API EndPoints
+
+
+@app.route('/json/registration/', methods = ['POST'])
+def newUserJSON():
+    username = request.json.get('username')
+    password = request.json.get('password')
+    if username is None or password is None:
+        abort(400)
+    if session.query(User).filter_by(username=username).first() is not None: 
+        abort(400)
+    user = User(username=username)
+    user.hash_password(password)
+    session.add(user)
+    session.commit()
+    return jsonify({ 'username': user.username}), 201
 
 
 @app.route('/incidents/json/')
