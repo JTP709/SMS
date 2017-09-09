@@ -1,11 +1,11 @@
 
-#Safety Management System Project for Udacity Full-Stack Nanodegree Program
+# Safety Management System Project for Udacity Full-Stack Nanodegree Program
 
-###Author: Jonathan Prell
-###v1.0	9/9/2017
+### Author: Jonathan Prell
+### v1.0	9/9/2017
 _________________________________________________________________
 
-##About:
+## About:
 
 The Simple Safety Manager accomplishes the requirements of the Item Catalogue project and more. I decided to build this application in substitution of the original project to demonstrate my ability to build a corporate grade solution for a real world problem.
 
@@ -18,7 +18,7 @@ Authentication is managed by a third party OAuth through Google.
 The application takes advantage of a simple and free open weather API from [Open Weather Map](https://openweathermap.org/api) to provide the user current weather information. The weather currently provides local information for my location in Cincinnati, OH.
 _________________________________________________________________
 
-##API Endpoints:
+## API Endpoints:
 
 API endpoints are available to provide JSON formatted data from the database.
 	/incidents/json 		- provides all items in the incidents database.
@@ -31,34 +31,34 @@ API endpoints are available to provide JSON formatted data from the database.
 	/users/json*id* 		- provides a specific item in the users database by id number.
 _________________________________________________________________
 
-##Installation:
+## Installation:
 
 Prerequisite Programs:
-[Python 3](https://www.python.org/)
-[PostgreSQL](https://www.postgresql.org/)
-[psycopg](http://initd.org/psycopg/)
-[Flask](http://flask.pocoo.org/)
-[OAuth 2.0](https://oauth.net/2/)
-[Advanced Python Scheudler](https://apscheduler.readthedocs.io/en/latest/)
+* [Python 3](https://www.python.org/)
+* [PostgreSQL](https://www.postgresql.org/)
+* [psycopg](http://initd.org/psycopg/)
+* [Flask](http://flask.pocoo.org/)
+* [OAuth 2.0](https://oauth.net/2/)
+* [Advanced Python Scheudler](https://apscheduler.readthedocs.io/en/latest/)
 
 Please run the following programs to set up the application on a vagrant virtual machine:
 * Please following these instructions for setting up the vagrant VM:
 	* https://www.udacity.com/wiki/ud088/vagrant
 
 Installing the database:
-	python database.py
+    python database.py
 
 Populating the database:
-	python database_populator.py
+    python database_populator.py
 
 Running the Safety Management System:
-	python3 simple_safety.py
-		* note: must run using python 3
+    python3 simple_safety.py
+* note: must run using python 3
 _________________________________________________________________
 
-##Free online images used:
+## Free online images used:
 
-[Incident clip art](http://www.clker.com/)clipart-warning-exclamation-triangle.html)
-[Audit clip art](http://www.clipartpanda.com/clipart_images/downloads-2959318)
-[Action Item clip art](https://www.1001freedownloads.com/free-clipart/checkbox-checked-3)
-[User clip art](http://www.freeiconspng.com/img/909)
+* [Incident clip art](http://www.clker.com/)clipart-warning-exclamation-triangle.html)
+* [Audit clip art](http://www.clipartpanda.com/clipart_images/downloads-2959318)
+* [Action Item clip art](https://www.1001freedownloads.com/free-clipart/checkbox-checked-3)
+* [User clip art](http://www.freeiconspng.com/img/909)
