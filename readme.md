@@ -67,27 +67,27 @@ Please run the following programs to set up the application on a vagrant virtual
 * Please following these instructions for setting up the vagrant VM:
 	* https://www.udacity.com/wiki/ud088/vagrant
 
-Installing the database:
-* Open postgres and run the following command:
+### Installing the database:
+Open postgres and run the following command:
 ```
 CREATE DATABASE safety
 ```
-* Note: you may change the name of the database if necessary.
-* Open the connect.py file and update the username, password, and database name fields.
+Note: you may change the name of the database if necessary.
+Open the connect.py file and update the username, password, and database name fields.
 ```
 python database.py
 ```
 
-Populating the database:
+### Populating the database:
 ```
 python database_populator.py
 ```
 
-Running the Safety Management System:
+### Running the Safety Management System:
 ```
 python3 simple_safety.py
 ```
-* note: must run using python 3
+note: must run using python 3
 _________________________________________________________________
 
 ## Free online images used:
