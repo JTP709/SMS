@@ -29,6 +29,20 @@ def createUser(session):
     new_id = query.id
     return new_id
 
+def verifyUser(email, password):
+    # Connect to the database
+    con = connect()
+    Base.metadata.bind = con
+    # Creates a session
+    DBSession = sessionmaker(bind = con)
+    dbsession = DBSession()
+    user = dbsession.query(Users).filter_by(email = email).first()
+    verify = user.verify_password(password)
+    if not user or not user.verify_password(password):
+        return False
+    else:
+        return True
+
 def getUserInfo(id):
     # Connect to the database
     con = connect()
@@ -55,7 +69,6 @@ def getUserID(email):
         user = None
     else:
         user = str(query.id)
-        print(user)
     return user
 
 def datetime_handler(x):
@@ -95,8 +108,7 @@ def getInjuryRates():
     query_ri = dbsession.query(func.count(Incidents.incident_type)).filter_by(incident_type = 'RI')
     query_rd = dbsession.query(func.count(Incidents.incident_type)).filter_by(incident_type = 'RD')
     query_lti = dbsession.query(func.count(Incidents.incident_type)).filter_by(incident_type = 'LTI')
-    print(query_fa)
-    print(query_fa[0][0])
+
     total_fa = query_fa[0][0]
     total_ri = query_ri[0][0]
     total_rd = query_rd[0][0]
@@ -107,7 +119,6 @@ def getInjuryRates():
 
     hours_query = dbsession.query(func.sum(Manhours.hours)).filter_by(year = 2017)
     manhours = hours_query[0][0]
-    print(manhours)
 
     fair = round(float(total_fa*200000)/float(manhours), 2)
     rir = round(float(total_rir*200000)/float(manhours), 2)

@@ -9,7 +9,7 @@
 
 # Import custom functions
 from functions import createUser, getUserInfo, getUserID, datetime_handler
-from functions import getInjuryRates, getWeather
+from functions import getInjuryRates, getWeather, verifyUser
 from connect import connect
 # Import database objects
 from database_setup import Base, Users, Incidents, Audits, Actions
@@ -20,6 +20,7 @@ from sqlalchemy.orm import sessionmaker
 # Import Flask operations
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask import make_response, flash, session
+from flask_httpauth import HTTPBasicAuth
 # Import oauth
 from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
 # Import advanced python scheduler for scheduled weather api calls
@@ -40,25 +41,75 @@ print(sys.version)
 CLIENT_ID = json.loads(open('client_secrets.json', 'r')
                        .read())['web']['client_id']
 APPLICATION_NAME = "Safety Management System"
+auth = HTTPBasicAuth()
 
 app = Flask(__name__)
 
 # Authentication
 
+@auth.verify_password
+def verify_password(email,password):
+    user = dbsession.query(User).filter_by(email = email).first()
+    if not user or not user.verify_password(password):
+        return False
+    g.user = user
+    return True
 
-@app.route('/login/')
+@app.route('/login/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def showLogin():
     """Routes to Login Page"""
-    user_profile = None
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+    if request.method == 'POST':
+        # Connect to the database
+        con = connect()
+        Base.metadata.bind = con
+        # Creates a session
+        DBSession = sessionmaker(bind=con)
+        dbsession = DBSession()
+
+        email = request.form['email']
+        password = request.form['password']
+
+        user = dbsession.query(Users).filter_by(email = email).first()
+        
+        # Verify user password
+        verified = verifyUser(email, password)
+        print(verified)
+        if verified is not True:
+            flash("Email and/or Password was incorrect.")
+            return redirect(url_for('showLogin'))
+
+        if request.args.get('state') != session['state']:
+            response = make_response(json.dumps('Invalid state'), 401)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+        session['username'] = user.name
+        session['picture'] = user.picture
+        session['email'] = user.email
+
+        output = ''
+        output += '<h2>Welcome, '
+        output += session['username']
+        output += '!</h2>'
+        output += '</br>'
+        output += '<img src="'
+        output += session['picture']
+        output += ' " style = "width: 300px; height: 300px;border-radius: 150px;\
+        -moz-border-radius-webkit-border-radius: 150px;\
+        -moz-border-radius: 150px;"> '
+        return output
+    else:   
+        user_profile = None
+        state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in range(32))
-    session['state'] = state
-    return render_template('login.html',
-                           STATE=state,
-                           user_profile=user_profile)
+        session['state'] = state
+        return render_template('login.html',
+                               STATE=state,
+                               user_profile=user_profile)
 
 
-@app.route('/register/', methods = ['GET', 'POST'])
+@app.route('/register/', methods=['GET', 'POST'])
 def newUser():
     if 'username' in session:
         return redirect('/dashboard/')
@@ -75,25 +126,27 @@ def newUser():
         password = request.form['password']
         v_password = request.form['v_password']
 
+        query = dbsession.query(Users).filter_by(email=email).first()
+
         if password != v_password:
             flash("Your passwords do not match.")
             return redirect(url_for('newUser'))
+        elif query is not None:
+            flash("This e-mail already exists.")
+            return redirect(url_for('newUser'))
         else:
             user = Users(name=name,
-                        email=email)
+                         email=email,
+                         position='',
+                         picture='user.png')
             user.hash_password(password)
             dbsession.add(user)
             dbsession.commit()
             flash("You are now registered and may log in.")
             return redirect(url_for('showLogin'))
     else:
-        user_profile = None
-        state = ''.join(random.choice(string.ascii_uppercase + string.digits)
-                        for x in range(32))
-        session['state'] = state
-        return render_template('register.html',
-                               STATE=state,
-                               user_profile=user_profile)
+        return render_template('register.html')
+
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -350,7 +403,7 @@ def dashboard():
                                            'FMMonth FMDD, YYYY'),
                               Actions.open_close). \
         filter_by(open_close='t').order_by(Actions.due_date)
-
+    print(user_profile[1])
     return render_template('dashboard.html',
                            incidents=results,
                            health=health,

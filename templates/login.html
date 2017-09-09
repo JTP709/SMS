@@ -97,21 +97,21 @@
           
           <form class="form-signin" id="result">
             <h2 class="form-signin-heading">Please Sign In:</h2>
-            <!-- Login Section -->
+            <!-- Login Section 
             <label for="inputEmail" class="sr-only">Email address</label>
-            <input type="username" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+            <input type="username" id="inputEmail" class="form-control" placeholder="Email address" name="email" required autofocus>
             <label for="inputPassword" class="sr-only">Password</label>
-            <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-            <!-- Checkbox not functional, may be implemented later
+            <input type="password" id="inputPassword" class="form-control" placeholder="Password" name="password" required>
+            
             <div class="checkbox">
               <label>
                 <input type="checkbox" value="remember-me"> Remember me
               </label>
             </div>
-            END OF CHECKBOX -->
+
             <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
             <h4>You can also sign in with:</h4>
-            <!-- END OF LOGIN SECTION -->
+            END OF LOGIN SECTION -->
             <!-- GOOGLE PLUS SIGN IN-->
             <div id="signInButton">
               <span class="g-signin"
@@ -124,7 +124,8 @@
               data-approvalprompt="force">
               </span>
             </div>
-            <h4>Are you a new user? <a href="/register/">Click Here to register!</a></h4>
+            <!-- removed until backend is implemented
+            <h4>Are you a new user? <a href="/register/">Click Here to register!</a></h4> -->
           </form>
 
         </div>
@@ -169,5 +170,6 @@
       }); } }
     </script>
     <!--END GOOGLE PLUS SIGN IN -->
+
   </body>
 </html>

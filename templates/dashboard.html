@@ -106,6 +106,12 @@
               <h4>{{user_profile[0]}}</h4>
               <span class="text-muted">Profile Manager</span>
             </div>
+            {% elif user_profile[1] == None: %}
+            <div class="col-xs-6 col-sm-3 placeholder">
+              <a href="/login/"><img src="{{ url_for('static', filename ='user.png') }}" width="200" height="200" class="img-responsive" alt="User Profile Manager"></a>
+              <h4>{{user_profile[0]}}</h4>
+              <span class="text-muted">Profile Manager</span>
+            </div>
             {% else: %}
             <div class="col-xs-6 col-sm-3 placeholder">
               <a href="/login/"><img src="{{ url_for('static', filename ='user.png') }}" width="200" height="200" class="img-responsive" alt="User Profile Manager"></a>
