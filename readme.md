@@ -35,21 +35,25 @@ _________________________________________________________________
 
 API endpoints are available to provide JSON formatted data from the database.
 * /incidents/json
-	* provides all items in the incidents database.
-* /incidents/json/<id>
-	* provides a specific item in the incidents database by id number.
+	* Provides all items in the incidents database.
+* /incidents/json/*id*
+	* Provides a specific item in the incidents database by id number.
+	* Replace *id* with the case id number.
 * /audits/json
-	* provides all items in the audits database.
-* /audits/json<id>
-	* provides a specific item in the audits database by id number.
+	* Provides all items in the audits database.
+* /audits/json*id*
+	* Provides a specific item in the audits database by id number.
+	* Replace *id* with the audit id number.
 * /actions/json
-	* provides all items in the actions database.
-* /actions/json<id>
-	* provides a specific item in the actions database by id number.
+	* Provides all items in the actions database.
+* /actions/json*id*
+	* Provides a specific item in the actions database by id number.
+	* Replace *id* with the actions id number.
 * /users/json
-	* provides all items in the users database.
-* /users/json<id>
-	* provides a specific item in the users database by id number.
+	* Provides all items in the users database.
+* /users/json*id*
+	* Provides a specific item in the users database by id number.
+	* Replace *id* with the user id number.
 _________________________________________________________________
 
 ## Installation:
