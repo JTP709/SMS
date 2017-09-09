@@ -60,7 +60,7 @@ Prerequisite Programs:
 * [psycopg](http://initd.org/psycopg/)
 * [Flask](http://flask.pocoo.org/)
 * [OAuth 2.0](https://oauth.net/2/)
-* [Advanced Python Scheudler](https://apscheduler.readthedocs.io/en/latest/)
+* [Advanced Python Scheduler](https://apscheduler.readthedocs.io/en/latest/)
 
 Please run the following programs to set up the application on a vagrant virtual machine:
 * Please following these instructions for setting up the vagrant VM:
