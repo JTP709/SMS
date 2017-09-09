@@ -61,6 +61,7 @@ Prerequisite Programs:
 * [Flask](http://flask.pocoo.org/)
 * [OAuth 2.0](https://oauth.net/2/)
 * [Advanced Python Scheduler](https://apscheduler.readthedocs.io/en/latest/)
+* [SQL Alchemy](https://www.sqlalchemy.org/)
 
 Please run the following programs to set up the application on a vagrant virtual machine:
 * Please following these instructions for setting up the vagrant VM:
