@@ -40,12 +40,13 @@ app = Flask(__name__)
 
 # Authentication
 
+
 @app.route('/login/')
 def showLogin():
     """Routes to Login Page"""
     user_profile = None
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
-                for x in range(32))
+                    for x in range(32))
     session['state'] = state
     return render_template('login.html',
                            STATE=state,
@@ -66,8 +67,8 @@ def gconnect():
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
-        response = make_response(json.dumps('Failed to upgrade the \
-                                            authorization code.'),
+        response = make_response(json.dumps('Failed to upgrade the'
+                                            'authorization code.'),
                                  401)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -85,14 +86,14 @@ def gconnect():
     # Verify that the access token is used for the intended user.
     gplus_id = credentials.id_token['sub']
     if result['user_id'] != gplus_id:
-        respones = make_response(json.dumps("Token's user ID doesn't \
-                                            match the given user ID"), 401)
+        respones = make_response(json.dumps("Token's user ID doesn't' \
+                                            'match the given user ID"), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Verify that the access token is valid for this app.
     if result['issued_to'] != CLIENT_ID:
-        response = make_response(json.dumps("Token's client ID does \
-                                            not match app's."), 401)
+        response = make_response(json.dumps("Token's client ID does' \
+                                            'not match app's."), 401)
         print("Token's client ID does not match app's.")
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -132,9 +133,9 @@ def gconnect():
     output += '</br>'
     output += '<img src="'
     output += session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;\
-    -moz-border-radius-webkit-border-radius: 150px;\
-    -moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;" \
+    "-moz-border-radius-webkit-border-radius: 150px;" \
+    "-moz-border-radius: 150px;"> '
     print("done!")
     return output
 
@@ -169,8 +170,8 @@ def gdisconnect():
         return redirect('/dashboard/')
     else:
         response = make_response(json.
-                                 dumps('Failed to revoke token for given \
-                                       user.', 400))
+                                 dumps('Failed to revoke token for given'
+                                       'user.', 400))
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -384,8 +385,9 @@ def newIncident():
         getcase_id = dbsession.query(Incidents.case_num). \
             order_by(desc(Incidents.case_num)).first()
         case_id = getcase_id[0]
+        ca = request.form['corrective_action']
         action_items = Actions(finding=request.form['description'],
-                               corrective_action=request.form['corrective_action'],
+                               corrective_action=ca,
                                due_date=request.form['due_date'],
                                open_close='t',
                                user_id=user_id,
@@ -492,11 +494,11 @@ def editIncident(id):
                                   func.to_char(Actions.due_date,
                                                'FMMonth FMDD, YYYY')). \
             filter_by(case_id=id).first()
-        print(incidents)
-        print(actions)
 
-        if 'username' not in session or \
-        int(incidents[9]) != int(session['user_id']):
+        creator = int(incidents[9])
+        ses_user = int(session['user_id'])
+
+        if 'username' not in session or creator != ses_user:
             flash("Sorry, %s, you are not authorized to edit this incident." %
                   session['username'])
             return redirect('/incidents/')
@@ -675,8 +677,9 @@ def newAudit():
         getaudit_id = dbsession.query(Audits.id). \
             order_by(desc(Audits.id)).first()
         audit_id = getaudit_id[0]
+        ca = request.form['corrective_action']
         action_items = Actions(finding=request.form['description'],
-                               corrective_action=request.form['corrective_action'],
+                               corrective_action=ca,
                                due_date=request.form['due_date'],
                                open_close='t',
                                user_id=user_id,
@@ -775,8 +778,10 @@ def editAudit(id):
         print(results[14])
         print(session['user_id'])
 
-        if 'username' not in session or \
-        int(results[14]) != int(session['user_id']):
+        creator = int(results[14])
+        ses_user = int(session['user_id'])
+
+        if 'username' not in session or creator != ses_user:
             flash("Sorry, %s, you are not authorized to edit this Audit."
                   % session['username'])
             return redirect('/audits/')
@@ -940,8 +945,10 @@ def editActionItem(id):
                                   Actions.user_id). \
             filter_by(id=id).first()
 
-        if 'username' not in session or \
-        int(actions[8]) != int(session['user_id']):
+        creator = int(actions[8])
+        ses_user = int(session['user_id'])
+
+        if 'username' not in session or creator != ses_user:
             flash("Sorry, %s, you are not authorized to edit this \
                   action item." % session['username'])
             return redirect('/actions/')
