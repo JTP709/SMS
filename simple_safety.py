@@ -1,12 +1,5 @@
 #!/usr/bin/python3
 
-# TODO
-# - Generate Custom Reports
-#    - Filter options for custom report
-# - JSON
-#    - Allow CRUD operations through RESTful API endpoints
-#    - Implement OAuth for API endpoints
-
 # Import custom functions
 from functions import createUser, getUserInfo, getUserID, datetime_handler
 from functions import getInjuryRates, getWeather, verifyUser
@@ -46,14 +39,6 @@ auth = HTTPBasicAuth()
 app = Flask(__name__)
 
 # Authentication
-
-@auth.verify_password
-def verify_password(email,password):
-    user = dbsession.query(User).filter_by(email = email).first()
-    if not user or not user.verify_password(password):
-        return False
-    g.user = user
-    return True
 
 @app.route('/login/')
 def showLogin():
@@ -1027,21 +1012,6 @@ def resources():
     return render_template('resources.html', user_profile=user_profile)
 
 # JSON API EndPoints
-
-
-@app.route('/json/registration/', methods = ['POST'])
-def newUserJSON():
-    username = request.json.get('username')
-    password = request.json.get('password')
-    if username is None or password is None:
-        abort(400)
-    if session.query(User).filter_by(username=username).first() is not None: 
-        abort(400)
-    user = User(username=username)
-    user.hash_password(password)
-    session.add(user)
-    session.commit()
-    return jsonify({ 'username': user.username}), 201
 
 
 @app.route('/incidents/json/')
