@@ -2,7 +2,7 @@
 # Safety Management System Project for Udacity Full-Stack Nanodegree Program
 
 ### Author: Jonathan Prell
-### v1.0	9/9/2017
+### v1.0 - 9/9/2017
 _________________________________________________________________
 
 ## About:
