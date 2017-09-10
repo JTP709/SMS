@@ -529,10 +529,24 @@ def deleteIncident(id):
         incident = dbsession.query(Incidents).filter_by(case_num=id).first()
         dbsession.delete(incident)
         dbsession.commit()
-
         return redirect(url_for('incidents'))
     else:
-        return render_template('incidents_delete.html', id=id)
+        # Creates a connection
+        con = connect()
+        Base.metadata.bind = con
+        # Creates a session
+        DBSession = sessionmaker(bind=con)
+        dbsession = DBSession()
+        incident = dbsession.query(Incidents).filter_by(case_num=id).first()
+        creator = int(incident.user_id)
+        ses_user = int(session['user_id'])
+        if 'username' not in session or creator != ses_user:
+            flash("Sorry, %s, you are not authorized to delete this incident." %
+                  session['username'])
+            return redirect('/incidents/')
+        else:
+            user_profile = (session['username'], session['picture'])
+            return render_template('incidents_delete.html', id=id)
 
 # Audit Manager
 
@@ -814,10 +828,24 @@ def deleteAudit(id):
 
         return redirect(url_for('audits'))
     else:
-        user_profile = (session['username'], session['picture'])
-        return render_template('audits_delete.html',
-                               id=id,
-                               user_profile=user_profile)
+        # Creates a connection
+        con = connect()
+        Base.metadata.bind = con
+        # Creates a session
+        DBSession = sessionmaker(bind=con)
+        dbsession = DBSession()
+        audit = dbsession.query(Audits).filter_by(id=id).first()
+        creator = int(audit.user_id)
+        ses_user = int(session['user_id'])
+        if 'username' not in session or creator != ses_user:
+            flash("Sorry, %s, you are not authorized to delete this incident." %
+                  session['username'])
+            return redirect('/audits/')
+        else:
+            user_profile = (session['username'], session['picture'])
+            return render_template('audits_delete.html',
+                                   id=id,
+                                   user_profile=user_profile)
 
 # Action Item Manager
 
@@ -976,10 +1004,24 @@ def deleteActionItem(id):
         dbsession.commit()
         return redirect(url_for('actions'))
     else:
-        user_profile = (session['username'], session['picture'])
-        return render_template('actions_delete.html',
-                               id=id,
-                               user_profile=user_profile)
+        # Creates a connection
+        con = connect()
+        Base.metadata.bind = con
+        # Creates a session
+        DBSession = sessionmaker(bind=con)
+        dbsession = DBSession()
+        action = dbsession.query(Actions).filter_by(id=id).first()
+        creator = int(action.user_id)
+        ses_user = int(session['user_id'])
+        if 'username' not in session or creator != ses_user:
+            flash("Sorry, %s, you are not authorized to delete this incident." %
+                  session['username'])
+            return redirect('/actions/')
+        else:
+            user_profile = (session['username'], session['picture'])
+            return render_template('actions_delete.html',
+                                   id=id,
+                                   user_profile=user_profile)
 
 
 @app.route('/actions/close/<int:id>/', methods=['GET', 'POST'])
