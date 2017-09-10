@@ -9,6 +9,13 @@ from sqlalchemy import create_engine
 from connect import connect
 
 
+def dump_datetime(value):
+    """Deserialize datetime object into string for JSON processing"""
+    if value is None:
+        return None
+    return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
+
+
 def createUser(session):
     # Connect to the database
     con = connect()

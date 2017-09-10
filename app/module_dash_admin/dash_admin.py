@@ -1,24 +1,34 @@
 #!/usr/bin/python3
 
 # Import custom functions
-from functions import createUser, getUserInfo, getUserID, datetime_handler
-from functions import getInjuryRates, getWeather, verifyUser
+from app.functions import createUser, getUserInfo, getUserID, datetime_handler
+from app.functions import getInjuryRates, getWeather, verifyUser, dump_datetime
 from connect import connect
+
 # Import database objects
-from database_setup import Base, Users, Incidents, Audits, Actions
-from database_setup import Manhours
+from app.module_auth.model_users import Users
+from app.module_auth.model_incidents import Incidents
+from app.module_auth.model_audits import Audits
+from app.module_auth.model_actions import Actions
+from app.module_auth.model_incidents import Manhours
+
 # Import SQL Alchemy functions/operations
 from sqlalchemy import func, desc
 from sqlalchemy.orm import sessionmaker
+
 # Import Flask operations
 from flask import Flask, render_template, request, redirect, url_for, jsonify
-from flask import make_response, flash, session
+from flask import make_response, flash, session, Blueprint
+
 from flask_httpauth import HTTPBasicAuth
+
 # Import oauth
 from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
+
 # Import advanced python scheduler for scheduled weather api calls
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
+
 # Import required python libraries
 import psycopg2
 import random
@@ -27,20 +37,37 @@ import httplib2
 import json
 import requests
 import datetime
+
 # Print python version for troubleshooting purposes; must be Pyton 3 or higher.
 import sys
 print(sys.version)
 
+from app import db as DBSession
+
+#Define the blueprint:
+mod_dashboard = Blueprint('mod_dashboard', __name__, url_prefix='/dashboard/')
+
 # Main Page/Dashbaord
 
 
-@app.route('/')
-@app.route('/dashboard/')
+@mod_dashboard.route('/dashboard/')
 def dashboard():
     """Loads the dashboard page"""
     user_profile = None
     if 'username' in session:
         user_profile = (session['username'], session['picture'])
+
+    # Generates initial weather information
+    weather = getWeather()
+    # Starts apscheduler in the background
+    scheduler = BackgroundScheduler()
+    scheduler.start()
+    # Creats a job for apscheduler to update the weather information every hour
+    scheduler.add_job(
+        func=getWeather,
+        trigger=(IntervalTrigger(hours=1)),
+        id='weather')
+
     # Connect to the database
     con = connect()
     Base.metadata.bind = con
