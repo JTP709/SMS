@@ -3,7 +3,7 @@
 # Import custom functions
 from functions import createUser, getUserInfo, getUserID, datetime_handler
 from functions import getInjuryRates, getWeather, verifyUser
-from functions import login_required, owner_required, check_if_incident_exists
+from functions import login_required, owner_required, check_if_report_exists
 from connect import connect
 # Import database objects
 from database_setup import Base, Users, Incidents, Audits, Actions
@@ -348,7 +348,6 @@ def incidents():
                            injury_rate=injury_rate,
                            user_profile=user_profile,
                            manhours=manhours)
-    db.close()
 
 
 @app.route('/incidents/new/', methods=['GET', 'POST'])
@@ -396,6 +395,8 @@ def newIncident():
 
 @app.route('/incidents/edit/<int:id>/', methods=['GET', 'POST'])
 @login_required
+@owner_required('incidents')
+@check_if_report_exists('incidents')
 def editIncident(id):
     """Page to edit an existing incident report"""
     if request.method == 'POST':
@@ -485,23 +486,17 @@ def editIncident(id):
                                                'FMMonth FMDD, YYYY')). \
             filter_by(case_id=id).first()
 
-        creator = int(incidents[9])
-        ses_user = int(session['user_id'])
-
-        if 'username' not in session or creator != ses_user:
-            flash("Sorry, %s, you are not authorized to edit this incident." %
-                  session['username'])
-            return redirect('/incidents/')
-        else:
-            user_profile = (session['username'], session['picture'])
-            return render_template('incidents_edit.html',
-                                   incidents=incidents,
-                                   actions=actions,
-                                   user_profile=user_profile)
+        user_profile = (session['username'], session['picture'])
+        return render_template('incidents_edit.html',
+                               incidents=incidents,
+                               actions=actions,
+                               user_profile=user_profile)
 
 
 @app.route('/incidents/delete/<int:id>/', methods=['GET', 'POST'])
 @login_required
+@owner_required('incidents')
+@check_if_report_exists('incidents')
 def deleteIncident(id):
     """Page to delete an existing incident report"""
     if request.method == 'POST':
@@ -615,7 +610,6 @@ def audits():
                            health=health,
                            health_rates=health_rates,
                            user_profile=user_profile)
-    db.close()
 
 
 @app.route('/audits/new/', methods=['GET', 'POST'])
@@ -774,7 +768,6 @@ def editAudit(id):
             return render_template('audits_edit.html',
                                    audits=results,
                                    user_profile=user_profile)
-        db.close()
 
 
 @app.route('/audits/delete/<int:id>/', methods=['GET', 'POST'])
@@ -938,7 +931,6 @@ def editActionItem(id):
             return render_template('actions_edit.html',
                                    actions=actions,
                                    user_profile=user_profile)
-        db.close()
 
 
 @app.route('/actions/delete/<int:id>/', methods=['GET', 'POST'])

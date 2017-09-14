@@ -21,40 +21,62 @@ def login_required(func):
             func()
     return wrapper
 
+def owner_required(table):
+    def tags_decorator(func):
+        @wraps(func) # this requires an import
+        def wrapper(**kwargs):
+            user_profile = (session['username'], session['picture'])
+            # Connect to the database
+            con = connect()
+            Base.metadata.bind = con
+            # Creates a session
+            DBSession = sessionmaker(bind=con)
+            dbsession = DBSession()
+            if table == 'incidents':
+                query = dbsession.query(Incidents).filter_by(case_num=id).first()
+            if table == 'audits':
+                query = dbsession.query(Audits).filter_by(id=id).first()
+            if table == 'actions':
+                query = dbsession.query(Actions).filter_by(id=id).first()
+            
+            creator = int(query.user_id)
+            ses_user = int(session['user_id'])
+            if 'username' not in session or creator != ses_user:
+                flash("Sorry, %s,"
+                      " you are not authorized to edit this report." %
+                      session['username'])
+                return redirect('/incidents/')
+            else:
+                 func(**kwargs)
+        return wrapper
+    return tags_decorator
 
-def owner_required(func):
-    @wraps(func) # this requires an import
-    def wrapper():
-        user_profile = (session['username'], session['picture'])
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind=con)
-        dbsession = DBSession()
 
-        incidents = dbsession.query(Incidents). \
-            filter_by(case_num=id).first()
-
-        creator = int(incidents[9])
-        ses_user = int(session['user_id'])
-        if 'username' not in session or creator != ses_user:
-            flash("Sorry, %s, you are not authorized to edit this incident." %
-                  session['username'])
-            return redirect('/incidents/')
-        else:
-            func()
-    return wrapper
-
-
-def checkif_incident_exists(func):
-    @wraps(func) # this requires an import
-    def wrapper():
-        if 'username' not in login_session:
-            return redirect('login')
-        else:
-            func()
-    return wrapper
+def check_if_report_exists(table):
+    def tags_decorator(func):
+        @wraps(func) # this requires an import
+        def wrapper(**kwargs):
+            # Connect to the database
+            con = connect()
+            Base.metadata.bind = con
+            # Creates a session
+            DBSession = sessionmaker(bind=con)
+            dbsession = DBSession()
+            if table == 'incidents':
+                query = dbsession.query(Incidents).filter_by(case_num=id).first()
+            if table == 'audits':
+                query = dbsession.query(Audits).filter_by(id=id).first()
+            if table == 'actions':
+                query = dbsession.query(Actions).filter_by(id=id).first()
+            if query is None:
+                flash("Sorry, %s,"
+                      " this report does not exists" %
+                      session['username'])
+                return redirect('/dashboard/')
+            else:
+                 func(**kwargs)
+        return wrapper
+    return tags_decorator
 
 # Functions
 
