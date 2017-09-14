@@ -7,6 +7,38 @@ from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Users, Incidents, Audits, Actions, Manhours
 from sqlalchemy import create_engine
 from connect import connect
+from functools import wraps
+
+
+def login_required(func):
+    @wraps(func) # this requires an import
+    def wrapper():
+        if 'username' not in login_session:
+            return redirect('login')
+        else:
+            func()
+    return wrapper
+
+
+
+def owner_required(func):
+    @wraps(func) # this requires an import
+    def wrapper():
+        if 'username' not in login_session:
+            return redirect('login')
+        else:
+            func()
+    return wrapper
+
+
+def checkif_incident_exists(func):
+    @wraps(func) # this requires an import
+    def wrapper():
+        if 'username' not in login_session:
+            return redirect('login')
+        else:
+            func()
+    return wrapper
 
 
 def createUser(session):

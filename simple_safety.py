@@ -3,6 +3,7 @@
 # Import custom functions
 from functions import createUser, getUserInfo, getUserID, datetime_handler
 from functions import getInjuryRates, getWeather, verifyUser
+from functions import login_required, owner_required, check_if_incident_exists
 from connect import connect
 # Import database objects
 from database_setup import Base, Users, Incidents, Audits, Actions
@@ -170,10 +171,9 @@ def gdisconnect():
 
 
 @app.route('/profile/', methods=['GET', 'POST'])
+@login_required
 def profile():
     """loads the user profile page"""
-    if 'username' not in session:
-        return redirect('/login')
     if request.method == 'POST':
         # Connect to the database
         con = connect()
@@ -352,10 +352,9 @@ def incidents():
 
 
 @app.route('/incidents/new/', methods=['GET', 'POST'])
+@login_required
 def newIncident():
     """Loads the page to submit a new incident report"""
-    if 'username' not in session:
-        return redirect('/login')
     if request.method == 'POST':
         # Connect to the database
         con = connect()
@@ -396,10 +395,9 @@ def newIncident():
 
 
 @app.route('/incidents/edit/<int:id>/', methods=['GET', 'POST'])
+@login_required
 def editIncident(id):
     """Page to edit an existing incident report"""
-    if 'username' not in session:
-        return redirect('/login')
     if request.method == 'POST':
         # Connect to the database
         con = connect()
@@ -503,10 +501,9 @@ def editIncident(id):
 
 
 @app.route('/incidents/delete/<int:id>/', methods=['GET', 'POST'])
+@login_required
 def deleteIncident(id):
     """Page to delete an existing incident report"""
-    if 'username' not in session:
-        return redirect('/login')
     if request.method == 'POST':
         con = connect()
         Base.metadata.bind = con
@@ -622,10 +619,9 @@ def audits():
 
 
 @app.route('/audits/new/', methods=['GET', 'POST'])
+@login_required
 def newAudit():
     """Page to submit a new audit"""
-    if 'username' not in session:
-        return redirect('/login')
     if request.method == 'POST':
         # Connect to the database
         con = connect()
@@ -688,10 +684,9 @@ def newAudit():
 
 
 @app.route('/audits/edit/<int:id>/', methods=['GET', 'POST'])
+@login_required
 def editAudit(id):
     """Page to edit an audit"""
-    if 'username' not in session:
-        return redirect('/login')
     if request.method == 'POST':
         # Connect to the database
         con = connect()
@@ -783,10 +778,9 @@ def editAudit(id):
 
 
 @app.route('/audits/delete/<int:id>/', methods=['GET', 'POST'])
+@login_required
 def deleteAudit(id):
     """Page to delete an existing incident report"""
-    if 'username' not in session:
-        return redirect('/login')
     if request.method == 'POST':
         con = connect()
         Base.metadata.bind = con
@@ -848,10 +842,9 @@ def actions():
 
 
 @app.route('/actions/new/', methods=['GET', 'POST'])
+@login_required
 def newActionItem():
     """Page to submit a new action item"""
-    if 'username' not in session:
-        return redirect('/login')
     if request.method == 'POST':
         # Connect to the database
         con = connect()
@@ -878,10 +871,9 @@ def newActionItem():
 
 
 @app.route('/actions/edit/<int:id>/', methods=['GET', 'POST'])
+@login_required
 def editActionItem(id):
     """Page to edit existing action item"""
-    if 'username' not in session:
-        return redirect('/login')
     if request.method == 'POST':
         # Connect to the database
         con = connect()
@@ -950,10 +942,9 @@ def editActionItem(id):
 
 
 @app.route('/actions/delete/<int:id>/', methods=['GET', 'POST'])
+@login_required
 def deleteActionItem(id):
     """Page to delete action item"""
-    if 'username' not in session:
-        return redirect('/login')
     if request.method == 'POST':
         con = connect()
         Base.metadata.bind = con
@@ -973,10 +964,9 @@ def deleteActionItem(id):
 
 
 @app.route('/actions/close/<int:id>/', methods=['GET', 'POST'])
+@login_required
 def closeActionItem(id):
     """Page to close action items"""
-    if 'username' not in session:
-        return redirect('/login')
     if request.method == 'POST':
         # Connect to the database
         con = connect()
