@@ -9,6 +9,8 @@ from sqlalchemy import create_engine
 from connect import connect
 from functools import wraps
 
+# Decorators
+
 
 def login_required(func):
     @wraps(func) # this requires an import
@@ -20,12 +22,26 @@ def login_required(func):
     return wrapper
 
 
-
 def owner_required(func):
     @wraps(func) # this requires an import
     def wrapper():
-        if 'username' not in login_session:
-            return redirect('login')
+        user_profile = (session['username'], session['picture'])
+        # Connect to the database
+        con = connect()
+        Base.metadata.bind = con
+        # Creates a session
+        DBSession = sessionmaker(bind=con)
+        dbsession = DBSession()
+
+        incidents = dbsession.query(Incidents). \
+            filter_by(case_num=id).first()
+
+        creator = int(incidents[9])
+        ses_user = int(session['user_id'])
+        if 'username' not in session or creator != ses_user:
+            flash("Sorry, %s, you are not authorized to edit this incident." %
+                  session['username'])
+            return redirect('/incidents/')
         else:
             func()
     return wrapper
@@ -39,6 +55,8 @@ def checkif_incident_exists(func):
         else:
             func()
     return wrapper
+
+# Functions
 
 
 def createUser(session):
