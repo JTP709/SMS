@@ -27,9 +27,10 @@ import httplib2
 import json
 import requests
 import datetime
+
 # Print python version for troubleshooting purposes; must be Pyton 3 or higher.
-import sys
-print(sys.version)
+#import sys
+#print(sys.version)
 
 CLIENT_ID = json.loads(open('client_secrets.json', 'r')
                        .read())['web']['client_id']
@@ -94,7 +95,6 @@ def gconnect():
     if result['issued_to'] != CLIENT_ID:
         response = make_response(json.dumps("Token's client ID does' \
                                             'not match app's."), 401)
-        print("Token's client ID does not match app's.")
         response.headers['Content-Type'] = 'application/json'
         return response
     # Check to see if user is already logged in.
@@ -136,7 +136,6 @@ def gconnect():
     output += ' " style = "width: 300px; height: 300px;border-radius: 150px;" \
     "-moz-border-radius-webkit-border-radius: 150px;" \
     "-moz-border-radius: 150px;"> '
-    print("done!")
     return output
 
 
@@ -145,20 +144,14 @@ def gdisconnect():
     """Allows user to logout from Google authentication"""
     access_token = session.get('credentials')
     if access_token is None:
-        print('Access Token is None')
         response = make_response(json.dumps('Current user not connected.'),
                                  401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    print ('In gdisconnect access token is %s', access_token)
-    print ('User name is: ')
-    print (session['username'])
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % \
         session['credentials']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
-    print ('result is ')
-    print (result)
     if result['status'] == '200':
         del session['credentials']
         del session['gplus_id']
@@ -308,7 +301,6 @@ def dashboard():
                                            'FMMonth FMDD, YYYY'),
                               Actions.open_close). \
         filter_by(open_close='t').order_by(Actions.due_date)
-    print(user_profile[1])
     return render_template('dashboard.html',
                            incidents=results,
                            health=health,
@@ -775,8 +767,6 @@ def editAudit(id):
                                   Audits.user_id).filter_by(id=id). \
             join(Actions,
                  Audits.id == Actions.audit_id).first()
-        print(results[14])
-        print(session['user_id'])
 
         creator = int(results[14])
         ses_user = int(session['user_id'])
