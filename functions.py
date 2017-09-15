@@ -20,7 +20,10 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.WARNING)
 
 # create formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter('%(asctime)s - \
+                               %(name)s - \
+                               %(levelname)s - \
+                               %(message)s')
 
 # add formatter to ch
 ch.setFormatter(formatter)
@@ -30,9 +33,10 @@ logger.addHandler(ch)
 
 # Decorators
 
+
 def login_required(session):
     def tags_decorator(func):
-        @wraps(func) # this requires an import
+        @wraps(func)
         def wrapper(*args, **kwargs):
             logger.info('Checking if user in logged in.')
             if 'username' not in session:
@@ -47,7 +51,7 @@ def login_required(session):
 
 def owner_required(table, session):
     def tags_decorator(func):
-        @wraps(func) # this requires an import
+        @wraps(func)
         def wrapper(id):
             logger.info('Checking if user in logged in.')
             if 'username' not in session:
@@ -55,7 +59,10 @@ def owner_required(table, session):
                 return redirect('login')
             else:
                 user_profile = (session['username'], session['picture'])
-                logger.info('Imported user info: ' + session['username'] + ', ' + session['picture'])
+                logger.info('Imported user info: ' +
+                            session['username'] +
+                            ', ' +
+                            session['picture'])
                 # Connect to the database
                 con = connect()
                 Base.metadata.bind = con
@@ -64,15 +71,18 @@ def owner_required(table, session):
                 dbsession = DBSession()
                 logger.info('Connected to DB.')
                 if table == 'incidents':
-                    query = dbsession.query(Incidents).filter_by(case_num=id).first()
+                    query = dbsession.query(Incidents).\
+                        filter_by(case_num=id).first()
                     logger.info('Queried Incidents')
                 if table == 'audits':
-                    query = dbsession.query(Audits).filter_by(id=id).first()
+                    query = dbsession.query(Audits).\
+                        filter_by(id=id).first()
                     logger.info('Queried Audits')
                 if table == 'actions':
-                    query = dbsession.query(Actions).filter_by(id=id).first()
+                    query = dbsession.query(Actions).\
+                        filter_by(id=id).first()
                     logger.info('Queried Actions')
-                
+
                 creator = int(query.user_id)
                 ses_user = int(session['user_id'])
                 if creator != ses_user:
@@ -90,7 +100,7 @@ def owner_required(table, session):
 
 def check_if_report_exists(table, session):
     def tags_decorator(func):
-        @wraps(func) # this requires an import
+        @wraps(func)
         def wrapper(id):
             # Connect to the database
             con = connect()
@@ -100,13 +110,16 @@ def check_if_report_exists(table, session):
             dbsession = DBSession()
             logger.info('Connected to DB.')
             if table == 'incidents':
-                query = dbsession.query(Incidents).filter_by(case_num=id).first()
+                query = dbsession.query(Incidents).\
+                    filter_by(case_num=id).first()
                 logger.info('Queried Incidents')
             if table == 'audits':
-                query = dbsession.query(Audits).filter_by(id=id).first()
+                query = dbsession.query(Audits).\
+                    filter_by(id=id).first()
                 logger.info('Queried Audits')
             if table == 'actions':
-                query = dbsession.query(Actions).filter_by(id=id).first()
+                query = dbsession.query(Actions).\
+                    filter_by(id=id).first()
                 logger.info('Queried Actions')
             if query is None:
                 logger.info('No report exists.')

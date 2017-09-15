@@ -39,7 +39,10 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.WARNING)
 
 # create formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter('%(asctime)s - \
+                              %(name)s - \
+                              %(levelname)s - \
+                              %(message)s')
 
 # add formatter to ch
 ch.setFormatter(formatter)
@@ -48,8 +51,8 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 # Print python version for troubleshooting purposes; must be Pyton 3 or higher.
-#import sys
-#print(sys.version)
+# import sys
+# print(sys.version)
 
 CLIENT_ID = json.loads(open('client_secrets.json', 'r')
                        .read())['web']['client_id']
