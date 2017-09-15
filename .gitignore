@@ -2,3 +2,4 @@
 *.zip
 templates/old/*
 __pycache__/*
+test.py
