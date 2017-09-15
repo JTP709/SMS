@@ -24,7 +24,7 @@ def login_required(func):
 def owner_required(table):
     def tags_decorator(func):
         @wraps(func) # this requires an import
-        def wrapper(**kwargs):
+        def wrapper(*args, **kwargs):
             user_profile = (session['username'], session['picture'])
             # Connect to the database
             con = connect()
@@ -47,7 +47,7 @@ def owner_required(table):
                       session['username'])
                 return redirect('/incidents/')
             else:
-                 func(**kwargs)
+                 func(*args, **kwargs)
         return wrapper
     return tags_decorator
 
@@ -55,7 +55,7 @@ def owner_required(table):
 def check_if_report_exists(table):
     def tags_decorator(func):
         @wraps(func) # this requires an import
-        def wrapper(**kwargs):
+        def wrapper(*args, **kwargs):
             # Connect to the database
             con = connect()
             Base.metadata.bind = con
@@ -74,7 +74,7 @@ def check_if_report_exists(table):
                       session['username'])
                 return redirect('/dashboard/')
             else:
-                 func(**kwargs)
+                 func(*args, **kwargs)
         return wrapper
     return tags_decorator
 
