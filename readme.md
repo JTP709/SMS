@@ -2,14 +2,22 @@
 # Safety Management System Project for Udacity Full-Stack Nanodegree Program
 
 ### Author: Jonathan Prell
-### v1.0 - 9/9/2017
+### v1.1 - 9/15/2017
+_________________________________________________________________
+
+## Changelog:
+
+v1.1 - Added decorators to functions to check if:
+* User is logged in.
+* User is the author/owner of the item.
+* Item is created in the database.
 _________________________________________________________________
 
 ## About:
 
-The Simple Safety Manager accomplishes the requirements of the Item Catalogue project and more. I dec-id-ed to build this application in substitution of the original project to demonstrate my ability to build a corporate grade solution for a real world problem.
+The Simple Safety Manager accomplishes the requirements of the Item Catalogue project and more. I decided to build this application in substitution of the original project to demonstrate my ability to build a corporate grade solution for a real world problem.
 
-The application allows a user to capture inc-id-ent investigation details and compliance audit reports. The user may also track action items developed from the inc-id-ent cases or audit reports and tie them to those submissions or input an action item independantly.
+The application allows a user to capture incidents investigation details and compliance audit reports. The user may also track action items developed from the incidents cases or audit reports and tie them to those submissions or input an action item independantly.
 
 All of the data can be read by anybody, but a user must log in to submit new information. A user may only edit or delete information they created.
 
@@ -20,24 +28,24 @@ _________________________________________________________________
 
 ## How to Use:
 
-Any user may review the Inc-id-ents, Audits, or Action Items in the database.
+Any user may review the Incidents, Audits, or Action Items in the database.
 
 To submit a case or report, the user must login.
 
-Once the user is logged in, they may submit an Inc-id-ent, Audit, or Action Item. These options will be available on the s-id-ebar menu. All fields must be completed before the report can be submitted.
+Once the user is logged in, they may submit an incidents, Audit, or Action Item. These options will be available on the sidebar menu. All fields must be completed before the report can be submitted.
 
-Action Items are automatically submitted and attached to an Inc-id-ent Case or Audit. Indiv-id-ual Action Items related to safety may be submitted independantly. Once an Action Item has been completed, a logged in user may close the item.
+Action Items are automatically submitted and attached to an incidents Case or Audit. Individual Action Items related to safety may be submitted independantly. Once an Action Item has been completed, a logged in user may close the item.
 
-Users may only edit Inc-id-ents, Audits, or Action Items they have submitted themselves.
+Users may only edit Incidents, Audits, or Action Items they have submitted themselves.
 _________________________________________________________________
 
 ## API Endpoints:
 
 API endpoints are available to prov-id-e JSON formatted data from the database.
-* /inc-id-ents/json
-	* Prov-id-es all items in the inc-id-ents database.
-* /inc-id-ents/json/-id-
-	* Prov-id-es a specific item in the inc-id-ents database by -id- number.
+* /Incidents/json
+	* Prov-id-es all items in the Incidents database.
+* /Incidents/json/-id-
+	* Prov-id-es a specific item in the Incidents database by -id- number.
 	* Replace -id- with the case -id- number.
 * /audits/json
 	* Prov-id-es all items in the audits database.
@@ -107,7 +115,7 @@ _________________________________________________________________
 
 ## Free online images used:
 
-* [Inc-id-ent clip art](http://www.clker.com/clipart-warning-exclamation-triangle.html)
+* [incidents clip art](http://www.clker.com/clipart-warning-exclamation-triangle.html)
 * [Audit clip art](http://www.clipartpanda.com/clipart_images/downloads-2959318)
 * [Action Item clip art](https://www.1001freedownloads.com/free-clipart/checkbox-checked-3)
 * [User clip art](http://www.freeiconspng.com/img/909)
