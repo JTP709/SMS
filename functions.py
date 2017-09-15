@@ -8,73 +8,113 @@ from database_setup import Base, Users, Incidents, Audits, Actions, Manhours
 from sqlalchemy import create_engine
 from connect import connect
 from functools import wraps
+from flask import flash, redirect, url_for
+import logging
+
+# create logger
+logger = logging.getLogger('Functions')
+logger.setLevel(logging.WARNING)
+
+# create console handler and set level to debug
+ch = logging.StreamHandler()
+ch.setLevel(logging.WARNING)
+
+# create formatter
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+# add formatter to ch
+ch.setFormatter(formatter)
+
+# add ch to logger
+logger.addHandler(ch)
 
 # Decorators
 
-
-def login_required(func):
-    @wraps(func) # this requires an import
-    def wrapper():
-        if 'username' not in login_session:
-            return redirect('login')
-        else:
-            func()
-    return wrapper
-
-def owner_required(table):
+def login_required(session):
     def tags_decorator(func):
         @wraps(func) # this requires an import
         def wrapper(*args, **kwargs):
-            user_profile = (session['username'], session['picture'])
-            # Connect to the database
-            con = connect()
-            Base.metadata.bind = con
-            # Creates a session
-            DBSession = sessionmaker(bind=con)
-            dbsession = DBSession()
-            if table == 'incidents':
-                query = dbsession.query(Incidents).filter_by(case_num=id).first()
-            if table == 'audits':
-                query = dbsession.query(Audits).filter_by(id=id).first()
-            if table == 'actions':
-                query = dbsession.query(Actions).filter_by(id=id).first()
-            
-            creator = int(query.user_id)
-            ses_user = int(session['user_id'])
-            if 'username' not in session or creator != ses_user:
-                flash("Sorry, %s,"
-                      " you are not authorized to edit this report." %
-                      session['username'])
-                return redirect('/incidents/')
+            logger.info('Checking if user in logged in.')
+            if 'username' not in session:
+                logger.info('User is not logged in.')
+                return redirect('login')
             else:
-                 func(*args, **kwargs)
+                logger.info('User is logged in.')
+                return func(*args, **kwargs)
         return wrapper
     return tags_decorator
 
 
-def check_if_report_exists(table):
+def owner_required(table, session):
     def tags_decorator(func):
         @wraps(func) # this requires an import
-        def wrapper(*args, **kwargs):
+        def wrapper(id):
+            logger.info('Checking if user in logged in.')
+            if 'username' not in session:
+                logger.info('User is not logged in.')
+                return redirect('login')
+            else:
+                user_profile = (session['username'], session['picture'])
+                logger.info('Imported user info: ' + session['username'] + ', ' + session['picture'])
+                # Connect to the database
+                con = connect()
+                Base.metadata.bind = con
+                # Creates a session
+                DBSession = sessionmaker(bind=con)
+                dbsession = DBSession()
+                logger.info('Connected to DB.')
+                if table == 'incidents':
+                    query = dbsession.query(Incidents).filter_by(case_num=id).first()
+                    logger.info('Queried Incidents')
+                if table == 'audits':
+                    query = dbsession.query(Audits).filter_by(id=id).first()
+                    logger.info('Queried Audits')
+                if table == 'actions':
+                    query = dbsession.query(Actions).filter_by(id=id).first()
+                    logger.info('Queried Actions')
+                
+                creator = int(query.user_id)
+                ses_user = int(session['user_id'])
+                if creator != ses_user:
+                    logger.info('User is not the author of the report.')
+                    flash("Sorry, %s,"
+                          " you are not authorized to edit this report." %
+                          session['username'])
+                    return redirect('/incidents/')
+                else:
+                    logger.info('User is the verified author of the report.')
+                    return func(id)
+        return wrapper
+    return tags_decorator
+
+
+def check_if_report_exists(table, session):
+    def tags_decorator(func):
+        @wraps(func) # this requires an import
+        def wrapper(id):
             # Connect to the database
             con = connect()
             Base.metadata.bind = con
             # Creates a session
             DBSession = sessionmaker(bind=con)
             dbsession = DBSession()
+            logger.info('Connected to DB.')
             if table == 'incidents':
                 query = dbsession.query(Incidents).filter_by(case_num=id).first()
+                logger.info('Queried Incidents')
             if table == 'audits':
                 query = dbsession.query(Audits).filter_by(id=id).first()
+                logger.info('Queried Audits')
             if table == 'actions':
                 query = dbsession.query(Actions).filter_by(id=id).first()
+                logger.info('Queried Actions')
             if query is None:
-                flash("Sorry, %s,"
-                      " this report does not exists" %
-                      session['username'])
+                logger.info('No report exists.')
+                flash("Sorry, this report does not exists")
                 return redirect('/dashboard/')
             else:
-                 func(*args, **kwargs)
+                logger.info('Report exists in the DB.')
+                return func(id)
         return wrapper
     return tags_decorator
 
@@ -176,7 +216,7 @@ def getWeather():
     weather_icon = results['list'][0]['weather'][0]['icon']
 
     weather_data = (weather_main, weather_desc, weather_temp, weather_icon)
-    print("Weather API Updated")
+    logger.info('Weather Data Updated')
     return weather_data
 
 

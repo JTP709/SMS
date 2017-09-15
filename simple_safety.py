@@ -28,6 +28,24 @@ import httplib2
 import json
 import requests
 import datetime
+import logging
+
+# create logger
+logger = logging.getLogger('Main')
+logger.setLevel(logging.WARNING)
+
+# create console handler and set level to debug
+ch = logging.StreamHandler()
+ch.setLevel(logging.WARNING)
+
+# create formatter
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+# add formatter to ch
+ch.setFormatter(formatter)
+
+# add ch to logger
+logger.addHandler(ch)
 
 # Print python version for troubleshooting purposes; must be Pyton 3 or higher.
 #import sys
@@ -171,7 +189,7 @@ def gdisconnect():
 
 
 @app.route('/profile/', methods=['GET', 'POST'])
-@login_required
+@login_required(session)
 def profile():
     """loads the user profile page"""
     if request.method == 'POST':
@@ -319,12 +337,12 @@ def incidents():
     user_profile = None
     if 'username' in session:
         user_profile = (session['username'], session['picture'])
-        # Connect to the database
-        con = connect()
-        Base.metadata.bind = con
-        # Creates a session
-        DBSession = sessionmaker(bind=con)
-        dbsession = DBSession()
+    # Connect to the database
+    con = connect()
+    Base.metadata.bind = con
+    # Creates a session
+    DBSession = sessionmaker(bind=con)
+    dbsession = DBSession()
 
     results = dbsession.query(Incidents.case_num,
                               func.to_char(Incidents.date_time,
@@ -351,7 +369,7 @@ def incidents():
 
 
 @app.route('/incidents/new/', methods=['GET', 'POST'])
-@login_required
+@login_required(session)
 def newIncident():
     """Loads the page to submit a new incident report"""
     if request.method == 'POST':
@@ -394,9 +412,8 @@ def newIncident():
 
 
 @app.route('/incidents/edit/<int:id>/', methods=['GET', 'POST'])
-@login_required
-@owner_required('incidents')
-@check_if_report_exists('incidents')
+@check_if_report_exists('incidents', session)
+@owner_required('incidents', session)
 def editIncident(id):
     """Page to edit an existing incident report"""
     if request.method == 'POST':
@@ -486,7 +503,6 @@ def editIncident(id):
                                                'FMMonth FMDD, YYYY')). \
             filter_by(case_id=id).first()
 
-        user_profile = (session['username'], session['picture'])
         return render_template('incidents_edit.html',
                                incidents=incidents,
                                actions=actions,
@@ -494,9 +510,8 @@ def editIncident(id):
 
 
 @app.route('/incidents/delete/<int:id>/', methods=['GET', 'POST'])
-@login_required
-@owner_required('incidents')
-@check_if_report_exists('incidents')
+@check_if_report_exists('incidents', session)
+@owner_required('incidents', session)
 def deleteIncident(id):
     """Page to delete an existing incident report"""
     if request.method == 'POST':
@@ -514,6 +529,7 @@ def deleteIncident(id):
         dbsession.delete(incident)
         dbsession.commit()
 
+        user_profile = (session['username'], session['picture'])
         return redirect(url_for('incidents'))
     else:
         return render_template('incidents_delete.html', id=id)
@@ -613,7 +629,7 @@ def audits():
 
 
 @app.route('/audits/new/', methods=['GET', 'POST'])
-@login_required
+@login_required(session)
 def newAudit():
     """Page to submit a new audit"""
     if request.method == 'POST':
@@ -678,7 +694,8 @@ def newAudit():
 
 
 @app.route('/audits/edit/<int:id>/', methods=['GET', 'POST'])
-@login_required
+@check_if_report_exists('incidents', session)
+@owner_required('incidents', session)
 def editAudit(id):
     """Page to edit an audit"""
     if request.method == 'POST':
@@ -771,7 +788,8 @@ def editAudit(id):
 
 
 @app.route('/audits/delete/<int:id>/', methods=['GET', 'POST'])
-@login_required
+@check_if_report_exists('incidents', session)
+@owner_required('incidents', session)
 def deleteAudit(id):
     """Page to delete an existing incident report"""
     if request.method == 'POST':
@@ -835,7 +853,7 @@ def actions():
 
 
 @app.route('/actions/new/', methods=['GET', 'POST'])
-@login_required
+@login_required(session)
 def newActionItem():
     """Page to submit a new action item"""
     if request.method == 'POST':
@@ -864,7 +882,8 @@ def newActionItem():
 
 
 @app.route('/actions/edit/<int:id>/', methods=['GET', 'POST'])
-@login_required
+@check_if_report_exists('incidents', session)
+@owner_required('incidents', session)
 def editActionItem(id):
     """Page to edit existing action item"""
     if request.method == 'POST':
@@ -934,7 +953,8 @@ def editActionItem(id):
 
 
 @app.route('/actions/delete/<int:id>/', methods=['GET', 'POST'])
-@login_required
+@check_if_report_exists('incidents', session)
+@owner_required('incidents', session)
 def deleteActionItem(id):
     """Page to delete action item"""
     if request.method == 'POST':
@@ -956,7 +976,7 @@ def deleteActionItem(id):
 
 
 @app.route('/actions/close/<int:id>/', methods=['GET', 'POST'])
-@login_required
+@login_required(session)
 def closeActionItem(id):
     """Page to close action items"""
     if request.method == 'POST':
